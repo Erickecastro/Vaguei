@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Vaguei.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ee7f15bcd58f3ebd214964f8869cc695c0d045a8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+802c8d494d610187cf80f5d74d1565bd1d4526d9")]
 [assembly: System.Reflection.AssemblyProductAttribute("Vaguei.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Vaguei.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

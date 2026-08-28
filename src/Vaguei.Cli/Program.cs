@@ -1,5 +1,6 @@
 ﻿using Vaguei.Application.Interfaces;
 using Vaguei.ResumeParser.Parsers;
+using Vaguei.Application.Services;
 
 if (args.Length == 0)
 {
@@ -32,6 +33,10 @@ await using var fileStream = File.OpenRead(filePath);
 
 var text = await parser.ExtractTextAsync(fileStream);
 
+var analyzer = new ResumeAnalyzer();
+
+var profile = analyzer.Analyze(text);
+
 Console.WriteLine("==================================");
 Console.WriteLine("           VAGUEI");
 Console.WriteLine("==================================");
@@ -44,3 +49,20 @@ Console.WriteLine();
 Console.WriteLine("Conteúdo extraído:");
 Console.WriteLine("----------------------------------");
 Console.WriteLine(text);
+
+Console.WriteLine();
+Console.WriteLine("==================================");
+Console.WriteLine("Perfil identificado");
+Console.WriteLine("==================================");
+Console.WriteLine();
+
+Console.WriteLine($"Nome: {profile.Name}");
+Console.WriteLine($"Cargo: {profile.Summary}");
+
+Console.WriteLine();
+Console.WriteLine("Tecnologias identificadas:");
+
+foreach (var skill in profile.Skills.OrderBy(skill => skill))
+{
+    Console.WriteLine($"- {skill}");
+}
