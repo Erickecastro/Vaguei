@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Vaguei.Cli")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ff6b8798851075bb7f9291bb74724e676a45ae8c")]
 [assembly: System.Reflection.AssemblyProductAttribute("Vaguei.Cli")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Vaguei.Cli")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

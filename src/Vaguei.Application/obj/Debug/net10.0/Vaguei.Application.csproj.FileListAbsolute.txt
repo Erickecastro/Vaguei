@@ -13,3 +13,4 @@
 /home/ericke/Vaguei/src/Vaguei.Application/obj/Debug/net10.0/refint/Vaguei.Application.dll
 /home/ericke/Vaguei/src/Vaguei.Application/obj/Debug/net10.0/Vaguei.Application.pdb
 /home/ericke/Vaguei/src/Vaguei.Application/obj/Debug/net10.0/ref/Vaguei.Application.dll
+/home/ericke/Vaguei/src/Vaguei.Application/obj/Debug/net10.0/Vaguei.Application.sourcelink.json

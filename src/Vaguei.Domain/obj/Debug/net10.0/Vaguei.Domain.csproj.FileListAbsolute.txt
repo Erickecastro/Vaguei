@@ -9,3 +9,4 @@
 /home/ericke/Vaguei/src/Vaguei.Domain/obj/Debug/net10.0/refint/Vaguei.Domain.dll
 /home/ericke/Vaguei/src/Vaguei.Domain/obj/Debug/net10.0/Vaguei.Domain.pdb
 /home/ericke/Vaguei/src/Vaguei.Domain/obj/Debug/net10.0/ref/Vaguei.Domain.dll
+/home/ericke/Vaguei/src/Vaguei.Domain/obj/Debug/net10.0/Vaguei.Domain.sourcelink.json

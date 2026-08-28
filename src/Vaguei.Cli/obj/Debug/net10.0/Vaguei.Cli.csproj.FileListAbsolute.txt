@@ -24,3 +24,4 @@
 /home/ericke/Vaguei/src/Vaguei.Cli/obj/Debug/net10.0/Vaguei.Cli.pdb
 /home/ericke/Vaguei/src/Vaguei.Cli/obj/Debug/net10.0/Vaguei.Cli.genruntimeconfig.cache
 /home/ericke/Vaguei/src/Vaguei.Cli/obj/Debug/net10.0/ref/Vaguei.Cli.dll
+/home/ericke/Vaguei/src/Vaguei.Cli/obj/Debug/net10.0/Vaguei.Cli.sourcelink.json

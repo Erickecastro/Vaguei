@@ -93,3 +93,4 @@
 /home/ericke/Vaguei/tests/Vaguei.Tests/obj/Debug/net10.0/Vaguei.Tests.pdb
 /home/ericke/Vaguei/tests/Vaguei.Tests/obj/Debug/net10.0/Vaguei.Tests.genruntimeconfig.cache
 /home/ericke/Vaguei/tests/Vaguei.Tests/obj/Debug/net10.0/ref/Vaguei.Tests.dll
+/home/ericke/Vaguei/tests/Vaguei.Tests/obj/Debug/net10.0/Vaguei.Tests.sourcelink.json

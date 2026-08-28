@@ -15,3 +15,4 @@
 /home/ericke/Vaguei/src/Vaguei.Collectors/obj/Debug/net10.0/refint/Vaguei.Collectors.dll
 /home/ericke/Vaguei/src/Vaguei.Collectors/obj/Debug/net10.0/Vaguei.Collectors.pdb
 /home/ericke/Vaguei/src/Vaguei.Collectors/obj/Debug/net10.0/ref/Vaguei.Collectors.dll
+/home/ericke/Vaguei/src/Vaguei.Collectors/obj/Debug/net10.0/Vaguei.Collectors.sourcelink.json
