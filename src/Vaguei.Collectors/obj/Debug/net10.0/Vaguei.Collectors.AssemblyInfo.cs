@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Vaguei.Collectors")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+802c8d494d610187cf80f5d74d1565bd1d4526d9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1c833d29281d8b3d85b29d6c4e6e633f67253b70")]
 [assembly: System.Reflection.AssemblyProductAttribute("Vaguei.Collectors")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Vaguei.Collectors")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

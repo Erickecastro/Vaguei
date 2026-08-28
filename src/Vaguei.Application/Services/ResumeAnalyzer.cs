@@ -1,51 +1,11 @@
+using Vaguei.Application.Catalogs;
 using Vaguei.Domain.Entities;
+using Vaguei.Domain.Models;
 
 namespace Vaguei.Application.Services;
 
 public sealed class ResumeAnalyzer
 {
-    private static readonly string[] KnownSkills =
-    [
-        "C#",
-        ".NET",
-        "ASP.NET Core",
-        ".NET MAUI",
-        "Entity Framework Core",
-        "PostgreSQL",
-        "SQLite",
-        "SQL",
-        "JavaScript",
-        "Node.js",
-        "Express",
-        "React",
-        "Vite",
-        "HTML",
-        "CSS",
-        "Tailwind",
-        "Git",
-        "GitHub",
-        "Docker",
-        "Swagger",
-        "OpenAPI",
-        "JWT",
-        "REST",
-        "MVVM",
-        "SOLID",
-        "Clean Architecture",
-        "Dependency Injection",
-        "Repository Pattern",
-        "CommunityToolkit.Mvvm",
-        "Refit",
-        "FluentValidation",
-        "Serilog",
-        "xUnit",
-        "Moq",
-        "Azure",
-        "Linux",
-        "Windows",
-        "Android"
-    ];
-
     public CandidateProfile Analyze(string resumeText)
     {
         if (string.IsNullOrWhiteSpace(resumeText))
@@ -118,14 +78,29 @@ public sealed class ResumeAnalyzer
 
     private static IEnumerable<string> ExtractSkills(string resumeText)
     {
-        foreach (var skill in KnownSkills)
+        foreach (var skill in SkillCatalog.Skills)
         {
-            if (resumeText.Contains(
-                    skill,
-                    StringComparison.OrdinalIgnoreCase))
+            if (ContainsSkill(resumeText, skill))
             {
-                yield return skill;
+                yield return skill.Name;
             }
         }
+    }
+
+    private static bool ContainsSkill(
+        string resumeText,
+        SkillDefinition skill)
+    {
+        if (resumeText.Contains(
+                skill.Name,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return skill.Aliases.Any(alias =>
+            resumeText.Contains(
+                alias,
+                StringComparison.OrdinalIgnoreCase));
     }
 }

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Vaguei.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ee7f15bcd58f3ebd214964f8869cc695c0d045a8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1c833d29281d8b3d85b29d6c4e6e633f67253b70")]
 [assembly: System.Reflection.AssemblyProductAttribute("Vaguei.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Vaguei.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
