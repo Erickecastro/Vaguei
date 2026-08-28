@@ -6,6 +6,13 @@ namespace Vaguei.Application.Services;
 
 public sealed class ResumeAnalyzer
 {
+    private readonly SkillMatcher _skillMatcher;
+
+    public ResumeAnalyzer()
+    {
+        _skillMatcher = new SkillMatcher();
+    }
+
     public CandidateProfile Analyze(string resumeText)
     {
         if (string.IsNullOrWhiteSpace(resumeText))
@@ -76,31 +83,14 @@ public sealed class ResumeAnalyzer
         return string.Empty;
     }
 
-    private static IEnumerable<string> ExtractSkills(string resumeText)
+    private IEnumerable<string> ExtractSkills(string resumeText)
     {
         foreach (var skill in SkillCatalog.Skills)
         {
-            if (ContainsSkill(resumeText, skill))
+            if (_skillMatcher.ContainsSkill(resumeText, skill))
             {
                 yield return skill.Name;
             }
         }
-    }
-
-    private static bool ContainsSkill(
-        string resumeText,
-        SkillDefinition skill)
-    {
-        if (resumeText.Contains(
-                skill.Name,
-                StringComparison.OrdinalIgnoreCase))
-        {
-            return true;
-        }
-
-        return skill.Aliases.Any(alias =>
-            resumeText.Contains(
-                alias,
-                StringComparison.OrdinalIgnoreCase));
     }
 }
