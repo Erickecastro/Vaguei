@@ -1,0 +1,15 @@
+/home/ericke/Vaguei/src/Vaguei.Application/bin/Debug/net10.0/Vaguei.Application.deps.json
+/home/ericke/Vaguei/src/Vaguei.Application/bin/Debug/net10.0/Vaguei.Application.dll
+/home/ericke/Vaguei/src/Vaguei.Application/bin/Debug/net10.0/Vaguei.Application.pdb
+/home/ericke/Vaguei/src/Vaguei.Application/bin/Debug/net10.0/Vaguei.Domain.dll
+/home/ericke/Vaguei/src/Vaguei.Application/bin/Debug/net10.0/Vaguei.Domain.pdb
+/home/ericke/Vaguei/src/Vaguei.Application/obj/Debug/net10.0/Vaguei.Application.csproj.AssemblyReference.cache
+/home/ericke/Vaguei/src/Vaguei.Application/obj/Debug/net10.0/Vaguei.Application.GeneratedMSBuildEditorConfig.editorconfig
+/home/ericke/Vaguei/src/Vaguei.Application/obj/Debug/net10.0/Vaguei.Application.AssemblyInfoInputs.cache
+/home/ericke/Vaguei/src/Vaguei.Application/obj/Debug/net10.0/Vaguei.Application.AssemblyInfo.cs
+/home/ericke/Vaguei/src/Vaguei.Application/obj/Debug/net10.0/Vaguei.Application.csproj.CoreCompileInputs.cache
+/home/ericke/Vaguei/src/Vaguei.Application/obj/Debug/net10.0/Vaguei.A.C0A7A96C.Up2Date
+/home/ericke/Vaguei/src/Vaguei.Application/obj/Debug/net10.0/Vaguei.Application.dll
+/home/ericke/Vaguei/src/Vaguei.Application/obj/Debug/net10.0/refint/Vaguei.Application.dll
+/home/ericke/Vaguei/src/Vaguei.Application/obj/Debug/net10.0/Vaguei.Application.pdb
+/home/ericke/Vaguei/src/Vaguei.Application/obj/Debug/net10.0/ref/Vaguei.Application.dll

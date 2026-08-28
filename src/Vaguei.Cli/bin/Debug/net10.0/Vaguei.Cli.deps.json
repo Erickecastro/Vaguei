@@ -1,0 +1,110 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "Vaguei.Cli/1.0.0": {
+        "dependencies": {
+          "Vaguei.Application": "1.0.0",
+          "Vaguei.Collectors": "1.0.0",
+          "Vaguei.Domain": "1.0.0",
+          "Vaguei.Infrastructure": "1.0.0",
+          "Vaguei.ResumeParser": "1.0.0"
+        },
+        "runtime": {
+          "Vaguei.Cli.dll": {}
+        }
+      },
+      "Vaguei.Application/1.0.0": {
+        "dependencies": {
+          "Vaguei.Domain": "1.0.0"
+        },
+        "runtime": {
+          "Vaguei.Application.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Vaguei.Collectors/1.0.0": {
+        "dependencies": {
+          "Vaguei.Application": "1.0.0",
+          "Vaguei.Domain": "1.0.0"
+        },
+        "runtime": {
+          "Vaguei.Collectors.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Vaguei.Domain/1.0.0": {
+        "runtime": {
+          "Vaguei.Domain.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Vaguei.Infrastructure/1.0.0": {
+        "dependencies": {
+          "Vaguei.Application": "1.0.0",
+          "Vaguei.Domain": "1.0.0"
+        },
+        "runtime": {
+          "Vaguei.Infrastructure.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Vaguei.ResumeParser/1.0.0": {
+        "dependencies": {
+          "Vaguei.Application": "1.0.0",
+          "Vaguei.Domain": "1.0.0"
+        },
+        "runtime": {
+          "Vaguei.ResumeParser.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Vaguei.Cli/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Vaguei.Application/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Vaguei.Collectors/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Vaguei.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Vaguei.Infrastructure/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Vaguei.ResumeParser/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
