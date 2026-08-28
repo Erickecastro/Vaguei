@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using System.Text;
 using System.Xml.Linq;
 using Vaguei.Application.Interfaces;
 
@@ -6,6 +7,9 @@ namespace Vaguei.ResumeParser.Parsers;
 
 public sealed class OdtResumeParser : IResumeParser
 {
+    private static readonly XNamespace TextNamespace =
+        "urn:oasis:names:tc:opendocument:xmlns:text:1.0";
+
     public bool CanParse(string extension)
     {
         return string.Equals(
@@ -35,22 +39,102 @@ public sealed class OdtResumeParser : IResumeParser
 
         var document = await XDocument.LoadAsync(
             contentStream,
-            LoadOptions.None,
+            LoadOptions.PreserveWhitespace,
             cancellationToken);
 
-        XNamespace textNamespace =
-            "urn:oasis:names:tc:opendocument:xmlns:text:1.0";
-
-        var paragraphs = document
+        var bodyText = document
             .Descendants()
-            .Where(element =>
-                element.Name == textNamespace + "p" ||
-                element.Name == textNamespace + "h")
-            .Select(element => element.Value.Trim())
-            .Where(text => !string.IsNullOrWhiteSpace(text));
+            .FirstOrDefault(element =>
+                element.Name.LocalName == "text");
+
+        if (bodyText is null)
+        {
+            throw new InvalidDataException(
+                "Não foi possível localizar o conteúdo textual do arquivo ODT.");
+        }
+
+        var builder = new StringBuilder();
+
+        foreach (var node in bodyText.Nodes())
+        {
+            AppendNodeText(node, builder);
+        }
+
+        return NormalizeText(builder.ToString());
+    }
+
+    private static void AppendNodeText(
+        XNode node,
+        StringBuilder builder)
+    {
+        switch (node)
+        {
+            case XText textNode:
+                builder.Append(textNode.Value);
+                break;
+
+            case XElement element:
+                AppendElement(element, builder);
+                break;
+        }
+    }
+
+    private static void AppendElement(
+        XElement element,
+        StringBuilder builder)
+    {
+        if (element.Name == TextNamespace + "tab")
+        {
+            builder.Append('\t');
+            return;
+        }
+
+        if (element.Name == TextNamespace + "line-break")
+        {
+            builder.AppendLine();
+            return;
+        }
+
+        if (element.Name == TextNamespace + "s")
+        {
+            var countAttribute = element.Attribute(TextNamespace + "c");
+
+            var count = 1;
+
+            if (countAttribute is not null &&
+                int.TryParse(countAttribute.Value, out var parsedCount))
+            {
+                count = parsedCount;
+            }
+
+            builder.Append(' ', count);
+            return;
+        }
+
+        foreach (var node in element.Nodes())
+        {
+            AppendNodeText(node, builder);
+        }
+
+        if (element.Name == TextNamespace + "p" ||
+            element.Name == TextNamespace + "h" ||
+            element.Name == TextNamespace + "list-item")
+        {
+            builder.AppendLine();
+        }
+    }
+
+    private static string NormalizeText(string text)
+    {
+        var lines = text
+            .Replace("\r\n", "\n")
+            .Replace('\r', '\n')
+            .Split('\n')
+            .Select(line => line.Trim())
+            .Where(line => !string.IsNullOrWhiteSpace(line));
 
         return string.Join(
             Environment.NewLine,
-            paragraphs);
+            lines);
     }
 }
