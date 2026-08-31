@@ -96,7 +96,7 @@ Compatible Jobs
 # Supported Resume Formats
 
 * [x] ODT
-* [ ] DOCX
+* [x] DOCX
 * [ ] PDF
 * [ ] TXT
 
