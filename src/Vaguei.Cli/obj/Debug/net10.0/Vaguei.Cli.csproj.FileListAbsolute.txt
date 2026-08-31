@@ -52,3 +52,10 @@ C:\Users\erickecastro\Desktop\Estudos\Vaguei\src\Vaguei.Cli\obj\Debug\net10.0\re
 C:\Users\erickecastro\Desktop\Estudos\Vaguei\src\Vaguei.Cli\obj\Debug\net10.0\Vaguei.Cli.pdb
 C:\Users\erickecastro\Desktop\Estudos\Vaguei\src\Vaguei.Cli\obj\Debug\net10.0\Vaguei.Cli.genruntimeconfig.cache
 C:\Users\erickecastro\Desktop\Estudos\Vaguei\src\Vaguei.Cli\obj\Debug\net10.0\ref\Vaguei.Cli.dll
+C:\Users\erickecastro\Desktop\Estudos\Vaguei\src\Vaguei.Cli\bin\Debug\net10.0\UglyToad.PdfPig.Core.dll
+C:\Users\erickecastro\Desktop\Estudos\Vaguei\src\Vaguei.Cli\bin\Debug\net10.0\UglyToad.PdfPig.DocumentLayoutAnalysis.dll
+C:\Users\erickecastro\Desktop\Estudos\Vaguei\src\Vaguei.Cli\bin\Debug\net10.0\UglyToad.PdfPig.Fonts.dll
+C:\Users\erickecastro\Desktop\Estudos\Vaguei\src\Vaguei.Cli\bin\Debug\net10.0\UglyToad.PdfPig.Package.dll
+C:\Users\erickecastro\Desktop\Estudos\Vaguei\src\Vaguei.Cli\bin\Debug\net10.0\UglyToad.PdfPig.Tokenization.dll
+C:\Users\erickecastro\Desktop\Estudos\Vaguei\src\Vaguei.Cli\bin\Debug\net10.0\UglyToad.PdfPig.Tokens.dll
+C:\Users\erickecastro\Desktop\Estudos\Vaguei\src\Vaguei.Cli\bin\Debug\net10.0\UglyToad.PdfPig.dll

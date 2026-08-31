@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "yWV5HRARFmQ=",
+  "dgSpecHash": "SfDDTp3v5d0=",
   "success": true,
   "projectFilePath": "C:\\Users\\erickecastro\\Desktop\\Estudos\\Vaguei\\src\\Vaguei.Cli\\Vaguei.Cli.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\erickecastro\\.nuget\\packages\\pdfpig\\0.1.16\\pdfpig.0.1.16.nupkg.sha512"
+  ],
   "logs": []
 }

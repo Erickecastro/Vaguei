@@ -13,6 +13,7 @@ if (args.Length == 0)
     Console.WriteLine("Formatos suportados:");
     Console.WriteLine("- ODT");
     Console.WriteLine("- DOCX");
+    Console.WriteLine("- PDF");
     return;
 }
 
@@ -30,7 +31,8 @@ var extension = Path.GetExtension(filePath);
 var parserService = new ResumeParserService(
 [
     new OdtResumeParser(),
-    new DocxResumeParser()
+    new DocxResumeParser(),
+    new PdfResumeParser()
 ]);
 
 try
