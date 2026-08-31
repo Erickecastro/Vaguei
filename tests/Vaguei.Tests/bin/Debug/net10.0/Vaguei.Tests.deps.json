@@ -9,6 +9,7 @@
       "Vaguei.Tests/1.0.0": {
         "dependencies": {
           "Microsoft.NET.Test.Sdk": "17.14.1",
+          "Vaguei.Application": "1.0.0",
           "xunit": "2.9.3"
         },
         "runtime": {
@@ -329,6 +330,25 @@
             "fileVersion": "2.9.3.0"
           }
         }
+      },
+      "Vaguei.Application/1.0.0": {
+        "dependencies": {
+          "Vaguei.Domain": "1.0.0"
+        },
+        "runtime": {
+          "Vaguei.Application.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Vaguei.Domain/1.0.0": {
+        "runtime": {
+          "Vaguei.Domain.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
       }
     }
   },
@@ -414,6 +434,16 @@
       "sha512": "sha512-yMb6vMESlSrE3Wfj7V6cjQ3S4TXdXpRqYeNEI3zsX31uTsGMJjEw6oD5F5u1cHnMptjhEECnmZSsPxB6ChZHDQ==",
       "path": "xunit.extensibility.execution/2.9.3",
       "hashPath": "xunit.extensibility.execution.2.9.3.nupkg.sha512"
+    },
+    "Vaguei.Application/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Vaguei.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }

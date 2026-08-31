@@ -191,3 +191,9 @@ C:\Users\erickecastro\Desktop\Estudos\Vaguei\tests\Vaguei.Tests\obj\Debug\net10.
 C:\Users\erickecastro\Desktop\Estudos\Vaguei\tests\Vaguei.Tests\obj\Debug\net10.0\Vaguei.Tests.pdb
 C:\Users\erickecastro\Desktop\Estudos\Vaguei\tests\Vaguei.Tests\obj\Debug\net10.0\Vaguei.Tests.genruntimeconfig.cache
 C:\Users\erickecastro\Desktop\Estudos\Vaguei\tests\Vaguei.Tests\obj\Debug\net10.0\ref\Vaguei.Tests.dll
+C:\Users\erickecastro\Desktop\Estudos\Vaguei\tests\Vaguei.Tests\bin\Debug\net10.0\.msCoverageSourceRootsMapping_Vaguei.Tests
+C:\Users\erickecastro\Desktop\Estudos\Vaguei\tests\Vaguei.Tests\bin\Debug\net10.0\CoverletSourceRootsMapping_Vaguei.Tests
+C:\Users\erickecastro\Desktop\Estudos\Vaguei\tests\Vaguei.Tests\bin\Debug\net10.0\Vaguei.Application.dll
+C:\Users\erickecastro\Desktop\Estudos\Vaguei\tests\Vaguei.Tests\bin\Debug\net10.0\Vaguei.Domain.dll
+C:\Users\erickecastro\Desktop\Estudos\Vaguei\tests\Vaguei.Tests\bin\Debug\net10.0\Vaguei.Application.pdb
+C:\Users\erickecastro\Desktop\Estudos\Vaguei\tests\Vaguei.Tests\bin\Debug\net10.0\Vaguei.Domain.pdb

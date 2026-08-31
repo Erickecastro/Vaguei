@@ -393,6 +393,29 @@
         "build": {
           "build/net8.0/xunit.runner.visualstudio.props": {}
         }
+      },
+      "Vaguei.Application/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "dependencies": {
+          "Vaguei.Domain": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Vaguei.Application.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Vaguei.Application.dll": {}
+        }
+      },
+      "Vaguei.Domain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "compile": {
+          "bin/placeholder/Vaguei.Domain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Vaguei.Domain.dll": {}
+        }
       }
     }
   },
@@ -903,11 +926,22 @@
         "xunit.runner.visualstudio.3.1.4.nupkg.sha512",
         "xunit.runner.visualstudio.nuspec"
       ]
+    },
+    "Vaguei.Application/1.0.0": {
+      "type": "project",
+      "path": "../../src/Vaguei.Application/Vaguei.Application.csproj",
+      "msbuildProject": "../../src/Vaguei.Application/Vaguei.Application.csproj"
+    },
+    "Vaguei.Domain/1.0.0": {
+      "type": "project",
+      "path": "../../src/Vaguei.Domain/Vaguei.Domain.csproj",
+      "msbuildProject": "../../src/Vaguei.Domain/Vaguei.Domain.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net10.0": [
       "Microsoft.NET.Test.Sdk >= 17.14.1",
+      "Vaguei.Application >= 1.0.0",
       "coverlet.collector >= 6.0.4",
       "xunit >= 2.9.3",
       "xunit.runner.visualstudio >= 3.1.4"
@@ -939,7 +973,11 @@
         "net10.0": {
           "framework": "net10.0",
           "targetAlias": "net10.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\erickecastro\\Desktop\\Estudos\\Vaguei\\src\\Vaguei.Application\\Vaguei.Application.csproj": {
+              "projectPath": "C:\\Users\\erickecastro\\Desktop\\Estudos\\Vaguei\\src\\Vaguei.Application\\Vaguei.Application.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
