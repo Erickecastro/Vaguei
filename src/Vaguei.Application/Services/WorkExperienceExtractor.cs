@@ -214,9 +214,15 @@ public sealed class WorkExperienceExtractor
 
     private static string CleanDescriptionLine(string line)
     {
-        return line
+        var cleanedLine = line
             .Trim()
             .TrimStart('·', '•')
             .Trim();
+
+        cleanedLine = cleanedLine
+            .Replace(" · ", Environment.NewLine)
+            .Replace(" • ", Environment.NewLine);
+
+        return cleanedLine;
     }
 }
