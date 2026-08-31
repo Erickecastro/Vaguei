@@ -43,13 +43,6 @@ The project is also a practical environment for exploring software architecture,
 
 * xUnit
 
-### Development
-
-* JetBrains Rider
-* Visual Studio
-* Git
-* GitHub
-
 ### Planned
 
 * DOCX parsing
