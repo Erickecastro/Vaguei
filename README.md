@@ -97,8 +97,8 @@ Compatible Jobs
 
 * [x] ODT
 * [x] DOCX
-* [ ] PDF
-* [ ] TXT
+* [x] PDF
+* [x] TXT
 
 # Supported Platforms
 

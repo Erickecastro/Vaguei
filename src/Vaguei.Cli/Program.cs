@@ -14,6 +14,7 @@ if (args.Length == 0)
     Console.WriteLine("- ODT");
     Console.WriteLine("- DOCX");
     Console.WriteLine("- PDF");
+    Console.WriteLine("- TXT");
     return;
 }
 
@@ -32,7 +33,8 @@ var parserService = new ResumeParserService(
 [
     new OdtResumeParser(),
     new DocxResumeParser(),
-    new PdfResumeParser()
+    new PdfResumeParser(),
+    new TextResumeParser()
 ]);
 
 try
