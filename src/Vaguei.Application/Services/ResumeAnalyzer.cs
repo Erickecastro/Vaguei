@@ -7,11 +7,13 @@ public sealed class ResumeAnalyzer
 {
     private readonly SkillMatcher _skillMatcher;
     private readonly WorkExperienceExtractor _experienceExtractor;
+    private readonly ProfessionalSummaryExtractor _summaryExtractor;
 
     public ResumeAnalyzer()
     {
         _skillMatcher = new SkillMatcher();
         _experienceExtractor = new WorkExperienceExtractor();
+        _summaryExtractor = new ProfessionalSummaryExtractor();
     }
 
     public CandidateProfile Analyze(string resumeText)
@@ -33,6 +35,7 @@ public sealed class ResumeAnalyzer
 
         profile.Name = ExtractName(lines);
         profile.ProfessionalTitle = ExtractProfessionalTitle(lines);
+        profile.Summary = _summaryExtractor.Extract(resumeText);
 
         foreach (var skill in ExtractSkills(resumeText))
         {
@@ -53,7 +56,9 @@ public sealed class ResumeAnalyzer
         {
             if (line.Contains('@') ||
                 line.StartsWith('+') ||
-                line.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                line.StartsWith(
+                    "http",
+                    StringComparison.OrdinalIgnoreCase))
             {
                 continue;
             }
@@ -78,7 +83,10 @@ public sealed class ResumeAnalyzer
             return string.Empty;
         }
 
-        var nameIndex = Array.IndexOf(lines, name);
+        var nameIndex =
+            Array.IndexOf(
+                lines,
+                name);
 
         if (nameIndex >= 0 &&
             nameIndex + 1 < lines.Length)
@@ -89,11 +97,14 @@ public sealed class ResumeAnalyzer
         return string.Empty;
     }
 
-    private IEnumerable<string> ExtractSkills(string resumeText)
+    private IEnumerable<string> ExtractSkills(
+        string resumeText)
     {
         foreach (var skill in SkillCatalog.Skills)
         {
-            if (_skillMatcher.ContainsSkill(resumeText, skill))
+            if (_skillMatcher.ContainsSkill(
+                    resumeText,
+                    skill))
             {
                 yield return skill.Name;
             }
