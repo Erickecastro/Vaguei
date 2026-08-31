@@ -1,7 +1,5 @@
 # Vaguei
 
----
-
 > A smarter way to find job opportunities that match your profile.
 
 ![.NET](https://img.shields.io/badge/.NET-10-512BD4?style=for-the-badge\&logo=dotnet)
@@ -12,8 +10,6 @@
 
 # About
 
----
-
 **Vaguei** is a personal project designed to make the job search process in the technology industry simpler, smarter, and more relevant.
 
 The idea is to analyze a candidate's resume, identify skills, technologies, professional experience, and career profile, and use this information to search, organize, and rank job opportunities according to their compatibility.
@@ -22,8 +18,6 @@ The project is also a practical environment for exploring software architecture,
 
 
 # Features
-
----
 
 * Resume text extraction
 * Candidate profile analysis
@@ -37,8 +31,6 @@ The project is also a practical environment for exploring software architecture,
 
 # Tech Stack
 
----
-
 ### Core
 
 * C#
@@ -47,23 +39,9 @@ The project is also a practical environment for exploring software architecture,
 * Regular Expressions
 * XML processing
 
-### Resume Processing
-
-* OpenDocument Text (ODT)
-* Custom resume parsing
-* Skill matching
-* Candidate profile extraction
-
 ### Testing
 
 * xUnit
-
-### Development
-
-* JetBrains Rider
-* Visual Studio
-* Git
-* GitHub
 
 ### Planned
 
@@ -77,8 +55,6 @@ The project is also a practical environment for exploring software architecture,
 * Artificial Intelligence
 
 # Architecture
-
----
 
 The solution is divided into independent projects with clearly defined responsibilities.
 
@@ -119,8 +95,6 @@ Compatible Jobs
 
 # Supported Resume Formats
 
----
-
 * [x] ODT
 * [ ] DOCX
 * [ ] PDF
@@ -128,15 +102,11 @@ Compatible Jobs
 
 # Supported Platforms
 
----
-
 * Linux
 * Windows
 * macOS
 
 # Goals
-
----
 
 * Automate part of the job search process
 * Identify technologies and skills from resumes
