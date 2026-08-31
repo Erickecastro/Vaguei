@@ -74,9 +74,15 @@ public sealed class PdfResumeParser : IResumeParser
             var previousLine =
                 normalizedLines[^1];
 
+            var nextLine =
+                index + 1 < rawLines.Count
+                    ? rawLines[index + 1]
+                    : null;
+
             if (ShouldJoinBulletContinuation(
                     previousLine,
-                    currentLine))
+                    currentLine,
+                    nextLine))
             {
                 normalizedLines[^1] =
                     $"{previousLine} {currentLine}";
@@ -94,7 +100,8 @@ public sealed class PdfResumeParser : IResumeParser
 
     private static bool ShouldJoinBulletContinuation(
         string previousLine,
-        string currentLine)
+        string currentLine,
+        string? nextLine)
     {
         if (string.IsNullOrWhiteSpace(previousLine) ||
             string.IsNullOrWhiteSpace(currentLine))
@@ -122,6 +129,24 @@ public sealed class PdfResumeParser : IResumeParser
             return false;
         }
 
+        // Se a próxima linha contém empresa + período,
+        // a linha atual provavelmente é um cargo.
+        if (nextLine is not null &&
+            LooksLikeExperiencePeriod(nextLine))
+        {
+            return false;
+        }
+
+        // Se a próxima linha inicia outro bullet e a linha
+        // atual não parece finalizar uma frase, ela pode ser
+        // um título, como um projeto.
+        if (nextLine is not null &&
+            IsBulletLine(nextLine) &&
+            !EndsWithSentencePunctuation(currentLine))
+        {
+            return false;
+        }
+
         return true;
     }
 
@@ -129,6 +154,15 @@ public sealed class PdfResumeParser : IResumeParser
     {
         return line.StartsWith('·') ||
                line.StartsWith('•');
+    }
+
+    private static bool EndsWithSentencePunctuation(
+        string line)
+    {
+        return line.EndsWith('.') ||
+               line.EndsWith('!') ||
+               line.EndsWith('?') ||
+               line.EndsWith(';');
     }
 
     private static bool LooksLikeSectionTitle(
