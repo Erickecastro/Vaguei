@@ -74,11 +74,8 @@ try
     Console.WriteLine("==================================");
     Console.WriteLine();
 
-    Console.WriteLine(
-        $"Nome: {profile.Name}");
-
-    Console.WriteLine(
-        $"Cargo: {profile.Summary}");
+    Console.WriteLine($"Nome: {profile.Name}");
+    Console.WriteLine($"Cargo: {profile.ProfessionalTitle}");
 
     Console.WriteLine();
     Console.WriteLine("Tecnologias identificadas:");

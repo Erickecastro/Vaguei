@@ -6,6 +6,8 @@ public sealed class CandidateProfile
 
     public string Name { get; set; } = string.Empty;
 
+    public string ProfessionalTitle { get; set; } = string.Empty;
+
     public string Summary { get; set; } = string.Empty;
 
     public HashSet<string> Skills { get; set; } =

@@ -32,7 +32,7 @@ public sealed class ResumeAnalyzer
         var profile = new CandidateProfile();
 
         profile.Name = ExtractName(lines);
-        profile.Summary = ExtractProfessionalTitle(lines);
+        profile.ProfessionalTitle = ExtractProfessionalTitle(lines);
 
         foreach (var skill in ExtractSkills(resumeText))
         {
