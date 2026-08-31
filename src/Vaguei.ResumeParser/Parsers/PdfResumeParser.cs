@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.RegularExpressions;
 using UglyToad.PdfPig;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
 using Vaguei.Application.Interfaces;
@@ -46,7 +47,7 @@ public sealed class PdfResumeParser : IResumeParser
             builder.ToString());
     }
 
-        private static string NormalizeText(string text)
+    private static string NormalizeText(string text)
     {
         var rawLines = text
             .Replace("\r\n", "\n")
@@ -58,27 +59,31 @@ public sealed class PdfResumeParser : IResumeParser
 
         var normalizedLines = new List<string>();
 
-        foreach (var line in rawLines)
+        for (var index = 0;
+             index < rawLines.Count;
+             index++)
         {
+            var currentLine = rawLines[index];
+
             if (normalizedLines.Count == 0)
             {
-                normalizedLines.Add(line);
+                normalizedLines.Add(currentLine);
                 continue;
             }
 
             var previousLine =
                 normalizedLines[^1];
 
-            if (ShouldJoinLines(
+            if (ShouldJoinBulletContinuation(
                     previousLine,
-                    line))
+                    currentLine))
             {
                 normalizedLines[^1] =
-                    $"{previousLine} {line}";
+                    $"{previousLine} {currentLine}";
             }
             else
             {
-                normalizedLines.Add(line);
+                normalizedLines.Add(currentLine);
             }
         }
 
@@ -87,7 +92,7 @@ public sealed class PdfResumeParser : IResumeParser
             normalizedLines);
     }
 
-    private static bool ShouldJoinLines(
+    private static bool ShouldJoinBulletContinuation(
         string previousLine,
         string currentLine)
     {
@@ -97,8 +102,12 @@ public sealed class PdfResumeParser : IResumeParser
             return false;
         }
 
-        if (currentLine.StartsWith('·') ||
-            currentLine.StartsWith('•'))
+        if (!IsBulletLine(previousLine))
+        {
+            return false;
+        }
+
+        if (IsBulletLine(currentLine))
         {
             return false;
         }
@@ -113,19 +122,13 @@ public sealed class PdfResumeParser : IResumeParser
             return false;
         }
 
-        if (LooksLikeProfileHeader(currentLine))
-        {
-            return false;
-        }
-
-        if (previousLine.EndsWith('.') ||
-            previousLine.EndsWith(':') ||
-            previousLine.EndsWith(';'))
-        {
-            return false;
-        }
-
         return true;
+    }
+
+    private static bool IsBulletLine(string line)
+    {
+        return line.StartsWith('·') ||
+               line.StartsWith('•');
     }
 
     private static bool LooksLikeSectionTitle(
@@ -152,18 +155,10 @@ public sealed class PdfResumeParser : IResumeParser
         string line)
     {
         return line.Contains('|') &&
-               System.Text.RegularExpressions.Regex.IsMatch(
+               Regex.IsMatch(
                    line,
                    @"\b\d{4}\b\s*[—–-]\s*(?:\b\d{4}\b|Atual)",
-                   System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-    }
-
-    private static bool LooksLikeProfileHeader(
-        string line)
-    {
-        return line.Contains('@') ||
-               line.StartsWith('+') ||
-               line.StartsWith("http",
-                   StringComparison.OrdinalIgnoreCase);
+                   RegexOptions.IgnoreCase |
+                   RegexOptions.CultureInvariant);
     }
 }
