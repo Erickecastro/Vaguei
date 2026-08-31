@@ -1,64 +1,86 @@
-# Vaguei 
+# Vaguei
 
-O **Vaguei** é um projeto pessoal que estou desenvolvendo para facilitar uma das partes mais cansativas da busca por emprego na área de tecnologia: encontrar vagas que realmente façam sentido para o meu perfil.
+---
 
-A ideia surgiu da vontade de criar uma ferramenta capaz de analisar meu currículo, entender minhas tecnologias, experiências e áreas de interesse e, a partir dessas informações, encontrar e organizar vagas de desenvolvimento de software que tenham maior compatibilidade com o meu perfil.
+> A smarter way to find job opportunities that match your profile.
 
-Além de ser uma ferramenta que pretendo utilizar no meu próprio dia a dia, o Vaguei também é um projeto de estudo onde posso aplicar e aprofundar meus conhecimentos em **C#, .NET, arquitetura de software, processamento de dados, APIs e automação**.
+![.NET](https://img.shields.io/badge/.NET-10-512BD4?style=for-the-badge\&logo=dotnet)
+![C#](https://img.shields.io/badge/C%23-239120?style=for-the-badge\&logo=c-sharp)
+![xUnit](https://img.shields.io/badge/xUnit-Testing-512BD4?style=for-the-badge)
+![Platform](https://img.shields.io/badge/Platform-Cross--Platform-blue?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-success?style=for-the-badge)
 
-## 💡 Como vai funcionar
+# About
 
-O objetivo é permitir que um currículo seja fornecido ao Vaguei e transformado em um perfil estruturado.
+---
 
-Atualmente, o projeto já consegue:
+**Vaguei** is a personal project designed to make the job search process in the technology industry simpler, smarter, and more relevant.
 
-* Ler currículos no formato `.odt`;
-* Extrair o conteúdo do documento;
-* Identificar informações básicas do candidato;
-* Identificar linguagens, frameworks e outras tecnologias;
-* Reconhecer aliases de tecnologias;
-* Extrair experiências profissionais;
-* Identificar empresas, cargos e períodos das experiências.
+The idea is to analyze a candidate's resume, identify skills, technologies, professional experience, and career profile, and use this information to search, organize, and rank job opportunities according to their compatibility.
 
-A ideia é evoluir esse processo para também pesquisar vagas em diferentes fontes e comparar os requisitos encontrados com o perfil extraído do currículo.
+The project is also a practical environment for exploring software architecture, data processing, automation, APIs, testing, and eventually artificial intelligence using C# and the .NET ecosystem.
 
-## 🎯 Objetivo
 
-O fluxo principal que pretendo construir é:
+# Features
 
-```text
-Currículo
-   ↓
-Extração de texto
-   ↓
-Análise do perfil
-   ↓
-CandidateProfile
-   ↓
-Busca de vagas
-   ↓
-Análise das vagas
-   ↓
-Matching
-   ↓
-Vagas mais compatíveis
-```
+---
 
-Cada vaga poderá receber uma pontuação de compatibilidade considerando fatores como tecnologias, experiência, senioridade, localização e modelo de trabalho.
+* Resume text extraction
+* Candidate profile analysis
+* Skill and technology detection
+* Technology alias recognition
+* Professional experience extraction
+* Company and job title identification
+* Employment period detection
+* Structured candidate profiles
+* Cross-platform execution
 
-No futuro, também pretendo utilizar IA como uma camada complementar para ajudar na interpretação das vagas e explicar os motivos pelos quais uma oportunidade pode ou não combinar com o perfil.
+# Tech Stack
 
-## 🛠️ Stack
+---
 
-O projeto está sendo desenvolvido principalmente com:
+### Core
 
-* **C#**
-* **.NET 10**
-* **xUnit**
-* **XML / OpenDocument**
-* **Git e GitHub**
+* C#
+* .NET 10
+* LINQ
+* Regular Expressions
+* XML processing
 
-A arquitetura foi organizada para manter as responsabilidades separadas entre domínio, regras da aplicação, leitura de currículos, coleta de vagas e infraestrutura.
+### Resume Processing
+
+* OpenDocument Text (ODT)
+* Custom resume parsing
+* Skill matching
+* Candidate profile extraction
+
+### Testing
+
+* xUnit
+
+### Development
+
+* JetBrains Rider
+* Visual Studio
+* Git
+* GitHub
+
+### Planned
+
+* DOCX parsing
+* PDF parsing
+* Job source integrations
+* Job matching engine
+* REST APIs
+* Avalonia UI
+* Docker
+* Artificial Intelligence
+
+# Architecture
+
+---
+
+The solution is divided into independent projects with clearly defined responsibilities.
 
 ```text
 Vaguei
@@ -71,24 +93,85 @@ Vaguei
 └── Vaguei.Tests
 ```
 
-## 📄 Formatos de currículo
+The main resume processing flow follows this structure:
 
-O primeiro formato implementado foi o **OpenDocument Text (`.odt`)**.
+```text
+Resume
+   |
+   v
+Resume Parser
+   |
+   v
+Resume Analyzer
+   |
+   v
+Candidate Profile
+   |
+   v
+Job Search
+   |
+   v
+Matching Engine
+   |
+   v
+Compatible Jobs
+```
 
-A ideia é adicionar suporte também para:
-
-* DOCX
-* PDF
-* TXT
-
-Independentemente do formato, todos os documentos serão convertidos para uma representação comum antes da análise.
-
-## 🚧 Status
-
-O Vaguei ainda está em desenvolvimento e muitas funcionalidades serão adicionadas e modificadas durante a evolução do projeto.
-
-Neste momento, o foco está na construção da base responsável por interpretar o currículo e gerar um perfil estruturado. As próximas etapas incluem suporte a novos formatos de documento, coleta de vagas, sistema de matching e uma interface gráfica.
+# Supported Resume Formats
 
 ---
 
-Feito como projeto pessoal para aprender, experimentar e, quem sabe, tornar a procura pela próxima vaga um pouco mais inteligente. 🚀
+* [x] ODT
+* [ ] DOCX
+* [ ] PDF
+* [ ] TXT
+
+# Supported Platforms
+
+---
+
+* Linux
+* Windows
+* macOS
+
+# Goals
+
+---
+
+* Automate part of the job search process
+* Identify technologies and skills from resumes
+* Build structured candidate profiles
+* Search jobs from multiple sources
+* Rank opportunities by profile compatibility
+* Reduce irrelevant job recommendations
+* Provide explainable compatibility scores
+* Identify potential skill gaps
+
+# Matching
+
+The goal of the matching system is to compare the candidate profile with each job opportunity using factors such as:
+
+* Skills
+* Technologies
+* Job title
+* Professional experience
+* Seniority
+* Location
+* Work model
+* Candidate preferences
+
+Each opportunity will eventually receive a compatibility score to help prioritize the most relevant jobs.
+
+# Screenshots
+
+> Coming soon.
+
+# Contributing
+
+Contributions, ideas, and suggestions are welcome.
+
+If you find an issue or have an idea that could improve the project, feel free to open an Issue or submit a Pull Request.
+
+# License
+
+This project is licensed under the MIT License.
