@@ -1,16 +1,17 @@
 using Vaguei.Application.Catalogs;
 using Vaguei.Domain.Entities;
-using Vaguei.Domain.Models;
 
 namespace Vaguei.Application.Services;
 
 public sealed class ResumeAnalyzer
 {
     private readonly SkillMatcher _skillMatcher;
+    private readonly WorkExperienceExtractor _experienceExtractor;
 
     public ResumeAnalyzer()
     {
         _skillMatcher = new SkillMatcher();
+        _experienceExtractor = new WorkExperienceExtractor();
     }
 
     public CandidateProfile Analyze(string resumeText)
@@ -36,6 +37,11 @@ public sealed class ResumeAnalyzer
         foreach (var skill in ExtractSkills(resumeText))
         {
             profile.Skills.Add(skill);
+        }
+
+        foreach (var experience in _experienceExtractor.Extract(resumeText))
+        {
+            profile.Experiences.Add(experience);
         }
 
         return profile;

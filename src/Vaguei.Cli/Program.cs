@@ -66,3 +66,23 @@ foreach (var skill in profile.Skills.OrderBy(skill => skill))
 {
     Console.WriteLine($"- {skill}");
 }
+
+Console.WriteLine();
+Console.WriteLine("Experiências profissionais:");
+
+foreach (var experience in profile.Experiences)
+{
+    Console.WriteLine();
+    Console.WriteLine($"Cargo: {experience.Position}");
+    Console.WriteLine($"Empresa: {experience.Company}");
+
+    var endPeriod = experience.IsCurrent
+        ? "Atual"
+        : experience.EndYear?.ToString() ?? "?";
+
+    Console.WriteLine(
+        $"Período: {experience.StartYear} — {endPeriod}");
+
+    Console.WriteLine("Descrição:");
+    Console.WriteLine(experience.Description);
+}

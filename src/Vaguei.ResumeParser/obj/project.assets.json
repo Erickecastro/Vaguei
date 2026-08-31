@@ -46,25 +46,25 @@
     ]
   },
   "packageFolders": {
-    "/home/ericke/.nuget/packages/": {}
+    "C:\\Users\\erickecastro\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/ericke/Vaguei/src/Vaguei.ResumeParser/Vaguei.ResumeParser.csproj",
+      "projectUniqueName": "C:\\Users\\erickecastro\\Desktop\\Estudos\\Vaguei\\src\\Vaguei.ResumeParser\\Vaguei.ResumeParser.csproj",
       "projectName": "Vaguei.ResumeParser",
-      "projectPath": "/home/ericke/Vaguei/src/Vaguei.ResumeParser/Vaguei.ResumeParser.csproj",
-      "packagesPath": "/home/ericke/.nuget/packages/",
-      "outputPath": "/home/ericke/Vaguei/src/Vaguei.ResumeParser/obj/",
+      "projectPath": "C:\\Users\\erickecastro\\Desktop\\Estudos\\Vaguei\\src\\Vaguei.ResumeParser\\Vaguei.ResumeParser.csproj",
+      "packagesPath": "C:\\Users\\erickecastro\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\erickecastro\\Desktop\\Estudos\\Vaguei\\src\\Vaguei.ResumeParser\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/ericke/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\erickecastro\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
-        "/home/ericke/.dotnet/library-packs": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -72,11 +72,11 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {
-            "/home/ericke/Vaguei/src/Vaguei.Application/Vaguei.Application.csproj": {
-              "projectPath": "/home/ericke/Vaguei/src/Vaguei.Application/Vaguei.Application.csproj"
+            "C:\\Users\\erickecastro\\Desktop\\Estudos\\Vaguei\\src\\Vaguei.Application\\Vaguei.Application.csproj": {
+              "projectPath": "C:\\Users\\erickecastro\\Desktop\\Estudos\\Vaguei\\src\\Vaguei.Application\\Vaguei.Application.csproj"
             },
-            "/home/ericke/Vaguei/src/Vaguei.Domain/Vaguei.Domain.csproj": {
-              "projectPath": "/home/ericke/Vaguei/src/Vaguei.Domain/Vaguei.Domain.csproj"
+            "C:\\Users\\erickecastro\\Desktop\\Estudos\\Vaguei\\src\\Vaguei.Domain\\Vaguei.Domain.csproj": {
+              "projectPath": "C:\\Users\\erickecastro\\Desktop\\Estudos\\Vaguei\\src\\Vaguei.Domain\\Vaguei.Domain.csproj"
             }
           }
         }
@@ -91,7 +91,7 @@
         "auditLevel": "low",
         "auditMode": "all"
       },
-      "SdkAnalysisLevel": "10.0.400"
+      "SdkAnalysisLevel": "10.0.300"
     },
     "frameworks": {
       "net10.0": {
@@ -113,7 +113,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/home/ericke/.dotnet/sdk/10.0.400/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.CSharp": "(,4.7.32767]",
           "Microsoft.VisualBasic": "(,10.4.32767]",

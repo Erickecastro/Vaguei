@@ -8,7 +8,9 @@ public sealed class WorkExperience
 
     public string Description { get; set; } = string.Empty;
 
-    public DateOnly? StartDate { get; set; }
+    public int? StartYear { get; set; }
 
-    public DateOnly? EndDate { get; set; }
+    public int? EndYear { get; set; }
+
+    public bool IsCurrent { get; set; }
 }
