@@ -1,6 +1,8 @@
 ﻿using Vaguei.Application.Services;
 using Vaguei.ResumeParser.Parsers;
 using Vaguei.ResumeParser.Services;
+using Vaguei.Collectors.Sources;
+using Vaguei.Domain.Models;
 
 if (args.Length == 0)
 {
@@ -120,4 +122,37 @@ catch (InvalidDataException exception)
 {
     Console.WriteLine(
         $"Não foi possível ler o currículo: {exception.Message}");
+}
+
+using var httpClient = new HttpClient();
+
+var jobSource = new ArbeitnowJobSource(httpClient);
+
+var query = new JobSearchQuery
+{
+    Keywords =
+    [
+        ".NET",
+        "C#",
+        "ASP.NET Core"
+    ],
+    IncludeRemote = true
+};
+
+Console.WriteLine();
+Console.WriteLine("==================================");
+Console.WriteLine("Vagas encontradas");
+Console.WriteLine("==================================");
+Console.WriteLine();
+
+var jobs = await jobSource.SearchAsync(query);
+
+foreach (var job in jobs.Take(10))
+{
+    Console.WriteLine($"Cargo: {job.Title}");
+    Console.WriteLine($"Empresa: {job.Company}");
+    Console.WriteLine($"Local: {job.Location}");
+    Console.WriteLine($"Fonte: {job.Source}");
+    Console.WriteLine($"URL: {job.Url}");
+    Console.WriteLine("----------------------------------");
 }

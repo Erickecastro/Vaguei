@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Vaguei.Application\Vaguei.Application.csproj" />
     <ProjectReference Include="..\..\src\Vaguei.ResumeParser\Vaguei.ResumeParser.csproj" />
+    <ProjectReference Include="..\..\src\Vaguei.Collectors\Vaguei.Collectors.csproj" />
   </ItemGroup>
 
 </Project>
