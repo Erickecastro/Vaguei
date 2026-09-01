@@ -5,6 +5,15 @@ namespace Vaguei.Application.Services;
 
 public sealed class JobSearchQueryBuilder
 {
+    private readonly JobSearchTermGenerator
+        _termGenerator;
+
+    public JobSearchQueryBuilder()
+    {
+        _termGenerator =
+            new JobSearchTermGenerator();
+    }
+
     public JobSearchQuery Build(
         CandidateProfile profile,
         JobSearchPreferences preferences)
@@ -12,7 +21,8 @@ public sealed class JobSearchQueryBuilder
         ArgumentNullException.ThrowIfNull(profile);
         ArgumentNullException.ThrowIfNull(preferences);
 
-        var query = new JobSearchQuery();
+        var query =
+            new JobSearchQuery();
 
         AddKeywords(
             query,
@@ -35,26 +45,17 @@ public sealed class JobSearchQueryBuilder
         return query;
     }
 
-    private static void AddKeywords(
+    private void AddKeywords(
         JobSearchQuery query,
         CandidateProfile profile,
         JobSearchPreferences preferences)
     {
-        if (preferences.DesiredRoles.Count > 0)
-        {
-            foreach (var role in preferences.DesiredRoles)
-            {
-                AddDistinct(
-                    query.Keywords,
-                    role);
-            }
+        var terms =
+            _termGenerator.Generate(
+                profile,
+                preferences);
 
-            return;
-        }
-
-        AddDistinct(
-            query.Keywords,
-            profile.ProfessionalTitle);
+        query.Keywords.AddRange(terms);
     }
 
     private static void AddLocations(
@@ -92,7 +93,8 @@ public sealed class JobSearchQueryBuilder
             return;
         }
 
-        var normalizedValue = value.Trim();
+        var normalizedValue =
+            value.Trim();
 
         if (values.Any(
                 existing =>

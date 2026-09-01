@@ -8,11 +8,19 @@ namespace Vaguei.Tests.Application;
 public sealed class JobSearchQueryBuilderTests
 {
     [Fact]
-    public void Build_UsesProfessionalTitleWhenNoDesiredRolesExist()
+    public void Build_GeneratesKeywordsFromProfile()
     {
         var profile = new CandidateProfile
         {
-            ProfessionalTitle = "Desenvolvedor .NET"
+            ProfessionalTitle =
+                "Desenvolvedor .NET",
+
+            Skills =
+            [
+                ".NET",
+                "C#",
+                "ASP.NET Core"
+            ]
         };
 
         var preferences =
@@ -26,10 +34,20 @@ public sealed class JobSearchQueryBuilderTests
                 profile,
                 preferences);
 
-        Assert.Single(query.Keywords);
-
         Assert.Contains(
             "Desenvolvedor .NET",
+            query.Keywords);
+
+        Assert.Contains(
+            ".NET Developer",
+            query.Keywords);
+
+        Assert.Contains(
+            "C# Developer",
+            query.Keywords);
+
+        Assert.Contains(
+            "Backend Developer",
             query.Keywords);
     }
 
