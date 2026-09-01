@@ -40,6 +40,27 @@ public sealed class ArbeitnowJobSource : IJobSource
         return jobs;
     }
 
+    private static DateTimeOffset? ConvertPublishedAt(
+        long? createdAt)
+    {
+        if (createdAt is null ||
+            createdAt <= 0)
+        {
+            return null;
+        }
+
+        try
+        {
+            return DateTimeOffset
+                .FromUnixTimeSeconds(
+                    createdAt.Value);
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return null;
+        }
+    }
+
     private static JobPosting MapJob(ArbeitnowJob job)
     {
         return new JobPosting
@@ -57,14 +78,18 @@ public sealed class ArbeitnowJobSource : IJobSource
                 job.Url,
                 UriKind.Absolute,
                 out var uri)
-                    ? uri
-                    : null,
+                ? uri
+                : null,
 
             Source = "Arbeitnow",
 
             WorkModel = job.Remote
                 ? WorkModel.Remote
-                : WorkModel.Unknown
+                : WorkModel.Unknown,
+
+            PublishedAt =
+                ConvertPublishedAt(
+                    job.CreatedAt)
         };
     }
 
@@ -149,5 +174,8 @@ public sealed class ArbeitnowJobSource : IJobSource
 
         [JsonPropertyName("tags")]
         public List<string> Tags { get; init; } = [];
+
+        [JsonPropertyName("created_at")]
+        public long? CreatedAt { get; init; }
     }
 }

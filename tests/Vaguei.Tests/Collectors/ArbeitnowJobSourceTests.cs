@@ -23,6 +23,7 @@ public sealed class ArbeitnowJobSourceTests
                   "remote": true,
                   "url": "https://example.com/job",
                   "location": "Brasil",
+                  "created_at": 1788264000,
                   "tags": [
                     "C#",
                     ".NET"
@@ -53,6 +54,11 @@ public sealed class ArbeitnowJobSourceTests
         Assert.Equal(
             "Desenvolvedor .NET",
             job.Title);
+
+        Assert.Equal(
+            DateTimeOffset.FromUnixTimeSeconds(
+                1788264000),
+            job.PublishedAt);
 
         Assert.Equal(
             "Empresa Teste",
@@ -230,6 +236,48 @@ public sealed class ArbeitnowJobSourceTests
         Assert.Contains(
             "Manaus",
             result[0].Location.RawLocation ?? string.Empty);
+    }
+
+    [Fact]
+    public async Task SearchAsync_MapsMissingPublicationDateAsNull()
+    {
+        const string json =
+            """
+            {
+              "data": [
+                {
+                  "slug": "test-job",
+                  "company_name": "Test Company",
+                  "title": ".NET Developer",
+                  "description": "C# and ASP.NET Core",
+                  "remote": true,
+                  "url": "https://example.com/jobs/test",
+                  "location": "Remote",
+                  "tags": []
+                }
+              ]
+            }
+            """;
+
+        using var httpClient =
+            new HttpClient(
+                new FakeHttpMessageHandler(json));
+
+        var source =
+            new ArbeitnowJobSource(
+                httpClient);
+
+        var query =
+            new JobSearchQuery();
+
+        var jobs =
+            await source.SearchAsync(query);
+
+        var job =
+            Assert.Single(jobs);
+
+        Assert.Null(
+            job.PublishedAt);
     }
 
     private static HttpClient CreateHttpClient(

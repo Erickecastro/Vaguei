@@ -184,8 +184,21 @@ try
     var jobs =
         await jobSource.SearchAsync(query);
 
+    var freshnessFilter =
+        new JobFreshnessFilter();
+
+    var freshJobs =
+        freshnessFilter.Filter(
+            jobs,
+            preferences,
+            DateTimeOffset.UtcNow);
+
     var jobList =
-        jobs.Take(10).ToList();
+        freshJobs
+            .OrderByDescending(
+                job => job.PublishedAt)
+            .Take(10)
+            .ToList();
 
     Console.WriteLine();
     Console.WriteLine("==================================");
@@ -212,6 +225,9 @@ try
 
         Console.WriteLine(
             $"Modelo: {job.WorkModel}");
+
+        Console.WriteLine(
+            $"Publicada: {job.PublishedAt:dd/MM/yyyy HH:mm} UTC");
 
         Console.WriteLine(
             $"Fonte: {job.Source}");
