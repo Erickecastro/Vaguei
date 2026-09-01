@@ -25,4 +25,7 @@ public sealed class JobSearchPreferences
     public bool IncludeBrazil { get; set; } = true;
 
     public bool IncludeInternational { get; set; }
+
+    public JobPublicationWindow PublicationWindow { get; set; } =
+        JobPublicationWindow.Last6Months;
 }
