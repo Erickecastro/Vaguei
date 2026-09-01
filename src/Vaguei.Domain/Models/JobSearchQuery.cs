@@ -8,7 +8,7 @@ public sealed class JobSearchQuery
 
     public List<string> Locations { get; set; } = [];
 
-    public bool IncludeRemote { get; set; } = true;
+    public List<WorkModel> WorkModels { get; set; } = [];
 
     public List<EmploymentType> EmploymentTypes { get; set; } = [];
 

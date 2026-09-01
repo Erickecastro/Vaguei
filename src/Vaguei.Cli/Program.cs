@@ -135,8 +135,7 @@ var query = new JobSearchQuery
         ".NET",
         "C#",
         "ASP.NET Core"
-    ],
-    IncludeRemote = true
+    ]
 };
 
 Console.WriteLine();
@@ -151,7 +150,7 @@ foreach (var job in jobs.Take(10))
 {
     Console.WriteLine($"Cargo: {job.Title}");
     Console.WriteLine($"Empresa: {job.Company}");
-    Console.WriteLine($"Local: {job.Location}");
+    Console.WriteLine($"Local: {job.Location.RawLocation ?? "Não informado"}");
     Console.WriteLine($"Fonte: {job.Source}");
     Console.WriteLine($"URL: {job.Url}");
     Console.WriteLine("----------------------------------");

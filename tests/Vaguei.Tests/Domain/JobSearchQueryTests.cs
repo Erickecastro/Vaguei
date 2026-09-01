@@ -1,3 +1,4 @@
+using Vaguei.Domain.Enums;
 using Vaguei.Domain.Models;
 
 namespace Vaguei.Tests.Domain;
@@ -11,16 +12,9 @@ public sealed class JobSearchQueryTests
 
         Assert.Empty(query.Keywords);
         Assert.Empty(query.Locations);
+        Assert.Empty(query.WorkModels);
         Assert.Empty(query.EmploymentTypes);
         Assert.Empty(query.SeniorityLevels);
-    }
-
-    [Fact]
-    public void NewQuery_IncludesRemoteByDefault()
-    {
-        var query = new JobSearchQuery();
-
-        Assert.True(query.IncludeRemote);
     }
 
     [Fact]
@@ -39,7 +33,9 @@ public sealed class JobSearchQueryTests
         Assert.Equal(3, query.Keywords.Count);
         Assert.Contains(".NET", query.Keywords);
         Assert.Contains("Backend", query.Keywords);
-        Assert.Contains("ASP.NET Core", query.Keywords);
+        Assert.Contains(
+            "ASP.NET Core",
+            query.Keywords);
     }
 
     [Fact]
@@ -60,13 +56,43 @@ public sealed class JobSearchQueryTests
     }
 
     [Fact]
-    public void Query_AllowsRemoteToBeDisabled()
+    public void Query_AllowsMultipleWorkModels()
     {
         var query = new JobSearchQuery
         {
-            IncludeRemote = false
+            WorkModels =
+            [
+                WorkModel.Remote,
+                WorkModel.Hybrid
+            ]
         };
 
-        Assert.False(query.IncludeRemote);
+        Assert.Equal(2, query.WorkModels.Count);
+
+        Assert.Contains(
+            WorkModel.Remote,
+            query.WorkModels);
+
+        Assert.Contains(
+            WorkModel.Hybrid,
+            query.WorkModels);
+    }
+
+    [Fact]
+    public void Query_AllowsOnSiteOnly()
+    {
+        var query = new JobSearchQuery
+        {
+            WorkModels =
+            [
+                WorkModel.OnSite
+            ]
+        };
+
+        Assert.Single(query.WorkModels);
+
+        Assert.Contains(
+            WorkModel.OnSite,
+            query.WorkModels);
     }
 }

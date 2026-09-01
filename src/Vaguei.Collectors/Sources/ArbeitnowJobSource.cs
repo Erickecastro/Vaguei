@@ -22,9 +22,10 @@ public sealed class ArbeitnowJobSource : IJobSource
         JobSearchQuery query,
         CancellationToken cancellationToken = default)
     {
-        var response = await _httpClient.GetFromJsonAsync<ArbeitnowResponse>(
-            "https://www.arbeitnow.com/api/job-board-api",
-            cancellationToken);
+        var response =
+            await _httpClient.GetFromJsonAsync<ArbeitnowResponse>(
+                "https://www.arbeitnow.com/api/job-board-api",
+                cancellationToken);
 
         if (response is null)
         {
@@ -46,14 +47,21 @@ public sealed class ArbeitnowJobSource : IJobSource
             Title = job.Title,
             Company = job.CompanyName,
             Description = job.Description ?? string.Empty,
-            Location = job.Location,
+
+            Location = new JobLocation
+            {
+                RawLocation = job.Location
+            },
+
             Url = Uri.TryCreate(
                 job.Url,
                 UriKind.Absolute,
                 out var uri)
                     ? uri
                     : null,
+
             Source = "Arbeitnow",
+
             WorkModel = job.Remote
                 ? WorkModel.Remote
                 : WorkModel.Unknown
@@ -66,14 +74,15 @@ public sealed class ArbeitnowJobSource : IJobSource
     {
         if (query.Keywords.Count > 0)
         {
-            var matchesKeyword = query.Keywords.Any(
-                keyword =>
-                    job.Title.Contains(
-                        keyword,
-                        StringComparison.OrdinalIgnoreCase) ||
-                    job.Description.Contains(
-                        keyword,
-                        StringComparison.OrdinalIgnoreCase));
+            var matchesKeyword =
+                query.Keywords.Any(
+                    keyword =>
+                        job.Title.Contains(
+                            keyword,
+                            StringComparison.OrdinalIgnoreCase) ||
+                        job.Description.Contains(
+                            keyword,
+                            StringComparison.OrdinalIgnoreCase));
 
             if (!matchesKeyword)
             {
@@ -81,20 +90,23 @@ public sealed class ArbeitnowJobSource : IJobSource
             }
         }
 
-        if (!query.IncludeRemote &&
-            job.WorkModel == WorkModel.Remote)
+        if (query.WorkModels.Count > 0 &&
+            !query.WorkModels.Contains(job.WorkModel))
         {
             return false;
         }
 
         if (query.Locations.Count > 0)
         {
-            var matchesLocation = query.Locations.Any(
-                location =>
-                    job.Location?.Contains(
-                        location,
-                        StringComparison.OrdinalIgnoreCase)
-                    == true);
+            var rawLocation =
+                job.Location.RawLocation ?? string.Empty;
+
+            var matchesLocation =
+                query.Locations.Any(
+                    location =>
+                        rawLocation.Contains(
+                            location,
+                            StringComparison.OrdinalIgnoreCase));
 
             if (!matchesLocation &&
                 job.WorkModel != WorkModel.Remote)

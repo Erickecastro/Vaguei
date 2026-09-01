@@ -2,6 +2,7 @@ using System.Net;
 using System.Text;
 using Vaguei.Collectors.Sources;
 using Vaguei.Domain.Models;
+using Vaguei.Domain.Enums;
 
 namespace Vaguei.Tests.Collectors;
 
@@ -59,7 +60,7 @@ public sealed class ArbeitnowJobSourceTests
 
         Assert.Equal(
             "Brasil",
-            job.Location);
+            job.Location.RawLocation);
 
         Assert.Equal(
             "Arbeitnow",
@@ -122,7 +123,7 @@ public sealed class ArbeitnowJobSourceTests
     }
 
     [Fact]
-    public async Task SearchAsync_ExcludesRemoteJobsWhenDisabled()
+    public async Task SearchAsync_FiltersByWorkModel()
     {
         const string json =
             """
@@ -138,10 +139,10 @@ public sealed class ArbeitnowJobSourceTests
                 },
                 {
                   "company_name": "Empresa B",
-                  "title": "Desenvolvedor Presencial",
+                  "title": "Desenvolvedor Não Remoto",
                   "description": "",
                   "remote": false,
-                  "url": "https://example.com/onsite",
+                  "url": "https://example.com/local",
                   "location": "Manaus"
                 }
               ]
@@ -155,7 +156,10 @@ public sealed class ArbeitnowJobSourceTests
         var query =
             new JobSearchQuery
             {
-                IncludeRemote = false
+                WorkModels =
+                [
+                    WorkModel.Remote
+                ]
             };
 
         var jobs =
@@ -167,8 +171,12 @@ public sealed class ArbeitnowJobSourceTests
         Assert.Single(result);
 
         Assert.Equal(
-            "Desenvolvedor Presencial",
+            "Desenvolvedor Remoto",
             result[0].Title);
+
+        Assert.Equal(
+            WorkModel.Remote,
+            result[0].WorkModel);
     }
 
     [Fact]
@@ -221,7 +229,7 @@ public sealed class ArbeitnowJobSourceTests
 
         Assert.Contains(
             "Manaus",
-            result[0].Location);
+            result[0].Location.RawLocation ?? string.Empty);
     }
 
     private static HttpClient CreateHttpClient(

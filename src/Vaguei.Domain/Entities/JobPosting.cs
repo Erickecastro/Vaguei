@@ -1,4 +1,5 @@
 using Vaguei.Domain.Enums;
+using Vaguei.Domain.Models;
 
 namespace Vaguei.Domain.Entities;
 
@@ -12,7 +13,7 @@ public sealed class JobPosting
 
     public string Description { get; set; } = string.Empty;
 
-    public string? Location { get; set; }
+    public JobLocation Location { get; set; } = new();
 
     public Uri? Url { get; set; }
 
@@ -26,7 +27,8 @@ public sealed class JobPosting
 
     public DateTimeOffset? PublishedAt { get; set; }
 
-    public DateTimeOffset FoundAt { get; init; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset FoundAt { get; init; } =
+        DateTimeOffset.UtcNow;
 
     public HashSet<string> Skills { get; set; } =
         new(StringComparer.OrdinalIgnoreCase);
