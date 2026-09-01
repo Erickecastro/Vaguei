@@ -1,8 +1,8 @@
 ﻿using Vaguei.Application.Services;
-using Vaguei.ResumeParser.Parsers;
-using Vaguei.ResumeParser.Services;
 using Vaguei.Collectors.Sources;
 using Vaguei.Domain.Models;
+using Vaguei.ResumeParser.Parsers;
+using Vaguei.ResumeParser.Services;
 
 if (args.Length == 0)
 {
@@ -113,6 +113,115 @@ try
         Console.WriteLine(
             experience.Description);
     }
+
+    var preferences =
+        new JobSearchPreferences();
+
+    var queryBuilder =
+        new JobSearchQueryBuilder();
+
+    var query =
+        queryBuilder.Build(
+            profile,
+            preferences);
+
+    Console.WriteLine();
+    Console.WriteLine("==================================");
+    Console.WriteLine("Consulta gerada");
+    Console.WriteLine("==================================");
+    Console.WriteLine();
+
+    Console.WriteLine("Palavras-chave:");
+
+    if (query.Keywords.Count == 0)
+    {
+        Console.WriteLine("- Nenhuma");
+    }
+    else
+    {
+        foreach (var keyword in query.Keywords)
+        {
+            Console.WriteLine($"- {keyword}");
+        }
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("Localizações:");
+
+    if (query.Locations.Count == 0)
+    {
+        Console.WriteLine("- Qualquer localização");
+    }
+    else
+    {
+        foreach (var location in query.Locations)
+        {
+            Console.WriteLine($"- {location}");
+        }
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("Modelos de trabalho:");
+
+    if (query.WorkModels.Count == 0)
+    {
+        Console.WriteLine("- Qualquer modelo");
+    }
+    else
+    {
+        foreach (var workModel in query.WorkModels)
+        {
+            Console.WriteLine($"- {workModel}");
+        }
+    }
+
+    using var httpClient =
+        new HttpClient();
+
+    var jobSource =
+        new ArbeitnowJobSource(httpClient);
+
+    var jobs =
+        await jobSource.SearchAsync(query);
+
+    var jobList =
+        jobs.Take(10).ToList();
+
+    Console.WriteLine();
+    Console.WriteLine("==================================");
+    Console.WriteLine("Vagas encontradas");
+    Console.WriteLine("==================================");
+    Console.WriteLine();
+
+    if (jobList.Count == 0)
+    {
+        Console.WriteLine(
+            "Nenhuma vaga encontrada para a consulta atual.");
+    }
+
+    foreach (var job in jobList)
+    {
+        Console.WriteLine(
+            $"Cargo: {job.Title}");
+
+        Console.WriteLine(
+            $"Empresa: {job.Company}");
+
+        Console.WriteLine(
+            $"Local: {job.Location.RawLocation ?? "Não informado"}");
+
+        Console.WriteLine(
+            $"Modelo: {job.WorkModel}");
+
+        Console.WriteLine(
+            $"Fonte: {job.Source}");
+
+        Console.WriteLine(
+            $"URL: {job.Url}");
+
+        Console.WriteLine(
+            "----------------------------------");
+    }
 }
 catch (NotSupportedException exception)
 {
@@ -122,36 +231,4 @@ catch (InvalidDataException exception)
 {
     Console.WriteLine(
         $"Não foi possível ler o currículo: {exception.Message}");
-}
-
-using var httpClient = new HttpClient();
-
-var jobSource = new ArbeitnowJobSource(httpClient);
-
-var query = new JobSearchQuery
-{
-    Keywords =
-    [
-        ".NET",
-        "C#",
-        "ASP.NET Core"
-    ]
-};
-
-Console.WriteLine();
-Console.WriteLine("==================================");
-Console.WriteLine("Vagas encontradas");
-Console.WriteLine("==================================");
-Console.WriteLine();
-
-var jobs = await jobSource.SearchAsync(query);
-
-foreach (var job in jobs.Take(10))
-{
-    Console.WriteLine($"Cargo: {job.Title}");
-    Console.WriteLine($"Empresa: {job.Company}");
-    Console.WriteLine($"Local: {job.Location.RawLocation ?? "Não informado"}");
-    Console.WriteLine($"Fonte: {job.Source}");
-    Console.WriteLine($"URL: {job.Url}");
-    Console.WriteLine("----------------------------------");
 }
