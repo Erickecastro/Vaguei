@@ -8,12 +8,14 @@ public sealed class ResumeAnalyzer
     private readonly SkillMatcher _skillMatcher;
     private readonly WorkExperienceExtractor _experienceExtractor;
     private readonly ProfessionalSummaryExtractor _summaryExtractor;
+    private readonly SkillRelevanceAnalyzer _skillRelevanceAnalyzer;
 
     public ResumeAnalyzer()
     {
         _skillMatcher = new SkillMatcher();
         _experienceExtractor = new WorkExperienceExtractor();
         _summaryExtractor = new ProfessionalSummaryExtractor();
+        _skillRelevanceAnalyzer = new SkillRelevanceAnalyzer();
     }
 
     public CandidateProfile Analyze(string resumeText)
@@ -45,6 +47,12 @@ public sealed class ResumeAnalyzer
         foreach (var experience in _experienceExtractor.Extract(resumeText))
         {
             profile.Experiences.Add(experience);
+        }
+
+        foreach (var detailedSkill in
+            _skillRelevanceAnalyzer.Analyze(profile))
+        {
+            profile.DetailedSkills.Add(detailedSkill);
         }
 
         return profile;

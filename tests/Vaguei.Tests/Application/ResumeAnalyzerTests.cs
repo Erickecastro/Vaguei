@@ -1,4 +1,5 @@
 using Vaguei.Application.Services;
+using Vaguei.Domain.Enums;
 
 namespace Vaguei.Tests.Application;
 
@@ -180,5 +181,143 @@ public sealed class ResumeAnalyzerTests
 
         Assert.Throws<ArgumentException>(
             action);
+    }
+
+    [Fact]
+    public void Analyze_PopulatesDetailedSkills()
+    {
+        const string resumeText =
+            """
+            Maria Silva
+            Desenvolvedor .NET
+
+            EXPERIÊNCIA PROFISSIONAL
+            Desenvolvedor de Software
+            Empresa Exemplo | 2024 — Atual
+            Desenvolvimento de aplicações utilizando .NET e PostgreSQL.
+
+            LINGUAGENS E TECNOLOGIAS
+            C#, .NET, PostgreSQL, Git
+            """;
+
+        var analyzer =
+            new ResumeAnalyzer();
+
+        var profile =
+            analyzer.Analyze(
+                resumeText);
+
+        Assert.NotEmpty(
+            profile.DetailedSkills);
+
+        Assert.Contains(
+            profile.DetailedSkills,
+            skill =>
+                skill.Name.Equals(
+                    ".NET",
+                    StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void Analyze_ClassifiesTitleSkillAsPrimary()
+    {
+        const string resumeText =
+            """
+            Maria Silva
+            Desenvolvedor .NET
+
+            LINGUAGENS E TECNOLOGIAS
+            C#, .NET, Git
+            """;
+
+        var analyzer =
+            new ResumeAnalyzer();
+
+        var profile =
+            analyzer.Analyze(
+                resumeText);
+
+        var dotnet =
+            Assert.Single(
+                profile.DetailedSkills,
+                skill =>
+                    skill.Name.Equals(
+                        ".NET",
+                        StringComparison.OrdinalIgnoreCase));
+
+        Assert.Equal(
+            SkillRelevance.Primary,
+            dotnet.Relevance);
+    }
+
+    [Fact]
+    public void Analyze_ClassifiesExperienceSkillAsRelevant()
+    {
+        const string resumeText =
+            """
+            Maria Silva
+            Desenvolvedor de Software
+
+            EXPERIÊNCIA PROFISSIONAL
+            Desenvolvedor de Software
+            Empresa Exemplo | 2024 — Atual
+            Desenvolvimento de aplicações utilizando PostgreSQL.
+
+            LINGUAGENS E TECNOLOGIAS
+            PostgreSQL
+            """;
+
+        var analyzer =
+            new ResumeAnalyzer();
+
+        var profile =
+            analyzer.Analyze(
+                resumeText);
+
+        var postgresql =
+            Assert.Single(
+                profile.DetailedSkills,
+                skill =>
+                    skill.Name.Equals(
+                        "PostgreSQL",
+                        StringComparison.OrdinalIgnoreCase));
+
+        Assert.Equal(
+            SkillRelevance.Relevant,
+            postgresql.Relevance);
+    }
+
+    [Fact]
+    public void Analyze_KeepsLegacySkillsAndDetailedSkillsConsistent()
+    {
+        const string resumeText =
+            """
+            Maria Silva
+            Desenvolvedor .NET
+
+            LINGUAGENS E TECNOLOGIAS
+            C#, .NET, PostgreSQL, Git
+            """;
+
+        var analyzer =
+            new ResumeAnalyzer();
+
+        var profile =
+            analyzer.Analyze(
+                resumeText);
+
+        Assert.Equal(
+            profile.Skills.Count,
+            profile.DetailedSkills.Count);
+
+        foreach (var skill in profile.Skills)
+        {
+            Assert.Contains(
+                profile.DetailedSkills,
+                detailedSkill =>
+                    detailedSkill.Name.Equals(
+                        skill,
+                        StringComparison.OrdinalIgnoreCase));
+        }
     }
 }
