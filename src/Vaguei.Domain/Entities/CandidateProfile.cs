@@ -1,3 +1,5 @@
+using Vaguei.Domain.Models;
+
 namespace Vaguei.Domain.Entities;
 
 public sealed class CandidateProfile
@@ -12,6 +14,8 @@ public sealed class CandidateProfile
 
     public HashSet<string> Skills { get; set; } =
         new(StringComparer.OrdinalIgnoreCase);
+
+    public List<CandidateSkill> DetailedSkills { get; set; } = [];
 
     public List<WorkExperience> Experiences { get; set; } = [];
 }
