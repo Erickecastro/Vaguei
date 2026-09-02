@@ -324,4 +324,281 @@ public sealed class JobMatcherTests
             Description = description
         };
     }
+
+    [Fact]
+    public void Match_GivesMoreWeightToPrimarySkills()
+    {
+        var profile =
+            CreateProfile(
+                string.Empty,
+                "Primary Skill",
+                "Supporting Skill");
+
+        profile.DetailedSkills.Add(
+            new CandidateSkill(
+                "Primary Skill",
+                SkillRelevance.Primary));
+
+        profile.DetailedSkills.Add(
+            new CandidateSkill(
+                "Supporting Skill",
+                SkillRelevance.Supporting));
+
+        var primaryJob =
+            CreateJob(
+                "Example Job",
+                "Experience with Primary Skill.");
+
+        var supportingJob =
+            CreateJob(
+                "Example Job",
+                "Experience with Supporting Skill.");
+
+        var preferences =
+            new JobSearchPreferences();
+
+        var primaryResult =
+            _matcher.Match(
+                profile,
+                primaryJob,
+                preferences);
+
+        var supportingResult =
+            _matcher.Match(
+                profile,
+                supportingJob,
+                preferences);
+
+        Assert.True(
+            primaryResult.Score >
+            supportingResult.Score);
+    }
+
+    [Fact]
+    public void Match_UsesWeightedDetailedSkills()
+    {
+        var profile =
+            CreateProfile(
+                string.Empty,
+                "Primary Skill",
+                "Relevant Skill",
+                "Supporting Skill");
+
+        profile.DetailedSkills.Add(
+            new CandidateSkill(
+                "Primary Skill",
+                SkillRelevance.Primary));
+
+        profile.DetailedSkills.Add(
+            new CandidateSkill(
+                "Relevant Skill",
+                SkillRelevance.Relevant));
+
+        profile.DetailedSkills.Add(
+            new CandidateSkill(
+                "Supporting Skill",
+                SkillRelevance.Supporting));
+
+        var job =
+            CreateJob(
+                "Example Job",
+                "Experience with Primary Skill.");
+
+        var result =
+            _matcher.Match(
+                profile,
+                job,
+                new JobSearchPreferences());
+
+        Assert.Equal(
+            62.5,
+            result.Score);
+    }
+
+    [Fact]
+    public void Match_PreservesLegacySkillScoring()
+    {
+        var profile =
+            CreateProfile(
+                string.Empty,
+                "C#",
+                ".NET",
+                "PostgreSQL",
+                "Git");
+
+        var job =
+            CreateJob(
+                "Example Job",
+                "C# and .NET.");
+
+        var result =
+            _matcher.Match(
+                profile,
+                job,
+                new JobSearchPreferences());
+
+        Assert.Equal(
+            50,
+            result.Score);
+    }
+
+    [Fact]
+    public void Match_DoesNotDiluteScoreBecauseProfileHasManySkills()
+    {
+        var profile =
+            CreateProfile(
+                string.Empty,
+                "Primary Skill",
+                "Relevant Skill 1",
+                "Relevant Skill 2",
+                "Relevant Skill 3",
+                "Supporting Skill 1",
+                "Supporting Skill 2",
+                "Supporting Skill 3",
+                "Supporting Skill 4");
+
+        profile.DetailedSkills.Add(
+            new CandidateSkill(
+                "Primary Skill",
+                SkillRelevance.Primary));
+
+        profile.DetailedSkills.Add(
+            new CandidateSkill(
+                "Relevant Skill 1",
+                SkillRelevance.Relevant));
+
+        profile.DetailedSkills.Add(
+            new CandidateSkill(
+                "Relevant Skill 2",
+                SkillRelevance.Relevant));
+
+        profile.DetailedSkills.Add(
+            new CandidateSkill(
+                "Relevant Skill 3",
+                SkillRelevance.Relevant));
+
+        profile.DetailedSkills.Add(
+            new CandidateSkill(
+                "Supporting Skill 1",
+                SkillRelevance.Supporting));
+
+        profile.DetailedSkills.Add(
+            new CandidateSkill(
+                "Supporting Skill 2",
+                SkillRelevance.Supporting));
+
+        profile.DetailedSkills.Add(
+            new CandidateSkill(
+                "Supporting Skill 3",
+                SkillRelevance.Supporting));
+
+        profile.DetailedSkills.Add(
+            new CandidateSkill(
+                "Supporting Skill 4",
+                SkillRelevance.Supporting));
+
+        var job =
+            CreateJob(
+                "Example Job",
+                """
+                Primary Skill,
+                Relevant Skill 1,
+                Relevant Skill 2,
+                Relevant Skill 3.
+                """);
+
+        var result =
+            _matcher.Match(
+                profile,
+                job,
+                new JobSearchPreferences());
+
+        Assert.Equal(
+            100,
+            result.Score);
+    }
+
+    [Fact]
+    public void Match_DoesNotLetSupportingSkillsEqualPrimaryEvidence()
+    {
+        var profile =
+            CreateProfile(
+                string.Empty,
+                "Primary Skill",
+                "Relevant Skill 1",
+                "Relevant Skill 2",
+                "Supporting Skill 1",
+                "Supporting Skill 2",
+                "Supporting Skill 3",
+                "Supporting Skill 4");
+
+        profile.DetailedSkills.Add(
+            new CandidateSkill(
+                "Primary Skill",
+                SkillRelevance.Primary));
+
+        profile.DetailedSkills.Add(
+            new CandidateSkill(
+                "Relevant Skill 1",
+                SkillRelevance.Relevant));
+
+        profile.DetailedSkills.Add(
+            new CandidateSkill(
+                "Relevant Skill 2",
+                SkillRelevance.Relevant));
+
+        profile.DetailedSkills.Add(
+            new CandidateSkill(
+                "Supporting Skill 1",
+                SkillRelevance.Supporting));
+
+        profile.DetailedSkills.Add(
+            new CandidateSkill(
+                "Supporting Skill 2",
+                SkillRelevance.Supporting));
+
+        profile.DetailedSkills.Add(
+            new CandidateSkill(
+                "Supporting Skill 3",
+                SkillRelevance.Supporting));
+
+        profile.DetailedSkills.Add(
+            new CandidateSkill(
+                "Supporting Skill 4",
+                SkillRelevance.Supporting));
+
+        var primaryJob =
+            CreateJob(
+                "Example Job",
+                "Primary Skill.");
+
+        var supportingJob =
+            CreateJob(
+                "Example Job",
+                """
+                Supporting Skill 1,
+                Supporting Skill 2,
+                Supporting Skill 3,
+                Supporting Skill 4.
+                """);
+
+        var preferences =
+            new JobSearchPreferences();
+
+        var primaryResult =
+            _matcher.Match(
+                profile,
+                primaryJob,
+                preferences);
+
+        var supportingResult =
+            _matcher.Match(
+                profile,
+                supportingJob,
+                preferences);
+
+        Assert.True(
+            primaryResult.Score >
+            supportingResult.Score);
+    }
 }

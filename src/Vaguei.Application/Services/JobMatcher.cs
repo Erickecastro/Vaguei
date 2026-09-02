@@ -11,8 +11,11 @@ public sealed class JobMatcher
 {
     private const double RoleWeight = 50;
     private const double SkillWeight = 50;
-
-    private const int MaximumSkillEvidence = 4;
+    private const double PrimarySkillWeight = 5;
+    private const double RelevantSkillWeight = 2;
+    private const double SupportingSkillWeight = 1;
+    private const double UnspecifiedSkillWeight = 1;
+    private const int MaximumWeightedSkillEvidence = 4;
 
     public JobMatchResult Match(
         CandidateProfile profile,
@@ -53,7 +56,8 @@ public sealed class JobMatcher
                 roleScore);
         }
 
-        if (profile.Skills.Count > 0)
+        if (profile.DetailedSkills.Count > 0 ||
+            profile.Skills.Count > 0)
         {
             availableWeight +=
                 SkillWeight;
@@ -207,10 +211,14 @@ public sealed class JobMatcher
             CandidateProfile profile,
             JobPosting job)
     {
+        var candidateSkills =
+            GetCandidateSkillNames(
+                profile);
+
         var matchedSkills =
             new List<string>();
 
-        foreach (var skill in profile.Skills)
+        foreach (var skill in candidateSkills)
         {
             if (JobContainsSkill(
                     job,
@@ -222,6 +230,33 @@ public sealed class JobMatcher
         }
 
         return matchedSkills;
+    }
+
+    private static IReadOnlyCollection<string>
+        GetCandidateSkillNames(
+            CandidateProfile profile)
+    {
+        if (profile.DetailedSkills.Count > 0)
+        {
+            return profile
+                .DetailedSkills
+                .Select(
+                    skill =>
+                        skill.Name)
+                .Distinct(
+                    StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+        }
+
+        return profile
+            .Skills
+            .Where(
+                skill =>
+                    !string.IsNullOrWhiteSpace(
+                        skill))
+            .Distinct(
+                StringComparer.OrdinalIgnoreCase)
+            .ToArray();
     }
 
     private static bool JobContainsSkill(
@@ -243,14 +278,89 @@ public sealed class JobMatcher
                 skill);
     }
 
-    private static double CalculateSkillScore(
-        CandidateProfile profile,
+    private static double CalculateSkillScore(CandidateProfile profile, IReadOnlyCollection<string> matchedSkills)
+    {
+        if (profile.DetailedSkills.Count > 0)
+        {
+            return CalculateWeightedSkillScore(
+                profile.DetailedSkills,
+                matchedSkills);
+        }
+
+        return CalculateLegacySkillScore(
+            profile.Skills,
+            matchedSkills);
+    }
+
+    private static double CalculateWeightedSkillScore(
+        IEnumerable<CandidateSkill> candidateSkills,
         IReadOnlyCollection<string> matchedSkills)
     {
+        var matchedSkillSet =
+            matchedSkills.ToHashSet(
+                StringComparer.OrdinalIgnoreCase);
+
+        var skills =
+            candidateSkills
+                .GroupBy(
+                    skill =>
+                        skill.Name,
+                    StringComparer.OrdinalIgnoreCase)
+                .Select(
+                    group =>
+                        group.First())
+                .ToArray();
+
+        if (skills.Length == 0)
+        {
+            return 0;
+        }
+
+        var requiredEvidenceWeight =
+            skills
+                .Select(
+                    skill =>
+                        GetSkillWeight(
+                            skill.Relevance))
+                .OrderByDescending(
+                    weight =>
+                        weight)
+                .Take(
+                    MaximumWeightedSkillEvidence)
+                .Sum();
+
+        if (requiredEvidenceWeight <= 0)
+        {
+            return 0;
+        }
+
+        var matchedWeight =
+            skills
+                .Where(
+                    skill =>
+                        matchedSkillSet.Contains(
+                            skill.Name))
+                .Sum(
+                    skill =>
+                        GetSkillWeight(
+                            skill.Relevance));
+
+        return Math.Min(
+            1,
+            matchedWeight /
+            requiredEvidenceWeight);
+    }
+
+    private static double CalculateLegacySkillScore(
+        IReadOnlyCollection<string> candidateSkills,
+        IReadOnlyCollection<string> matchedSkills)
+    {
+        const int maximumSkillEvidence = 4;
+
         var requiredEvidence =
             Math.Min(
-                profile.Skills.Count,
-                MaximumSkillEvidence);
+                candidateSkills.Count,
+                maximumSkillEvidence);
 
         if (requiredEvidence == 0)
         {
@@ -261,6 +371,28 @@ public sealed class JobMatcher
             1,
             (double)matchedSkills.Count /
             requiredEvidence);
+    }
+
+    private static double GetSkillWeight(
+        SkillRelevance relevance)
+    {
+        return relevance switch
+        {
+            SkillRelevance.Primary =>
+                PrimarySkillWeight,
+
+            SkillRelevance.Relevant =>
+                RelevantSkillWeight,
+
+            SkillRelevance.Supporting =>
+                SupportingSkillWeight,
+
+            SkillRelevance.Unspecified =>
+                UnspecifiedSkillWeight,
+
+            _ =>
+                UnspecifiedSkillWeight
+        };
     }
 
     private static void AddRoleReason(
@@ -372,24 +504,6 @@ public sealed class JobMatcher
             normalizedText,
             pattern,
             RegexOptions.IgnoreCase);
-    }
-
-    private static HashSet<string> Tokenize(
-        string text)
-    {
-        return Regex
-            .Matches(
-                text,
-                @"[\p{L}\p{N}+#.]+")
-            .Select(
-                match =>
-                    match.Value)
-            .Where(
-                token =>
-                    !string.IsNullOrWhiteSpace(
-                        token))
-            .ToHashSet(
-                StringComparer.OrdinalIgnoreCase);
     }
 
     private static string NormalizeText(

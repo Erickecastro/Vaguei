@@ -90,6 +90,23 @@ try
     }
 
     Console.WriteLine();
+    Console.WriteLine(
+        "Relevância das competências:");
+
+    foreach (var skill in
+             profile.DetailedSkills
+                 .OrderByDescending(
+                     skill =>
+                         skill.Relevance)
+                 .ThenBy(
+                     skill =>
+                         skill.Name))
+    {
+        Console.WriteLine(
+            $"- {skill.Name}: {skill.Relevance}");
+    }
+
+    Console.WriteLine();
     Console.WriteLine("Experiências profissionais:");
 
     foreach (var experience in profile.Experiences)
