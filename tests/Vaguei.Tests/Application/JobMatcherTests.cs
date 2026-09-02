@@ -239,6 +239,60 @@ public sealed class JobMatcherTests
                     JobMatchReasonKind.Neutral);
     }
 
+    [Fact]
+    public void Match_RecognizesPortugueseAndEnglishDeveloperRoles()
+    {
+        var profile =
+            CreateProfile(
+                "Desenvolvedor .NET");
+
+        var job =
+            CreateJob(
+                "Software Developer",
+                string.Empty);
+
+        var result =
+            _matcher.Match(
+                profile,
+                job,
+                new JobSearchPreferences());
+
+        Assert.Equal(
+            50,
+            result.Score);
+
+        Assert.Contains(
+            result.Reasons,
+            reason =>
+                reason.Criterion ==
+                JobMatchCriterion.ProfessionalRole &&
+                reason.Kind ==
+                JobMatchReasonKind.Positive);
+    }
+
+    [Fact]
+    public void Match_RecognizesEquivalentSoftwareEngineerRole()
+    {
+        var profile =
+            CreateProfile(
+                "Engenheiro de Software");
+
+        var job =
+            CreateJob(
+                "Senior Software Engineer",
+                string.Empty);
+
+        var result =
+            _matcher.Match(
+                profile,
+                job,
+                new JobSearchPreferences());
+
+        Assert.Equal(
+            100,
+            result.Score);
+    }
+
     private static CandidateProfile CreateProfile(
         string professionalTitle,
         params string[] skills)

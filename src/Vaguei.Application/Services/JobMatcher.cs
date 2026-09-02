@@ -110,6 +110,25 @@ public sealed class JobMatcher
             reasons);
     }
 
+    private readonly ProfessionalRoleNormalizer
+        _roleNormalizer;
+
+    public JobMatcher()
+        : this(
+            new ProfessionalRoleNormalizer())
+    {
+    }
+
+    public JobMatcher(
+        ProfessionalRoleNormalizer roleNormalizer)
+    {
+        ArgumentNullException.ThrowIfNull(
+            roleNormalizer);
+
+        _roleNormalizer =
+            roleNormalizer;
+    }
+
     private static IReadOnlyCollection<string>
         GetRoleCandidates(
             CandidateProfile profile,
@@ -138,7 +157,7 @@ public sealed class JobMatcher
         ];
     }
 
-    private static double CalculateRoleScore(
+    private double CalculateRoleScore(
         IEnumerable<string> roleCandidates,
         string jobTitle)
     {
@@ -152,58 +171,35 @@ public sealed class JobMatcher
             .Max();
     }
 
-    private static double CalculateRoleSimilarity(
+    private double CalculateRoleSimilarity(
         string expectedRole,
         string jobTitle)
     {
-        var expectedText =
-            NormalizeText(
+        var expectedTerms =
+            _roleNormalizer.Normalize(
                 expectedRole);
 
-        var jobText =
-            NormalizeText(
+        var jobTerms =
+            _roleNormalizer.Normalize(
                 jobTitle);
 
-        if (string.IsNullOrWhiteSpace(
-                expectedText) ||
-            string.IsNullOrWhiteSpace(
-                jobText))
+        if (expectedTerms.Count == 0 ||
+            jobTerms.Count == 0)
         {
             return 0;
         }
 
-        if (expectedText.Equals(
-                jobText,
-                StringComparison.OrdinalIgnoreCase))
-        {
-            return 1;
-        }
+        var jobTermSet =
+            jobTerms.ToHashSet(
+                StringComparer.OrdinalIgnoreCase);
 
-        if (jobText.Contains(
-                expectedText,
-                StringComparison.OrdinalIgnoreCase))
-        {
-            return 1;
-        }
-
-        var expectedTokens =
-            Tokenize(expectedText);
-
-        var jobTokens =
-            Tokenize(jobText);
-
-        if (expectedTokens.Count == 0)
-        {
-            return 0;
-        }
-
-        var matchedTokens =
-            expectedTokens.Count(
-                jobTokens.Contains);
+        var matchedTerms =
+            expectedTerms.Count(
+                jobTermSet.Contains);
 
         return
-            (double)matchedTokens /
-            expectedTokens.Count;
+            (double)matchedTerms /
+            expectedTerms.Count;
     }
 
     private static IReadOnlyCollection<string>
