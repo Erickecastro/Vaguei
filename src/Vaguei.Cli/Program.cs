@@ -3,6 +3,7 @@ using Vaguei.Collectors.Sources;
 using Vaguei.Domain.Models;
 using Vaguei.ResumeParser.Parsers;
 using Vaguei.ResumeParser.Services;
+using Vaguei.Domain.Enums;
 
 if (args.Length == 0)
 {
@@ -193,10 +194,21 @@ try
             preferences,
             DateTimeOffset.UtcNow);
 
-    var jobList =
+    var jobMatcher =
+        new JobMatcher();
+
+    var matchedJobs =
         freshJobs
+            .Select(
+                job =>
+                    jobMatcher.Match(
+                        profile,
+                        job,
+                        preferences))
             .OrderByDescending(
-                job => job.PublishedAt)
+                result => result.Score)
+            .ThenByDescending(
+                result => result.Job.PublishedAt)
             .Take(10)
             .ToList();
 
@@ -206,14 +218,17 @@ try
     Console.WriteLine("==================================");
     Console.WriteLine();
 
-    if (jobList.Count == 0)
+    if (matchedJobs.Count == 0)
     {
         Console.WriteLine(
-            "Nenhuma vaga encontrada para a consulta atual.");
+            "Nenhuma vaga encontrada.");
     }
 
-    foreach (var job in jobList)
+    foreach (var match in matchedJobs)
     {
+        var job =
+            match.Job;
+
         Console.WriteLine(
             $"Cargo: {job.Title}");
 
@@ -221,10 +236,13 @@ try
             $"Empresa: {job.Company}");
 
         Console.WriteLine(
-            $"Local: {job.Location.RawLocation ?? "Não informado"}");
+            $"Local: {job.Location.RawLocation}");
 
         Console.WriteLine(
             $"Modelo: {job.WorkModel}");
+
+        Console.WriteLine(
+            $"Compatibilidade: {match.Score:F2}%");
 
         Console.WriteLine(
             $"Publicada: {job.PublishedAt:dd/MM/yyyy HH:mm} UTC");
@@ -234,6 +252,28 @@ try
 
         Console.WriteLine(
             $"URL: {job.Url}");
+
+        Console.WriteLine(
+            "Motivos:");
+
+        foreach (var reason in match.Reasons)
+        {
+            var symbol =
+                reason.Kind switch
+                {
+                    JobMatchReasonKind.Positive =>
+                        "+",
+
+                    JobMatchReasonKind.Negative =>
+                        "-",
+
+                    _ =>
+                        "~"
+                };
+
+            Console.WriteLine(
+                $"{symbol} {reason.Description}");
+        }
 
         Console.WriteLine(
             "----------------------------------");
