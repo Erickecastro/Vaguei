@@ -70,7 +70,7 @@
       <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}" />
     </Style>
-    <Style Selector="ComboBoxItem.scope-option">
+    <Style Selector="ComboBoxItem">
       <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
     </Style>
   </Window.Styles>
@@ -94,33 +94,19 @@
           <PathIcon x:Name="SidebarToggleIcon" Width="27" Height="27"
                     Data="M15,4 L7,12 L15,20" />
         </Button>
-        <ComboBox x:Name="ScopeSelector" Grid.Column="2"
-                  Classes="scope-selector" Width="240" Height="54"
-                  SelectedIndex="{Binding SearchScopeIndex}"
-                  HorizontalContentAlignment="Stretch">
-          <ComboBoxItem Classes="scope-option">
-            <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-              <PathIcon x:Name="BrazilScopeIcon" Width="23" Height="23"
-                        Foreground="{DynamicResource PrimaryTextBrush}"
-                        Data="M12,2 C8.13,2 5,5.13 5,9 C5,14.25 12,22 12,22 C12,22 19,14.25 19,9 C19,5.13 15.87,2 12,2 Z M12,6.5 A2.5,2.5 0 1 1 12,11.5 A2.5,2.5 0 1 1 12,6.5 Z" />
-              <TextBlock x:Name="BrazilScopeText" VerticalAlignment="Center"
-                         FontSize="16" FontWeight="SemiBold"
-                         Foreground="{DynamicResource PrimaryTextBrush}"
-                         Text="Somente Brasil" />
-            </StackPanel>
-          </ComboBoxItem>
-          <ComboBoxItem Classes="scope-option">
-            <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-              <PathIcon x:Name="InternationalScopeIcon" Width="23" Height="23"
-                        Foreground="{DynamicResource PrimaryTextBrush}"
-                        Data="M12,2 C8.13,2 5,5.13 5,9 C5,14.25 12,22 12,22 C12,22 19,14.25 19,9 C19,5.13 15.87,2 12,2 Z M12,6.5 A2.5,2.5 0 1 1 12,11.5 A2.5,2.5 0 1 1 12,6.5 Z" />
-              <TextBlock x:Name="InternationalScopeText" VerticalAlignment="Center"
-                         FontSize="16" FontWeight="SemiBold"
-                         Foreground="{DynamicResource PrimaryTextBrush}"
-                         Text="Brasil + exterior" />
-            </StackPanel>
-          </ComboBoxItem>
-        </ComboBox>
+        <Grid Grid.Column="2" Width="240" Height="54">
+          <ComboBox x:Name="ScopeSelector" Classes="scope-selector"
+                    Width="240" Height="54" Padding="42,0,12,0"
+                    FontSize="16" FontWeight="SemiBold"
+                    ItemsSource="{Binding SearchScopes}"
+                    SelectedIndex="{Binding SearchScopeIndex}"
+                    HorizontalContentAlignment="Stretch" />
+          <PathIcon x:Name="ScopeLocationIcon" Width="23" Height="23"
+                    Margin="14,0,0,0" HorizontalAlignment="Left"
+                    VerticalAlignment="Center" IsHitTestVisible="False"
+                    Foreground="{DynamicResource PrimaryTextBrush}"
+                    Data="M12,2 C8.13,2 5,5.13 5,9 C5,14.25 12,22 12,22 C12,22 19,14.25 19,9 C19,5.13 15.87,2 12,2 Z M12,6.5 A2.5,2.5 0 1 1 12,11.5 A2.5,2.5 0 1 1 12,6.5 Z" />
+        </Grid>
         <Button Grid.Column="4" Classes="icon" Click="OnThemeToggleClick"
                 ToolTip.Tip="Alternar tema">
           <PathIcon Width="27" Height="27"
@@ -256,7 +242,17 @@
 
         <ScrollViewer Grid.Row="1">
           <StackPanel>
-            <Border Classes="card" Padding="30" IsVisible="{Binding !HasResults}">
+            <Border Classes="card" Padding="54,44" IsVisible="{Binding IsBusy}">
+              <StackPanel HorizontalAlignment="Center" Spacing="14">
+                <TextBlock HorizontalAlignment="Center" FontSize="19"
+                           FontWeight="Bold" Text="Procurando oportunidades..." />
+                <TextBlock Classes="subtitle" HorizontalAlignment="Center"
+                           TextAlignment="Center" Text="Isso pode levar alguns instantes." />
+                <ProgressBar Width="260" Height="6" IsIndeterminate="True" />
+              </StackPanel>
+            </Border>
+
+            <Border Classes="card" Padding="30" IsVisible="{Binding ShowEmptyState}">
               <StackPanel HorizontalAlignment="Center" Spacing="8">
                 <TextBlock HorizontalAlignment="Center" FontSize="34" Text="⌕" />
                 <TextBlock FontSize="18" FontWeight="Bold"

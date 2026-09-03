@@ -46,12 +46,14 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(RefreshJobsCommand))]
+    [NotifyPropertyChangedFor(nameof(ShowEmptyState))]
     private bool _isBusy;
 
     [ObservableProperty]
     private bool _hasProfile;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowEmptyState))]
     private bool _hasResults;
 
     public MainViewModel(
@@ -67,6 +69,14 @@ public partial class MainViewModel : ViewModelBase
     public ObservableCollection<JobResultItemViewModel> Jobs { get; } = [];
 
     public ObservableCollection<string> ProfileSkills { get; } = [];
+
+    public IReadOnlyList<string> SearchScopes { get; } =
+    [
+        "Somente Brasil",
+        "Brasil + exterior"
+    ];
+
+    public bool ShowEmptyState => !IsBusy && !HasResults;
 
     public async Task ProcessResumeAsync(
         string filePath,
@@ -89,12 +99,21 @@ public partial class MainViewModel : ViewModelBase
             var extension = Path.GetExtension(filePath);
             var parser = _parserService.GetParser(extension);
 
-            await using var stream = File.OpenRead(filePath);
-            var text = await parser.ExtractTextAsync(
-                stream,
+            var text = await Task.Run(
+                async () =>
+                {
+                    await using var stream = File.OpenRead(filePath);
+
+                    return await parser.ExtractTextAsync(
+                            stream,
+                            cancellationToken)
+                        .ConfigureAwait(false);
+                },
                 cancellationToken);
 
-            var profile = _resumeAnalyzer.Analyze(text);
+            var profile = await Task.Run(
+                () => _resumeAnalyzer.Analyze(text),
+                cancellationToken);
             _currentProfile = profile;
             CandidateName = profile.Name;
             ProfessionalTitle = profile.ProfessionalTitle;
@@ -177,10 +196,13 @@ public partial class MainViewModel : ViewModelBase
             IncludeInternational = IncludeInternational
         };
 
-        var result = await _searchOrchestrator.SearchAsync(
-            profile,
-            preferences,
-            DateTimeOffset.UtcNow,
+        var result = await Task.Run(
+            async () => await _searchOrchestrator.SearchAsync(
+                    profile,
+                    preferences,
+                    DateTimeOffset.UtcNow,
+                    cancellationToken)
+                .ConfigureAwait(false),
             cancellationToken);
 
         Jobs.Clear();

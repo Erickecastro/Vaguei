@@ -10,6 +10,18 @@ namespace Vaguei.Tests.Desktop;
 public sealed class MainViewModelTests
 {
     [Fact]
+    public void InitialState_ExposesSearchScopesAndEmptyState()
+    {
+        var viewModel = CreateViewModel(
+            new StubJobSource());
+
+        Assert.Equal(
+            ["Somente Brasil", "Brasil + exterior"],
+            viewModel.SearchScopes);
+        Assert.True(viewModel.ShowEmptyState);
+    }
+
+    [Fact]
     public async Task ProcessResumeAsync_PopulatesProfileAndJobs()
     {
         var filePath = CreateTemporaryResume();
@@ -130,6 +142,7 @@ public sealed class MainViewModelTests
                 viewModel.RefreshJobsCommand.ExecuteAsync(null);
 
             Assert.True(viewModel.IsBusy);
+            Assert.False(viewModel.ShowEmptyState);
             Assert.False(
                 viewModel.RefreshJobsCommand.CanExecute(null));
 

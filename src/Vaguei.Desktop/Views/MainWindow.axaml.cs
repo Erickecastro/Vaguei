@@ -174,10 +174,7 @@ public partial class MainWindow : Window
         DarkThemeLogo.IsVisible = isDark;
         LightThemeLogo.IsVisible = !isDark;
         ScopeSelector.Foreground = foreground;
-        BrazilScopeIcon.Foreground = foreground;
-        BrazilScopeText.Foreground = foreground;
-        InternationalScopeIcon.Foreground = foreground;
-        InternationalScopeText.Foreground = foreground;
+        ScopeLocationIcon.Foreground = foreground;
     }
 
     private void OnOpenJobClick(
