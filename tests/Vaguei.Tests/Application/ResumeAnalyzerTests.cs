@@ -386,4 +386,21 @@ public sealed class ResumeAnalyzerTests
                         StringComparison.OrdinalIgnoreCase));
         }
     }
+
+    [Fact]
+    public void Analyze_DoesNotInferSkillsFromContactInformation()
+    {
+        const string resumeText =
+            """
+            Maria Silva
+            Analista Financeiro
+            azure@example.com
+            https://github.com/maria
+            """;
+
+        var profile = new ResumeAnalyzer().Analyze(resumeText);
+
+        Assert.DoesNotContain("Azure", profile.Skills);
+        Assert.DoesNotContain("GitHub", profile.Skills);
+    }
 }

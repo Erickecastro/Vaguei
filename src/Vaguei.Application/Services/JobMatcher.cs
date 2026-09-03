@@ -16,6 +16,9 @@ public sealed class JobMatcher
     private const double SupportingSkillWeight = 1;
     private const double UnspecifiedSkillWeight = 1;
     private const int MaximumWeightedSkillEvidence = 4;
+    private const double CoreRequirementPenalty = 15;
+    private const double RequiredRequirementPenalty = 8;
+    private const double MaximumRequirementPenalty = 25;
 
     public JobMatchResult Match(
         CandidateProfile profile,
@@ -101,12 +104,22 @@ public sealed class JobMatcher
                 reasons);
         }
 
-        var score =
-            Math.Round(
-                weightedScore /
-                availableWeight *
-                100,
-                2);
+        var baseScore =
+            weightedScore /
+            availableWeight *
+            100;
+
+        var requirementPenalty =
+            CalculateRequirementPenalty(
+                profile,
+                job,
+                reasons);
+
+        var score = Math.Round(
+            Math.Max(
+                0,
+                baseScore - requirementPenalty),
+            2);
 
         return new JobMatchResult(
             job,
@@ -269,6 +282,14 @@ public sealed class JobMatcher
             return true;
         }
 
+        if (job.SkillRequirements.Any(requirement =>
+                requirement.Name.Equals(
+                    skill,
+                    StringComparison.OrdinalIgnoreCase)))
+        {
+            return true;
+        }
+
         return
             ContainsTerm(
                 job.Title,
@@ -393,6 +414,60 @@ public sealed class JobMatcher
             _ =>
                 UnspecifiedSkillWeight
         };
+    }
+
+    private static double CalculateRequirementPenalty(
+        CandidateProfile profile,
+        JobPosting job,
+        ICollection<JobMatchReason> reasons)
+    {
+        var candidateSkills = GetCandidateSkillNames(profile)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        if (candidateSkills.Count == 0 ||
+            job.SkillRequirements.Count == 0)
+        {
+            return 0;
+        }
+
+        var missingRequirements = job.SkillRequirements
+            .Where(requirement =>
+                requirement.Level is
+                    JobSkillRequirementLevel.Core or
+                    JobSkillRequirementLevel.Required)
+            .Where(requirement =>
+                !candidateSkills.Contains(requirement.Name))
+            .GroupBy(
+                requirement => requirement.Name,
+                StringComparer.OrdinalIgnoreCase)
+            .Select(group =>
+                group.OrderByDescending(
+                        requirement => requirement.Level)
+                    .First())
+            .ToArray();
+
+        foreach (var requirement in missingRequirements)
+        {
+            reasons.Add(
+                new JobMatchReason
+                {
+                    Criterion = JobMatchCriterion.Skill,
+                    Kind = JobMatchReasonKind.Negative,
+                    Description = requirement.Level ==
+                        JobSkillRequirementLevel.Core
+                            ? $"Competência central não identificada no perfil: {requirement.Name}."
+                            : $"Competência obrigatória não identificada no perfil: {requirement.Name}."
+                });
+        }
+
+        var penalty = missingRequirements.Sum(requirement =>
+            requirement.Level == JobSkillRequirementLevel.Core
+                ? CoreRequirementPenalty
+                : RequiredRequirementPenalty);
+
+        return Math.Min(
+            MaximumRequirementPenalty,
+            penalty);
     }
 
     private static void AddRoleReason(

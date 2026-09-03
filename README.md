@@ -124,6 +124,20 @@ Android and iOS are part of the long-term direction, after the desktop workflow 
 
 The graphical workflow should allow the user to select or drag a resume into the application, review the extracted profile, configure search preferences, and receive ranked opportunities with clear compatibility explanations.
 
+An initial Avalonia desktop interface is available in `src/Vaguei.Desktop`. Run it with:
+
+```bash
+dotnet run --project src/Vaguei.Desktop
+```
+
+For local diagnostics, the CLI accepts a resume path:
+
+```bash
+dotnet run --project src/Vaguei.Cli -- "/path/to/resume.pdf"
+```
+
+Resume contents are not printed by default. The optional `--show-raw` flag should only be used in a controlled local environment because resumes contain personal data.
+
 # Goals
 
 * Automate part of the job search process

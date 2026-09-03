@@ -5,13 +5,23 @@ using Vaguei.ResumeParser.Parsers;
 using Vaguei.ResumeParser.Services;
 using Vaguei.Domain.Enums;
 
-if (args.Length == 0)
+var filePath = args.FirstOrDefault(argument =>
+    !argument.Equals(
+        "--show-raw",
+        StringComparison.OrdinalIgnoreCase));
+
+var showRawResume = args.Any(argument =>
+    argument.Equals(
+        "--show-raw",
+        StringComparison.OrdinalIgnoreCase));
+
+if (string.IsNullOrWhiteSpace(filePath))
 {
     Console.WriteLine("Vaguei");
     Console.WriteLine();
     Console.WriteLine("Uso:");
     Console.WriteLine(
-        "dotnet run --project src/Vaguei.Cli -- <curriculo>");
+        "dotnet run --project src/Vaguei.Cli -- <curriculo> [--show-raw]");
     Console.WriteLine();
     Console.WriteLine("Formatos suportados:");
     Console.WriteLine("- ODT");
@@ -20,8 +30,6 @@ if (args.Length == 0)
     Console.WriteLine("- TXT");
     return;
 }
-
-var filePath = args[0];
 
 if (!File.Exists(filePath))
 {
@@ -65,11 +73,13 @@ try
     Console.WriteLine(
         $"Formato: {extension}");
 
-    Console.WriteLine();
-
-    Console.WriteLine("Conteúdo extraído:");
-    Console.WriteLine("----------------------------------");
-    Console.WriteLine(text);
+    if (showRawResume)
+    {
+        Console.WriteLine();
+        Console.WriteLine("Conteúdo extraído:");
+        Console.WriteLine("----------------------------------");
+        Console.WriteLine(text);
+    }
 
     Console.WriteLine();
     Console.WriteLine("==================================");

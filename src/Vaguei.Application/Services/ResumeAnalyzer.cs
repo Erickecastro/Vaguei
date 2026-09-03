@@ -12,6 +12,7 @@ public sealed class ResumeAnalyzer
     private readonly ProfessionalSummaryExtractor _summaryExtractor;
     private readonly SkillRelevanceAnalyzer _skillRelevanceAnalyzer;
     private readonly ResumeSectionClassifier _sectionClassifier;
+    private readonly ResumeTextSanitizer _textSanitizer;
 
     public ResumeAnalyzer()
     {
@@ -20,6 +21,7 @@ public sealed class ResumeAnalyzer
         _summaryExtractor = new ProfessionalSummaryExtractor();
         _skillRelevanceAnalyzer = new SkillRelevanceAnalyzer();
         _sectionClassifier = new ResumeSectionClassifier();
+        _textSanitizer = new ResumeTextSanitizer();
     }
 
     public CandidateProfile Analyze(string resumeText)
@@ -31,7 +33,10 @@ public sealed class ResumeAnalyzer
                 nameof(resumeText));
         }
 
-        var lines = resumeText
+        var sanitizedText = _textSanitizer.Sanitize(
+            resumeText);
+
+        var lines = sanitizedText
             .Split(
                 Environment.NewLine,
                 StringSplitOptions.RemoveEmptyEntries |
@@ -41,16 +46,16 @@ public sealed class ResumeAnalyzer
 
         profile.Name = ExtractName(lines);
         profile.ProfessionalTitle = ExtractProfessionalTitle(lines);
-        profile.Summary = _summaryExtractor.Extract(resumeText);
+        profile.Summary = _summaryExtractor.Extract(sanitizedText);
 
-        var matchedSkills = ExtractSkills(resumeText).ToArray();
+        var matchedSkills = ExtractSkills(sanitizedText).ToArray();
 
         foreach (var skill in matchedSkills)
         {
             profile.Skills.Add(skill.Name);
         }
 
-        foreach (var experience in _experienceExtractor.Extract(resumeText))
+        foreach (var experience in _experienceExtractor.Extract(sanitizedText))
         {
             profile.Experiences.Add(experience);
         }
@@ -58,7 +63,7 @@ public sealed class ResumeAnalyzer
         var evidenceBySkill = CollectEvidence(
             profile,
             matchedSkills,
-            _sectionClassifier.Classify(resumeText));
+            _sectionClassifier.Classify(sanitizedText));
 
         foreach (var detailedSkill in
             _skillRelevanceAnalyzer.Analyze(

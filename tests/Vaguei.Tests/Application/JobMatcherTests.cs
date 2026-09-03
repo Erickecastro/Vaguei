@@ -601,4 +601,197 @@ public sealed class JobMatcherTests
             primaryResult.Score >
             supportingResult.Score);
     }
+
+    [Fact]
+    public void Match_AppliesLimitedPenaltyForMissingRequiredSkill()
+    {
+        var profile = CreateProfile(
+            "Backend Developer",
+            "C#",
+            ".NET",
+            "Docker",
+            "PostgreSQL");
+
+        var job = CreateJob(
+            "Backend Developer",
+            "C#, .NET, Docker and PostgreSQL.");
+
+        job.SkillRequirements.Add(
+            new JobSkillRequirement(
+                "Java",
+                JobSkillRequirementLevel.Required));
+
+        var result = _matcher.Match(
+            profile,
+            job,
+            new JobSearchPreferences());
+
+        Assert.Equal(92, result.Score);
+
+        Assert.Contains(
+            result.Reasons,
+            reason =>
+                reason.Kind == JobMatchReasonKind.Negative &&
+                reason.Description.Contains("Java"));
+    }
+
+    [Fact]
+    public void Match_AppliesStrongerPenaltyForMissingCoreSkill()
+    {
+        var profile = CreateProfile(
+            "Software Developer",
+            "Docker");
+
+        var requiredJob = CreateJob(
+            "Software Developer",
+            "Docker");
+
+        requiredJob.SkillRequirements.Add(
+            new JobSkillRequirement(
+                "Go",
+                JobSkillRequirementLevel.Required));
+
+        var coreJob = CreateJob(
+            "Software Developer",
+            "Docker");
+
+        coreJob.SkillRequirements.Add(
+            new JobSkillRequirement(
+                "Go",
+                JobSkillRequirementLevel.Core));
+
+        var preferences = new JobSearchPreferences();
+
+        var requiredResult = _matcher.Match(
+            profile,
+            requiredJob,
+            preferences);
+
+        var coreResult = _matcher.Match(
+            profile,
+            coreJob,
+            preferences);
+
+        Assert.True(
+            coreResult.Score < requiredResult.Score);
+    }
+
+    [Fact]
+    public void Match_CapsCombinedRequirementPenalty()
+    {
+        var profile = CreateProfile(
+            "Software Developer",
+            "Docker");
+
+        var job = CreateJob(
+            "Software Developer",
+            "Docker");
+
+        job.SkillRequirements.AddRange(
+        [
+            new JobSkillRequirement(
+                "Go",
+                JobSkillRequirementLevel.Core),
+            new JobSkillRequirement(
+                "Rust",
+                JobSkillRequirementLevel.Core),
+            new JobSkillRequirement(
+                "Java",
+                JobSkillRequirementLevel.Required)
+        ]);
+
+        var result = _matcher.Match(
+            profile,
+            job,
+            new JobSearchPreferences());
+
+        Assert.Equal(75, result.Score);
+    }
+
+    [Theory]
+    [InlineData(JobSkillRequirementLevel.Mentioned)]
+    [InlineData(JobSkillRequirementLevel.Preferred)]
+    public void Match_DoesNotPenalizeNonMandatoryRequirement(
+        JobSkillRequirementLevel level)
+    {
+        var profile = CreateProfile(
+            "Software Developer",
+            "Docker");
+
+        var job = CreateJob(
+            "Software Developer",
+            "Docker");
+
+        job.SkillRequirements.Add(
+            new JobSkillRequirement(
+                "Go",
+                level));
+
+        var result = _matcher.Match(
+            profile,
+            job,
+            new JobSearchPreferences());
+
+        Assert.Equal(100, result.Score);
+        Assert.DoesNotContain(
+            result.Reasons,
+            reason =>
+                reason.Kind == JobMatchReasonKind.Negative);
+    }
+
+    [Fact]
+    public void Match_UsesStructuredRequirementAsPositiveEvidence()
+    {
+        var profile = CreateProfile(
+            string.Empty,
+            "Excel");
+
+        var job = CreateJob(
+            "Analista Financeiro",
+            string.Empty);
+
+        job.SkillRequirements.Add(
+            new JobSkillRequirement(
+                "Excel",
+                JobSkillRequirementLevel.Required));
+
+        var result = _matcher.Match(
+            profile,
+            job,
+            new JobSearchPreferences());
+
+        Assert.Equal(100, result.Score);
+        Assert.Contains(
+            result.Reasons,
+            reason =>
+                reason.Kind == JobMatchReasonKind.Positive &&
+                reason.Description.Contains("Excel"));
+    }
+
+    [Fact]
+    public void Match_DoesNotPenalizeWhenProfileHasNoSkillData()
+    {
+        var profile = CreateProfile(
+            "Software Developer");
+
+        var job = CreateJob(
+            "Software Developer",
+            string.Empty);
+
+        job.SkillRequirements.Add(
+            new JobSkillRequirement(
+                "Go",
+                JobSkillRequirementLevel.Core));
+
+        var result = _matcher.Match(
+            profile,
+            job,
+            new JobSearchPreferences());
+
+        Assert.Equal(100, result.Score);
+        Assert.DoesNotContain(
+            result.Reasons,
+            reason =>
+                reason.Kind == JobMatchReasonKind.Negative);
+    }
 }
