@@ -283,8 +283,74 @@ public sealed class ResumeAnalyzerTests
                         StringComparison.OrdinalIgnoreCase));
 
         Assert.Equal(
-            SkillRelevance.Relevant,
+            SkillRelevance.Primary,
             postgresql.Relevance);
+
+        Assert.Contains(
+            postgresql.Evidence,
+            evidence =>
+                evidence.Source == SkillEvidenceSource.ExperienceDescription);
+
+        Assert.Contains(
+            postgresql.Evidence,
+            evidence =>
+                evidence.Source == SkillEvidenceSource.SkillsSection);
+    }
+
+    [Fact]
+    public void Analyze_PreservesSkillEvidenceFromGenericSections()
+    {
+        const string resumeText =
+            """
+            Maria Silva
+            Analista de Sistemas
+
+            PROJETOS
+            Aplicação criada com Docker.
+
+            CURSOS
+            Fundamentos de Docker.
+            """;
+
+        var profile = new ResumeAnalyzer().Analyze(resumeText);
+
+        var docker = Assert.Single(
+            profile.DetailedSkills,
+            skill => skill.Name == "Docker");
+
+        Assert.Contains(
+            docker.Evidence,
+            evidence => evidence.Source == SkillEvidenceSource.Project);
+
+        Assert.Contains(
+            docker.Evidence,
+            evidence => evidence.Source == SkillEvidenceSource.Course);
+    }
+
+    [Fact]
+    public void Analyze_PreservesEvidenceWhenResumeUsesSkillAlias()
+    {
+        const string resumeText =
+            """
+            Maria Silva
+            Analista de Dados
+
+            EXPERIÊNCIA PROFISSIONAL
+            Analista de Dados
+            Empresa Exemplo | 2024 — Atual
+            Construção de relatórios com Postgres.
+            """;
+
+        var profile = new ResumeAnalyzer().Analyze(resumeText);
+
+        var postgresql = Assert.Single(
+            profile.DetailedSkills,
+            skill => skill.Name == "PostgreSQL");
+
+        Assert.Contains(
+            postgresql.Evidence,
+            evidence =>
+                evidence.Source == SkillEvidenceSource.ExperienceDescription);
     }
 
     [Fact]

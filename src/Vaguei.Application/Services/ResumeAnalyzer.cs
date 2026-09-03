@@ -1,5 +1,7 @@
 using Vaguei.Application.Catalogs;
 using Vaguei.Domain.Entities;
+using Vaguei.Domain.Enums;
+using Vaguei.Domain.Models;
 
 namespace Vaguei.Application.Services;
 
@@ -9,6 +11,7 @@ public sealed class ResumeAnalyzer
     private readonly WorkExperienceExtractor _experienceExtractor;
     private readonly ProfessionalSummaryExtractor _summaryExtractor;
     private readonly SkillRelevanceAnalyzer _skillRelevanceAnalyzer;
+    private readonly ResumeSectionClassifier _sectionClassifier;
 
     public ResumeAnalyzer()
     {
@@ -16,6 +19,7 @@ public sealed class ResumeAnalyzer
         _experienceExtractor = new WorkExperienceExtractor();
         _summaryExtractor = new ProfessionalSummaryExtractor();
         _skillRelevanceAnalyzer = new SkillRelevanceAnalyzer();
+        _sectionClassifier = new ResumeSectionClassifier();
     }
 
     public CandidateProfile Analyze(string resumeText)
@@ -39,9 +43,11 @@ public sealed class ResumeAnalyzer
         profile.ProfessionalTitle = ExtractProfessionalTitle(lines);
         profile.Summary = _summaryExtractor.Extract(resumeText);
 
-        foreach (var skill in ExtractSkills(resumeText))
+        var matchedSkills = ExtractSkills(resumeText).ToArray();
+
+        foreach (var skill in matchedSkills)
         {
-            profile.Skills.Add(skill);
+            profile.Skills.Add(skill.Name);
         }
 
         foreach (var experience in _experienceExtractor.Extract(resumeText))
@@ -49,8 +55,15 @@ public sealed class ResumeAnalyzer
             profile.Experiences.Add(experience);
         }
 
+        var evidenceBySkill = CollectEvidence(
+            profile,
+            matchedSkills,
+            _sectionClassifier.Classify(resumeText));
+
         foreach (var detailedSkill in
-            _skillRelevanceAnalyzer.Analyze(profile))
+            _skillRelevanceAnalyzer.Analyze(
+                profile,
+                evidenceBySkill))
         {
             profile.DetailedSkills.Add(detailedSkill);
         }
@@ -105,7 +118,7 @@ public sealed class ResumeAnalyzer
         return string.Empty;
     }
 
-    private IEnumerable<string> ExtractSkills(
+    private IEnumerable<SkillDefinition> ExtractSkills(
         string resumeText)
     {
         foreach (var skill in SkillCatalog.Skills)
@@ -114,8 +127,82 @@ public sealed class ResumeAnalyzer
                     resumeText,
                     skill))
             {
-                yield return skill.Name;
+                yield return skill;
             }
+        }
+    }
+
+    private IReadOnlyDictionary<string, IReadOnlyCollection<SkillEvidence>>
+        CollectEvidence(
+            CandidateProfile profile,
+            IEnumerable<SkillDefinition> skills,
+            IReadOnlyDictionary<SkillEvidenceSource, string> sections)
+    {
+        var result =
+            new Dictionary<string, IReadOnlyCollection<SkillEvidence>>(
+                StringComparer.OrdinalIgnoreCase);
+
+        foreach (var skill in skills)
+        {
+            var evidence = sections
+                .Where(section =>
+                    section.Key is not SkillEvidenceSource.ProfessionalSummary and
+                    not SkillEvidenceSource.ExperienceDescription)
+                .Where(section =>
+                    _skillMatcher.ContainsSkill(
+                        section.Value,
+                        skill))
+                .Select(section =>
+                    new SkillEvidence(
+                        section.Key))
+                .ToHashSet();
+
+            AddEvidenceWhenMatched(
+                evidence,
+                profile.ProfessionalTitle,
+                skill,
+                SkillEvidenceSource.ProfessionalTitle);
+
+            AddEvidenceWhenMatched(
+                evidence,
+                profile.Summary,
+                skill,
+                SkillEvidenceSource.ProfessionalSummary);
+
+            foreach (var experience in profile.Experiences)
+            {
+                AddEvidenceWhenMatched(
+                    evidence,
+                    experience.Position,
+                    skill,
+                    SkillEvidenceSource.ExperiencePosition);
+
+                AddEvidenceWhenMatched(
+                    evidence,
+                    experience.Description,
+                    skill,
+                    SkillEvidenceSource.ExperienceDescription);
+            }
+
+            result[skill.Name] = evidence;
+        }
+
+        return result;
+    }
+
+    private void AddEvidenceWhenMatched(
+        ISet<SkillEvidence> evidence,
+        string? text,
+        SkillDefinition skill,
+        SkillEvidenceSource source)
+    {
+        if (!string.IsNullOrWhiteSpace(text) &&
+            _skillMatcher.ContainsSkill(
+                text,
+                skill))
+        {
+            evidence.Add(
+                new SkillEvidence(source));
         }
     }
 }

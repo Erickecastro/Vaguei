@@ -104,6 +104,13 @@ try
     {
         Console.WriteLine(
             $"- {skill.Name}: {skill.Relevance}");
+
+        if (skill.Evidence.Count > 0)
+        {
+            Console.WriteLine(
+                $"  Evidências: {string.Join(", ",
+                    skill.Evidence.Select(item => item.Source))}");
+        }
     }
 
     Console.WriteLine();

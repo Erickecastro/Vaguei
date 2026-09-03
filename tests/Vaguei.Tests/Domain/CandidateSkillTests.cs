@@ -35,6 +35,25 @@ public sealed class CandidateSkillTests
             skill.Name);
     }
 
+    [Fact]
+    public void Constructor_PreservesDistinctEvidence()
+    {
+        var skill = new CandidateSkill(
+            "Project management",
+            SkillRelevance.Primary,
+            [
+                new SkillEvidence(SkillEvidenceSource.Project),
+                new SkillEvidence(SkillEvidenceSource.Project),
+                new SkillEvidence(SkillEvidenceSource.Certification)
+            ]);
+
+        Assert.Equal(2, skill.Evidence.Count);
+        Assert.Contains(
+            skill.Evidence,
+            evidence =>
+                evidence.Source == SkillEvidenceSource.Project);
+    }
+
     [Theory]
     [InlineData(SkillRelevance.Unspecified)]
     [InlineData(SkillRelevance.Supporting)]

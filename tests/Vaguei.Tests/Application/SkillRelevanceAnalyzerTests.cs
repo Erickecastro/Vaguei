@@ -1,6 +1,7 @@
 using Vaguei.Application.Services;
 using Vaguei.Domain.Entities;
 using Vaguei.Domain.Enums;
+using Vaguei.Domain.Models;
 
 namespace Vaguei.Tests.Application;
 
@@ -176,6 +177,68 @@ public sealed class SkillRelevanceAnalyzerTests
         Assert.Equal(
             SkillRelevance.Supporting,
             result["Git"].Relevance);
+    }
+
+    [Fact]
+    public void Analyze_UsesSectionEvidenceAndPreservesIt()
+    {
+        var profile = CreateProfile(
+            "Analista",
+            "Power BI");
+
+        var evidence =
+            new Dictionary<string, IReadOnlyCollection<SkillEvidence>>(
+                StringComparer.OrdinalIgnoreCase)
+            {
+                ["Power BI"] =
+                [
+                    new SkillEvidence(
+                        SkillEvidenceSource.SkillsSection)
+                ]
+            };
+
+        var result = Assert.Single(
+            _analyzer.Analyze(
+                profile,
+                evidence));
+
+        Assert.Equal(
+            SkillRelevance.Relevant,
+            result.Relevance);
+
+        Assert.Contains(
+            result.Evidence,
+            item =>
+                item.Source == SkillEvidenceSource.SkillsSection);
+    }
+
+    [Fact]
+    public void Analyze_CombinesIndependentEvidenceAsPrimary()
+    {
+        var profile = CreateProfile(
+            "Analista",
+            "Gestão de Projetos");
+
+        var evidence =
+            new Dictionary<string, IReadOnlyCollection<SkillEvidence>>
+            {
+                ["Gestão de Projetos"] =
+                [
+                    new SkillEvidence(
+                        SkillEvidenceSource.SkillsSection),
+                    new SkillEvidence(
+                        SkillEvidenceSource.Project)
+                ]
+            };
+
+        var result = Assert.Single(
+            _analyzer.Analyze(
+                profile,
+                evidence));
+
+        Assert.Equal(
+            SkillRelevance.Primary,
+            result.Relevance);
     }
 
     private static CandidateProfile CreateProfile(

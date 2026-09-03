@@ -6,7 +6,8 @@ public sealed class CandidateSkill
 {
     public CandidateSkill(
         string name,
-        SkillRelevance relevance)
+        SkillRelevance relevance,
+        IEnumerable<SkillEvidence>? evidence = null)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -20,9 +21,15 @@ public sealed class CandidateSkill
 
         Relevance =
             relevance;
+
+        Evidence = evidence?
+            .Distinct()
+            .ToArray() ?? [];
     }
 
     public string Name { get; }
 
     public SkillRelevance Relevance { get; }
+
+    public IReadOnlyCollection<SkillEvidence> Evidence { get; }
 }

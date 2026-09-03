@@ -13,6 +13,10 @@ public sealed class SkillRelevanceAnalyzer
     private const int SummaryWeight = 2;
     private const int ExperiencePositionWeight = 2;
     private const int ExperienceDescriptionWeight = 2;
+    private const int SkillsSectionWeight = 2;
+    private const int ProjectWeight = 2;
+    private const int CertificationWeight = 2;
+    private const int SupportingContextWeight = 1;
 
     private const int PrimaryThreshold = 4;
     private const int RelevantThreshold = 2;
@@ -20,7 +24,20 @@ public sealed class SkillRelevanceAnalyzer
     public IReadOnlyCollection<CandidateSkill> Analyze(
         CandidateProfile profile)
     {
+        return Analyze(
+            profile,
+            new Dictionary<string, IReadOnlyCollection<SkillEvidence>>(
+                StringComparer.OrdinalIgnoreCase));
+    }
+
+    public IReadOnlyCollection<CandidateSkill> Analyze(
+        CandidateProfile profile,
+        IReadOnlyDictionary<
+            string,
+            IReadOnlyCollection<SkillEvidence>> evidenceBySkill)
+    {
         ArgumentNullException.ThrowIfNull(profile);
+        ArgumentNullException.ThrowIfNull(evidenceBySkill);
 
         var skills =
             new List<CandidateSkill>();
@@ -32,10 +49,13 @@ public sealed class SkillRelevanceAnalyzer
                 continue;
             }
 
-            var score =
-                CalculateRelevanceScore(
-                    profile,
-                    skill);
+            var evidence = GetEvidence(
+                profile,
+                skill,
+                evidenceBySkill);
+
+            var score = evidence.Sum(
+                item => GetEvidenceWeight(item.Source));
 
             var relevance =
                 GetRelevance(score);
@@ -43,32 +63,43 @@ public sealed class SkillRelevanceAnalyzer
             skills.Add(
                 new CandidateSkill(
                     skill,
-                    relevance));
+                    relevance,
+                    evidence));
         }
 
         return skills;
     }
 
-    private static int CalculateRelevanceScore(
+    private static IReadOnlyCollection<SkillEvidence> GetEvidence(
         CandidateProfile profile,
-        string skill)
+        string skill,
+        IReadOnlyDictionary<
+            string,
+            IReadOnlyCollection<SkillEvidence>> evidenceBySkill)
     {
-        var score = 0;
+        var evidence = new HashSet<SkillEvidence>();
+
+        if (evidenceBySkill.TryGetValue(skill, out var providedEvidence))
+        {
+            evidence.UnionWith(providedEvidence);
+        }
 
         if (ContainsTerm(
                 profile.ProfessionalTitle,
                 skill))
         {
-            score +=
-                ProfessionalTitleWeight;
+            evidence.Add(
+                new SkillEvidence(
+                    SkillEvidenceSource.ProfessionalTitle));
         }
 
         if (ContainsTerm(
                 profile.Summary,
                 skill))
         {
-            score +=
-                SummaryWeight;
+            evidence.Add(
+                new SkillEvidence(
+                    SkillEvidenceSource.ProfessionalSummary));
         }
 
         foreach (var experience in profile.Experiences)
@@ -77,20 +108,50 @@ public sealed class SkillRelevanceAnalyzer
                     experience.Position,
                     skill))
             {
-                score +=
-                    ExperiencePositionWeight;
+                evidence.Add(
+                    new SkillEvidence(
+                        SkillEvidenceSource.ExperiencePosition));
             }
 
             if (ContainsTerm(
                     experience.Description,
                     skill))
             {
-                score +=
-                    ExperienceDescriptionWeight;
+                evidence.Add(
+                    new SkillEvidence(
+                        SkillEvidenceSource.ExperienceDescription));
             }
         }
 
-        return score;
+        return evidence.ToArray();
+    }
+
+    private static int GetEvidenceWeight(
+        SkillEvidenceSource source)
+    {
+        return source switch
+        {
+            SkillEvidenceSource.ProfessionalTitle =>
+                ProfessionalTitleWeight,
+            SkillEvidenceSource.ProfessionalSummary =>
+                SummaryWeight,
+            SkillEvidenceSource.ExperiencePosition =>
+                ExperiencePositionWeight,
+            SkillEvidenceSource.ExperienceDescription =>
+                ExperienceDescriptionWeight,
+            SkillEvidenceSource.SkillsSection =>
+                SkillsSectionWeight,
+            SkillEvidenceSource.Project =>
+                ProjectWeight,
+            SkillEvidenceSource.Certification =>
+                CertificationWeight,
+            SkillEvidenceSource.Education or
+            SkillEvidenceSource.Course or
+            SkillEvidenceSource.LanguageSection or
+            SkillEvidenceSource.Other =>
+                SupportingContextWeight,
+            _ => SupportingContextWeight
+        };
     }
 
     private static SkillRelevance GetRelevance(
