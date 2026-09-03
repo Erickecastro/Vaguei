@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Vaguei.Application.Interfaces;
+using Vaguei.Application.Services;
 using Vaguei.Domain.Entities;
 using Vaguei.Domain.Enums;
 using Vaguei.Domain.Models;
@@ -10,10 +11,12 @@ namespace Vaguei.Collectors.Sources;
 public sealed class ArbeitnowJobSource : IJobSource
 {
     private readonly HttpClient _httpClient;
+    private readonly JobSkillRequirementAnalyzer _requirementAnalyzer;
 
     public ArbeitnowJobSource(HttpClient httpClient)
     {
         _httpClient = httpClient;
+        _requirementAnalyzer = new JobSkillRequirementAnalyzer();
     }
 
     public string Name => "Arbeitnow";
@@ -61,9 +64,9 @@ public sealed class ArbeitnowJobSource : IJobSource
         }
     }
 
-    private static JobPosting MapJob(ArbeitnowJob job)
+    private JobPosting MapJob(ArbeitnowJob job)
     {
-        return new JobPosting
+        var posting = new JobPosting
         {
             Title = job.Title,
             Company = job.CompanyName,
@@ -89,8 +92,21 @@ public sealed class ArbeitnowJobSource : IJobSource
 
             PublishedAt =
                 ConvertPublishedAt(
-                    job.CreatedAt)
+                    job.CreatedAt),
+
+            Tags = job.Tags
+                .Where(tag =>
+                    !string.IsNullOrWhiteSpace(tag))
+                .Select(tag => tag.Trim())
+                .ToHashSet(StringComparer.OrdinalIgnoreCase)
         };
+
+        posting.SkillRequirements =
+            _requirementAnalyzer
+                .Analyze(posting)
+                .ToList();
+
+        return posting;
     }
 
     private static bool MatchesQuery(
@@ -133,8 +149,7 @@ public sealed class ArbeitnowJobSource : IJobSource
                             location,
                             StringComparison.OrdinalIgnoreCase));
 
-            if (!matchesLocation &&
-                job.WorkModel != WorkModel.Remote)
+            if (!matchesLocation)
             {
                 return false;
             }

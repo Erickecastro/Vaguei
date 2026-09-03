@@ -142,13 +142,21 @@ try
     var preferences =
         new JobSearchPreferences();
 
-    var queryBuilder =
-        new JobSearchQueryBuilder();
+    using var httpClient =
+        new HttpClient();
 
-    var query =
-        queryBuilder.Build(
-            profile,
-            preferences);
+    var orchestrator =
+        new JobSearchOrchestrator(
+        [
+            new ArbeitnowJobSource(httpClient)
+        ]);
+
+    var searchResult = await orchestrator.SearchAsync(
+        profile,
+        preferences,
+        DateTimeOffset.UtcNow);
+
+    var query = searchResult.Query;
 
     Console.WriteLine();
     Console.WriteLine("==================================");
@@ -200,41 +208,21 @@ try
         }
     }
 
-    using var httpClient =
-        new HttpClient();
+    var matchedJobs = searchResult.Matches
+        .Take(10)
+        .ToList();
 
-    var jobSource =
-        new ArbeitnowJobSource(httpClient);
+    Console.WriteLine();
+    Console.WriteLine(
+        $"Vagas coletadas: {searchResult.CollectedJobCount}");
+    Console.WriteLine(
+        $"Vagas únicas e válidas: {searchResult.UniqueJobCount}");
 
-    var jobs =
-        await jobSource.SearchAsync(query);
-
-    var freshnessFilter =
-        new JobFreshnessFilter();
-
-    var freshJobs =
-        freshnessFilter.Filter(
-            jobs,
-            preferences,
-            DateTimeOffset.UtcNow);
-
-    var jobMatcher =
-        new JobMatcher();
-
-    var matchedJobs =
-        freshJobs
-            .Select(
-                job =>
-                    jobMatcher.Match(
-                        profile,
-                        job,
-                        preferences))
-            .OrderByDescending(
-                result => result.Score)
-            .ThenByDescending(
-                result => result.Job.PublishedAt)
-            .Take(10)
-            .ToList();
+    foreach (var failure in searchResult.SourceFailures)
+    {
+        Console.WriteLine(
+            $"Fonte indisponível: {failure.Source} — {failure.Message}");
+    }
 
     Console.WriteLine();
     Console.WriteLine("==================================");
@@ -267,6 +255,14 @@ try
 
         Console.WriteLine(
             $"Compatibilidade: {match.Score:F2}%");
+
+        if (job.SkillRequirements.Count > 0)
+        {
+            Console.WriteLine(
+                $"Competências da vaga: {string.Join(", ",
+                    job.SkillRequirements.Select(requirement =>
+                        $"{requirement.Name} ({requirement.Level})"))}");
+        }
 
         Console.WriteLine(
             $"Publicada: {job.PublishedAt:dd/MM/yyyy HH:mm} UTC");

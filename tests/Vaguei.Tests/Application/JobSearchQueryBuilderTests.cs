@@ -94,6 +94,32 @@ public sealed class JobSearchQueryBuilderTests
     }
 
     [Fact]
+    public void Build_RestrictsDefaultSearchToBrazil()
+    {
+        var query = new JobSearchQueryBuilder().Build(
+            new CandidateProfile(),
+            new JobSearchPreferences());
+
+        Assert.Contains("Brasil", query.Locations);
+        Assert.Contains("Brazil", query.Locations);
+    }
+
+    [Fact]
+    public void Build_DoesNotRestrictLocationWhenInternationalIsIncluded()
+    {
+        var preferences = new JobSearchPreferences
+        {
+            IncludeInternational = true
+        };
+
+        var query = new JobSearchQueryBuilder().Build(
+            new CandidateProfile(),
+            preferences);
+
+        Assert.Empty(query.Locations);
+    }
+
+    [Fact]
     public void Build_CopiesSearchFilters()
     {
         var profile =

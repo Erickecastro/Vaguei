@@ -62,6 +62,24 @@ public sealed class JobSearchQueryBuilder
         JobSearchQuery query,
         JobSearchPreferences preferences)
     {
+        var hasExplicitLocation =
+            preferences.Countries.Count > 0 ||
+            preferences.States.Count > 0 ||
+            preferences.Cities.Count > 0;
+
+        if (!hasExplicitLocation &&
+            preferences.IncludeBrazil &&
+            !preferences.IncludeInternational)
+        {
+            AddDistinct(
+                query.Locations,
+                "Brasil");
+
+            AddDistinct(
+                query.Locations,
+                "Brazil");
+        }
+
         foreach (var country in preferences.Countries)
         {
             AddDistinct(

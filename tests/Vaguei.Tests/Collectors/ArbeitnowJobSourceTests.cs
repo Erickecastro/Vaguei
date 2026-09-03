@@ -73,6 +73,22 @@ public sealed class ArbeitnowJobSourceTests
             job.Source);
 
         Assert.NotNull(job.Url);
+
+        Assert.Contains("C#", job.Tags);
+        Assert.Contains(".NET", job.Tags);
+        Assert.Empty(job.Skills);
+
+        Assert.Contains(
+            job.SkillRequirements,
+            requirement =>
+                requirement.Name == ".NET" &&
+                requirement.Level == JobSkillRequirementLevel.Core);
+
+        Assert.Contains(
+            job.SkillRequirements,
+            requirement =>
+                requirement.Name == "C#" &&
+                requirement.Level == JobSkillRequirementLevel.Mentioned);
     }
 
     [Fact]

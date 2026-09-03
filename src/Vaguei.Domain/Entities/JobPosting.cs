@@ -32,4 +32,9 @@ public sealed class JobPosting
 
     public HashSet<string> Skills { get; set; } =
         new(StringComparer.OrdinalIgnoreCase);
+
+    public HashSet<string> Tags { get; set; } =
+        new(StringComparer.OrdinalIgnoreCase);
+
+    public List<JobSkillRequirement> SkillRequirements { get; set; } = [];
 }

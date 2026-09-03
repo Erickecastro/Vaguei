@@ -10,11 +10,11 @@
 
 # About
 
-**Vaguei** is a personal project designed to make the job search process in the technology industry simpler, smarter, and more relevant.
+**Vaguei** is a job discovery and matching application designed for professionals from any field. Its goal is to make the search for relevant opportunities simpler, smarter, and more transparent.
 
-The idea is to analyze a candidate's resume, identify skills, technologies, professional experience, and career profile, and use this information to search, organize, and rank job opportunities according to their compatibility.
+The application analyzes a candidate's resume, identifies professional skills, experience, education, and career context, and uses this information together with the user's preferences to search, organize, and rank opportunities from multiple job sources.
 
-The project is also a practical environment for exploring software architecture, data processing, automation, APIs, testing, and eventually artificial intelligence using C# and the .NET ecosystem.
+Software development is the initial validation domain because it reflects the first real test profile. The architecture and matching concepts must remain generic enough to support administration, accounting, design, engineering, healthcare, logistics, sales, and other professional fields.
 
 
 # Features
@@ -27,6 +27,12 @@ The project is also a practical environment for exploring software architecture,
 * Company and job title identification
 * Employment period detection
 * Structured candidate profiles
+* Skill relevance and evidence tracking
+* Job freshness filtering
+* Explainable job matching and ranking
+* Job requirement classification
+* Job source orchestration and failure isolation
+* Duplicate job removal
 * Cross-platform execution
 
 # Tech Stack
@@ -45,10 +51,8 @@ The project is also a practical environment for exploring software architecture,
 
 ### Planned
 
-* DOCX parsing
-* PDF parsing
-* Job source integrations
-* Job matching engine
+* Multiple job source integrations
+* Broader profession and skill taxonomies
 * REST APIs
 * Avalonia UI
 * Docker
@@ -69,7 +73,7 @@ Vaguei
 └── Vaguei.Tests
 ```
 
-The main resume processing flow follows this structure:
+The current application flow follows this structure:
 
 ```text
 Resume
@@ -87,6 +91,12 @@ Candidate Profile
 Job Search
    |
    v
+Source Orchestrator
+   |
+   v
+Freshness and Deduplication
+   |
+   v
 Matching Engine
    |
    v
@@ -100,22 +110,32 @@ Compatible Jobs
 * [x] PDF
 * [x] TXT
 
-# Supported Platforms
+# Platform Direction
 
-* Linux
-* Windows
-* macOS
+The core currently targets .NET 10 and is kept independent from the user interface.
+
+The first graphical interface is planned with Avalonia for:
+
+* Linux desktop
+* Windows desktop
+* macOS desktop
+
+Android and iOS are part of the long-term direction, after the desktop workflow is stable. The current CLI is a development and diagnostic interface, not the intended final product.
+
+The graphical workflow should allow the user to select or drag a resume into the application, review the extracted profile, configure search preferences, and receive ranked opportunities with clear compatibility explanations.
 
 # Goals
 
 * Automate part of the job search process
-* Identify technologies and skills from resumes
+* Support professionals from different fields
+* Identify professional skills and context from resumes
 * Build structured candidate profiles
 * Search jobs from multiple sources
 * Rank opportunities by profile compatibility
 * Reduce irrelevant job recommendations
 * Provide explainable compatibility scores
 * Identify potential skill gaps
+* Provide a simple, modern, cross-platform graphical experience
 
 # Matching
 

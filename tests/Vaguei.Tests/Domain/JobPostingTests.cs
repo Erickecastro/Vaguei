@@ -1,4 +1,5 @@
 using Vaguei.Domain.Entities;
+using Vaguei.Domain.Enums;
 using Vaguei.Domain.Models;
 
 namespace Vaguei.Tests.Domain;
@@ -59,5 +60,43 @@ public sealed class JobPostingTests
         Assert.Equal(
             "Manaus, Amazonas, Brazil",
             job.Location.RawLocation);
+    }
+
+    [Fact]
+    public void JobPosting_AllowsStructuredSkillRequirements()
+    {
+        var job = new JobPosting
+        {
+            Title = "Analista Financeiro",
+            Company = "Empresa Teste"
+        };
+
+        job.SkillRequirements.Add(
+            new JobSkillRequirement(
+                "Excel",
+                JobSkillRequirementLevel.Required));
+
+        var requirement = Assert.Single(
+            job.SkillRequirements);
+
+        Assert.Equal(
+            "Excel",
+            requirement.Name);
+    }
+
+    [Fact]
+    public void JobPosting_SeparatesTagsFromSkills()
+    {
+        var job = new JobPosting
+        {
+            Title = "Analista",
+            Company = "Empresa Teste",
+            Tags = ["Finance", "Remote"],
+            Skills = ["Excel"]
+        };
+
+        Assert.Contains("Finance", job.Tags);
+        Assert.DoesNotContain("Finance", job.Skills);
+        Assert.Contains("Excel", job.Skills);
     }
 }
