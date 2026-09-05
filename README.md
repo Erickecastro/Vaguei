@@ -41,6 +41,7 @@ Software development is the initial validation domain because it reflects the fi
 * Source failure warnings without interrupting successful providers
 * Dismissible connection warning with automatic timeout when every source is unreachable
 * Original job link for every result
+* In-app About area covering purpose, privacy, terms, and licenses
 
 ### Resume processing
 
@@ -75,6 +76,7 @@ Vaguei currently reads anonymous, read-only job data from public endpoints or pu
 * Greenhouse
 * InHire
 * Jobicy
+* Jooble (optional, with an official API key)
 * Lever
 * Remotive
 * SmartRecruiters
@@ -83,6 +85,13 @@ Vaguei currently reads anonymous, read-only job data from public endpoints or pu
 The repository contains a curated employer catalog for sources that require a board, tenant, site, company, or account identifier. This includes the public Sidia page on InHire and Brazilian coverage such as CI&T, Wildlife Studios, dLocal, EBANX, QuintoAndar, Wellhub, and others across the supported providers. The shared catalog lives in [`config/job-sources.json`](config/job-sources.json), is copied into Desktop and CLI builds, and falls back to validated built-in defaults when it is missing or malformed.
 
 The current integration does **not** scrape authenticated or protected pages. LinkedIn, Gupy, Catho, and similar platforms will only be integrated through an official API, an approved partnership, an employer-owned public feed, or another method explicitly permitted by their terms. Vaguei does not attempt to bypass authentication, anti-bot protection, rate limits, or access controls.
+
+Jooble support is enabled only when an official credential is available. Request a key through the [Jooble API portal](https://jooble.org/api/about), then provide it at runtime without committing it:
+
+```bash
+export JOOBLE_API_KEY="your-key"
+dotnet run --project src/Vaguei.Desktop
+```
 
 # Architecture
 
@@ -241,6 +250,15 @@ Vaguei should collect only the information required to search and rank vacancies
 New providers must use documented APIs, explicitly public employer feeds, licensed aggregators, or written authorization. Credentials must never be committed to the repository, and a provider failure must never expose resume contents in logs or diagnostics.
 
 Jobicy and Remotive results retain their canonical vacancy URLs and source attribution. Their public feeds are cached locally according to provider guidance, so changing filters does not generate unnecessary API traffic.
+
+Project governance documents are versioned with the code:
+
+* [Terms of Use](docs/TERMS_OF_USE.md)
+* [Privacy](docs/PRIVACY.md)
+* [Integrations and Partnerships](docs/PARTNERSHIPS.md)
+* [MIT License](LICENSE)
+
+These documents describe the current experimental application. They require legal review, an official contact channel, and an explicit acceptance/versioning mechanism before commercial distribution or remote personal-data processing.
 
 # Contributing
 

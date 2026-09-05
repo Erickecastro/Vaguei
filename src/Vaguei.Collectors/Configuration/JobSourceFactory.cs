@@ -8,13 +8,14 @@ public static class JobSourceFactory
 {
     public static IReadOnlyCollection<IJobSource> Create(
         HttpClient httpClient,
-        JobSourceCatalog? catalog = null)
+        JobSourceCatalog? catalog = null,
+        string? joobleApiKey = null)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
         catalog ??= JobSourceCatalog.Load();
 
         var concurrencyGate = new SemaphoreSlim(3, 3);
-        var sources = new IJobSource[]
+        var sources = new List<IJobSource>
         {
             new ArbeitnowJobSource(httpClient),
             new AshbyJobSource(httpClient, catalog.Ashby),
@@ -26,6 +27,12 @@ public static class JobSourceFactory
             new SmartRecruitersJobSource(httpClient, catalog.SmartRecruiters),
             new WorkableJobSource(httpClient, catalog.Workable)
         };
+
+        joobleApiKey ??= Environment.GetEnvironmentVariable("JOOBLE_API_KEY");
+        if (!string.IsNullOrWhiteSpace(joobleApiKey))
+        {
+            sources.Add(new JoobleJobSource(httpClient, joobleApiKey));
+        }
 
         return sources
             .Select(source => (IJobSource)new ResilientJobSource(

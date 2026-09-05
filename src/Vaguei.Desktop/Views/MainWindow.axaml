@@ -18,6 +18,8 @@
     <Style Selector="Button.open"><Setter Property="Width" Value="96"/><Setter Property="Height" Value="40"/><Setter Property="Padding" Value="0"/><Setter Property="HorizontalContentAlignment" Value="Center"/><Setter Property="VerticalContentAlignment" Value="Center"/><Setter Property="CornerRadius" Value="10"/><Setter Property="Background" Value="{DynamicResource SoftSurfaceBrush}"/><Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}"/><Setter Property="BorderThickness" Value="1"/></Style>
     <Style Selector="Button.open:pointerover"><Setter Property="Background" Value="{DynamicResource AccentSoftBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/></Style>
     <Style Selector="Button.favorite"><Setter Property="Width" Value="40"/><Setter Property="Height" Value="40"/><Setter Property="Padding" Value="0"/><Setter Property="HorizontalContentAlignment" Value="Center"/><Setter Property="VerticalContentAlignment" Value="Center"/><Setter Property="CornerRadius" Value="10"/><Setter Property="FontSize" Value="22"/><Setter Property="Background" Value="{DynamicResource SoftSurfaceBrush}"/><Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}"/><Setter Property="BorderThickness" Value="1"/></Style>
+    <Style Selector="Button.sidebarlink"><Setter Property="Height" Value="40"/><Setter Property="Padding" Value="12,0"/><Setter Property="HorizontalContentAlignment" Value="Left"/><Setter Property="VerticalContentAlignment" Value="Center"/><Setter Property="CornerRadius" Value="10"/><Setter Property="Background" Value="Transparent"/><Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}"/><Setter Property="BorderThickness" Value="1"/></Style>
+    <Style Selector="Button.sidebarlink:pointerover"><Setter Property="Background" Value="{DynamicResource SoftSurfaceBrush}"/></Style>
     <Style Selector="Button.window">
       <Setter Property="Width" Value="32"/><Setter Property="Height" Value="28"/><Setter Property="Padding" Value="0"/><Setter Property="CornerRadius" Value="0"/><Setter Property="Background" Value="Transparent"/><Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/><Setter Property="BorderThickness" Value="0"/>
       <Setter Property="Template"><ControlTemplate><ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/></ControlTemplate></Setter>
@@ -58,7 +60,7 @@
   <SplitView Grid.Row="1" x:Name="SidebarSplitView" DisplayMode="Inline" IsPaneOpen="True" OpenPaneLength="250" CompactPaneLength="0" UseLightDismissOverlayMode="True">
     <SplitView.Pane>
       <Border x:Name="SidebarPane" Width="250" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource OutlineBrush}" BorderThickness="0,0,1,0" Padding="20,18">
-        <Grid RowDefinitions="Auto,Auto,*,Auto">
+        <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
           <Grid Width="64" Height="64" HorizontalAlignment="Center">
             <Image x:Name="DarkThemeLogo" Width="64" Height="64" Source="/Assets/logo-dark-56.png" Stretch="Uniform" RenderOptions.BitmapInterpolationMode="HighQuality"/>
             <Image x:Name="LightThemeLogo" Width="64" Height="64" Source="/Assets/logo-light-56.png" Stretch="Uniform" RenderOptions.BitmapInterpolationMode="HighQuality"/>
@@ -97,6 +99,14 @@
             <TextBlock Classes="subtitle" FontSize="11" FontStyle="Italic" IsVisible="{Binding HasAdditionalSkills}" Text="{Binding AdditionalSkillCount, StringFormat='e mais {0} competências'}"/>
           </StackPanel>
           <Border Grid.Row="3" Classes="card" Padding="13"><StackPanel Spacing="6"><Grid ColumnDefinitions="*,Auto"><TextBlock FontWeight="Bold" Text="Status"/><Border Grid.Column="1" Classes="pill" Padding="8,3"><TextBlock FontSize="12" Text="{Binding Jobs.Count, StringFormat='{}{0} vagas'}"/></Border></Grid><TextBlock Classes="subtitle" FontSize="12" TextWrapping="Wrap" MaxHeight="52" TextTrimming="CharacterEllipsis" Text="{Binding StatusMessage}"/><ProgressBar Height="3" IsIndeterminate="True" IsVisible="{Binding IsBusy}"/><TextBlock Classes="subtitle" FontSize="10.5" TextWrapping="Wrap" MaxHeight="32" TextTrimming="CharacterEllipsis" Text="{Binding SourceCoverageSummary}" ToolTip.Tip="{Binding SourceCoverageSummary}"/><TextBlock Classes="subtitle" FontSize="11" TextWrapping="Wrap" MaxHeight="34" TextTrimming="CharacterEllipsis" Text="{Binding SourceWarnings}"/></StackPanel></Border>
+          <Button Grid.Row="4" Classes="sidebarlink" Margin="0,10,0,0" Click="OnAboutClick" ToolTip.Tip="Sobre, privacidade, termos e licenças">
+            <StackPanel Orientation="Horizontal" Spacing="9">
+              <Border Width="20" Height="20" CornerRadius="10" BorderBrush="{DynamicResource PrimaryTextBrush}" BorderThickness="1.4">
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" FontWeight="Bold" Text="i"/>
+              </Border>
+              <TextBlock VerticalAlignment="Center" FontWeight="SemiBold" Text="Sobre o Vaguei"/>
+            </StackPanel>
+          </Button>
         </Grid>
       </Border>
     </SplitView.Pane>

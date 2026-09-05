@@ -231,6 +231,18 @@ public partial class MainWindow : Window
         SidebarSplitView.IsPaneOpen = true;
     }
 
+    private async void OnAboutClick(
+        object? sender,
+        RoutedEventArgs eventArgs)
+    {
+        if (_isCompactLayout == true)
+        {
+            SidebarSplitView.IsPaneOpen = false;
+        }
+
+        await new AboutWindow().ShowDialog(this);
+    }
+
     private void UpdateThemeVisuals(
         ThemeVariant themeVariant)
     {

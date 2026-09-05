@@ -1,0 +1,86 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Vaguei.Desktop.Views.AboutWindow"
+        Width="780" Height="650" MinWidth="620" MinHeight="520"
+        CanResize="True" WindowDecorations="None"
+        ExtendClientAreaToDecorationsHint="True"
+        TransparencyLevelHint="Transparent" Background="Transparent"
+        Title="Sobre o Vaguei" Foreground="{DynamicResource PrimaryTextBrush}">
+  <Window.Styles>
+    <Style Selector="TextBlock.heading"><Setter Property="FontSize" Value="20"/><Setter Property="FontWeight" Value="Bold"/></Style>
+    <Style Selector="TextBlock.section"><Setter Property="FontSize" Value="15"/><Setter Property="FontWeight" Value="Bold"/><Setter Property="Margin" Value="0,12,0,3"/></Style>
+    <Style Selector="TextBlock.body"><Setter Property="FontSize" Value="13"/><Setter Property="LineHeight" Value="20"/><Setter Property="TextWrapping" Value="Wrap"/><Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/></Style>
+    <Style Selector="Border.panel"><Setter Property="Background" Value="{DynamicResource SoftSurfaceBrush}"/><Setter Property="CornerRadius" Value="12"/><Setter Property="Padding" Value="16"/></Style>
+  </Window.Styles>
+  <Border CornerRadius="12" ClipToBounds="True" Background="{DynamicResource PageBackgroundBrush}" BorderBrush="{DynamicResource OutlineBrush}" BorderThickness="1">
+    <Grid RowDefinitions="40,*">
+      <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource OutlineBrush}" BorderThickness="0,0,0,1">
+        <Grid ColumnDefinitions="*,Auto" PointerPressed="OnTitleBarPointerPressed">
+          <TextBlock Margin="16,0" VerticalAlignment="Center" FontWeight="SemiBold" Text="Sobre o Vaguei"/>
+          <Button Grid.Column="1" Width="40" Height="40" Padding="0" Background="Transparent" BorderThickness="0" Click="OnCloseClick" ToolTip.Tip="Fechar">
+            <Border Width="26" Height="26" CornerRadius="13" Background="{DynamicResource SoftSurfaceBrush}">
+              <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" Text="×"/>
+            </Border>
+          </Button>
+        </Grid>
+      </Border>
+      <Grid Grid.Row="1" Margin="24" RowDefinitions="Auto,16,*">
+        <Grid ColumnDefinitions="Auto,16,*">
+          <Grid Width="58" Height="58">
+            <Image x:Name="DarkThemeLogo" Source="/Assets/logo-dark-56.png" Stretch="Uniform" RenderOptions.BitmapInterpolationMode="HighQuality"/>
+            <Image x:Name="LightThemeLogo" Source="/Assets/logo-light-56.png" Stretch="Uniform" RenderOptions.BitmapInterpolationMode="HighQuality"/>
+          </Grid>
+          <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="2">
+            <TextBlock Classes="heading" Text="Vaguei"/>
+            <TextBlock Classes="body" Text="Oportunidades de diferentes fontes, reunidas com transparência e privacidade."/>
+          </StackPanel>
+        </Grid>
+        <TabControl Grid.Row="2">
+          <TabItem Header="Sobre">
+            <ScrollViewer Margin="4,16,4,4"><StackPanel Spacing="8">
+              <TextBlock Classes="section" Text="Nosso propósito"/>
+              <TextBlock Classes="body" Text="O Vaguei é um aplicativo experimental que ajuda pessoas de diferentes áreas a descobrir, filtrar e organizar oportunidades profissionais. As vagas mantêm a fonte e o endereço original para que a candidatura aconteça no canal oficial."/>
+              <Border Classes="panel" Margin="0,8,0,0"><TextBlock Classes="body" Text="O Vaguei não é afiliado às empresas ou plataformas exibidas e não garante entrevistas ou contratações. A disponibilidade depende das fontes autorizadas."/></Border>
+              <TextBlock Classes="section" Text="Como funciona"/>
+              <TextBlock Classes="body" Text="A busca consulta APIs e páginas públicas permitidas, normaliza os resultados, remove duplicidades e aplica filtros. Quando um currículo é anexado, sua análise acontece localmente e a compatibilidade é apenas uma estimativa explicável, não uma decisão de contratação."/>
+              <TextBlock Classes="section" Text="Fontes atuais"/>
+              <TextBlock Classes="body" Text="Arbeitnow, Ashby, Greenhouse, InHire, Jobicy, Lever, Remotive, SmartRecruiters e Workable. Jooble é ativada quando uma chave oficial é configurada."/>
+            </StackPanel></ScrollViewer>
+          </TabItem>
+          <TabItem Header="Privacidade">
+            <ScrollViewer Margin="4,16,4,4"><StackPanel>
+              <TextBlock Classes="section" Text="Processamento local"/>
+              <TextBlock Classes="body" Text="O currículo é processado no dispositivo. A versão atual não possui conta, backend, telemetria nem upload do arquivo. Dados de contato desnecessários são descartados antes da análise de perfil."/>
+              <TextBlock Classes="section" Text="Dados armazenados"/>
+              <TextBlock Classes="body" Text="Tema, preferências de busca e favoritos ficam no armazenamento local. As palavras e localidades pesquisadas são enviadas às fontes de vagas necessárias; o arquivo do currículo não é enviado."/>
+              <TextBlock Classes="section" Text="Sites externos"/>
+              <TextBlock Classes="body" Text="Ao abrir uma vaga, você passa a utilizar o site da empresa ou plataforma e deve consultar a política de privacidade daquele serviço."/>
+              <Border Classes="panel" Margin="0,16,0,0"><TextBlock Classes="body" Text="Esta descrição reflete a arquitetura atual. Novas funções com conta, sincronização ou backend exigirão atualização da política e revisão de conformidade com a LGPD."/></Border>
+            </StackPanel></ScrollViewer>
+          </TabItem>
+          <TabItem Header="Termos">
+            <ScrollViewer Margin="4,16,4,4"><StackPanel>
+              <TextBlock Classes="section" Text="Uso das vagas"/>
+              <TextBlock Classes="body" Text="Confirme empresa, requisitos, validade e endereço antes de se candidatar. O Vaguei não cobra pela candidatura e recomenda não realizar pagamentos solicitados por supostos recrutadores."/>
+              <TextBlock Classes="section" Text="Uso responsável"/>
+              <TextBlock Classes="body" Text="Não use o aplicativo para candidaturas automatizadas ou em massa, coleta de dados de terceiros, fraude, violação de controles de acesso ou atividade contrária à lei e aos termos das fontes."/>
+              <TextBlock Classes="section" Text="Limitações"/>
+              <TextBlock Classes="body" Text="Fontes externas podem alterar ou interromper seus serviços. Conteúdo e datas podem mudar, e não existe garantia de cobertura completa ou disponibilidade contínua."/>
+              <TextBlock Classes="section" Text="Propriedade intelectual"/>
+              <TextBlock Classes="body" Text="Marcas e anúncios permanecem sob os direitos de seus titulares. Sua exibição não implica afiliação ou endosso."/>
+            </StackPanel></ScrollViewer>
+          </TabItem>
+          <TabItem Header="Licenças">
+            <ScrollViewer Margin="4,16,4,4"><StackPanel>
+              <TextBlock Classes="section" Text="Vaguei — MIT License"/>
+              <TextBlock Classes="body" Text="Copyright © 2026 Ericke Castro. O software pode ser usado, copiado, modificado e distribuído nos termos da licença MIT, mantendo o aviso de copyright e a licença. O software é fornecido sem garantias."/>
+              <TextBlock Classes="section" Text="Conteúdo de terceiros"/>
+              <TextBlock Classes="body" Text="A licença MIT do código não concede direitos sobre marcas, logotipos, descrições de vagas ou dados fornecidos por terceiros. Cada integração permanece sujeita aos termos e requisitos de atribuição de sua fonte."/>
+              <Border Classes="panel" Margin="0,16,0,0"><TextBlock Classes="body" Text="Documentos completos no repositório: LICENSE, docs/TERMS_OF_USE.md, docs/PRIVACY.md e docs/PARTNERSHIPS.md."/></Border>
+            </StackPanel></ScrollViewer>
+          </TabItem>
+        </TabControl>
+      </Grid>
+    </Grid>
+  </Border>
+</Window>
