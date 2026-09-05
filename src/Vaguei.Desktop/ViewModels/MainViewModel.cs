@@ -59,6 +59,7 @@ public partial class MainViewModel : ViewModelBase
     private bool _isBusy;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ResultsSubtitle))]
     private bool _hasProfile;
 
     [ObservableProperty]
@@ -100,6 +101,10 @@ public partial class MainViewModel : ViewModelBase
     public bool ShowEmptyState => !IsBusy && !HasResults;
 
     public bool HasAdditionalSkills => AdditionalSkillCount > 0;
+
+    public string ResultsSubtitle => HasProfile
+        ? "Ordenadas por compatibilidade e recência"
+        : "Resultados da pesquisa direta ordenados por recência";
 
     public async Task ProcessResumeAsync(
         string filePath,
@@ -288,7 +293,9 @@ public partial class MainViewModel : ViewModelBase
         foreach (var match in result.Matches)
         {
             Jobs.Add(
-                new JobResultItemViewModel(match));
+                new JobResultItemViewModel(
+                    match,
+                    showCompatibility: _currentProfile is not null));
         }
 
         HasResults = Jobs.Count > 0;
@@ -301,7 +308,9 @@ public partial class MainViewModel : ViewModelBase
             ? IsValidDirectSearch(directSearch)
                 ? $"Nenhum resultado relacionado a “{directSearch}”. Tente outro cargo, tecnologia ou empresa."
                 : "Nenhuma vaga foi encontrada pelas fontes atuais com este filtro."
-            : $"{Jobs.Count} oportunidades encontradas e ordenadas por compatibilidade.";
+            : _currentProfile is null
+                ? $"{Jobs.Count} oportunidades encontradas para “{directSearch}”."
+                : $"{Jobs.Count} oportunidades encontradas e ordenadas por compatibilidade.";
     }
 
     private JobPublicationWindow GetPublicationWindow()

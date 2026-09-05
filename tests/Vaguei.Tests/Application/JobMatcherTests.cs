@@ -261,13 +261,11 @@ public sealed class JobMatcherTests
             50,
             result.Score);
 
-        Assert.Contains(
+        Assert.DoesNotContain(
             result.Reasons,
             reason =>
                 reason.Criterion ==
-                JobMatchCriterion.ProfessionalRole &&
-                reason.Kind ==
-                JobMatchReasonKind.Positive);
+                JobMatchCriterion.ProfessionalRole);
     }
 
     [Fact]

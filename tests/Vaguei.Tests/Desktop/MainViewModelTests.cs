@@ -224,6 +224,13 @@ public sealed class MainViewModelTests
 
         Assert.NotNull(source.LastQuery);
         Assert.Contains(".NET", source.LastQuery.Keywords);
+        var job = Assert.Single(viewModel.Jobs);
+        Assert.False(job.ShowCompatibility);
+        Assert.False(job.HasReasons);
+        Assert.False(job.HasSkills);
+        Assert.Equal(
+            "Resultados da pesquisa direta ordenados por recência",
+            viewModel.ResultsSubtitle);
     }
 
     [Fact]

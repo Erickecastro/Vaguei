@@ -54,9 +54,6 @@ public sealed class JobMatcher
             weightedScore +=
                 roleScore * RoleWeight;
 
-            AddRoleReason(
-                reasons,
-                roleScore);
         }
 
         if (profile.DetailedSkills.Count > 0 ||
@@ -468,42 +465,6 @@ public sealed class JobMatcher
         return Math.Min(
             MaximumRequirementPenalty,
             penalty);
-    }
-
-    private static void AddRoleReason(
-        ICollection<JobMatchReason> reasons,
-        double roleScore)
-    {
-        if (roleScore > 0)
-        {
-            reasons.Add(
-                new JobMatchReason
-                {
-                    Criterion =
-                        JobMatchCriterion.ProfessionalRole,
-
-                    Kind =
-                        JobMatchReasonKind.Positive,
-
-                    Description =
-                        "O cargo da vaga possui relação com o cargo profissional desejado."
-                });
-
-            return;
-        }
-
-        reasons.Add(
-            new JobMatchReason
-            {
-                Criterion =
-                    JobMatchCriterion.ProfessionalRole,
-
-                Kind =
-                    JobMatchReasonKind.Neutral,
-
-                Description =
-                    "Não foram encontrados termos em comum entre os cargos."
-            });
     }
 
     private static void AddSkillReasons(

@@ -5,21 +5,29 @@ namespace Vaguei.Desktop.ViewModels;
 public sealed class JobResultItemViewModel
 {
     public JobResultItemViewModel(
-        JobMatchResult result)
+        JobMatchResult result,
+        bool showCompatibility = true)
     {
         Title = result.Job.Title;
         Company = result.Job.Company;
         Location = result.Job.Location.RawLocation ?? "Local não informado";
         WorkModel = result.Job.WorkModel.ToString();
         Score = $"{result.Score:F0}%";
+        ShowCompatibility = showCompatibility;
         Source = result.Job.Source ?? "Fonte não informada";
         Url = result.Job.Url?.AbsoluteUri ?? string.Empty;
-        Reasons = string.Join(
-            Environment.NewLine,
-            result.Reasons.Select(reason =>
-                $"• {reason.Description}"));
+        Reasons = showCompatibility
+            ? string.Join(
+                Environment.NewLine,
+                result.Reasons
+                    .Where(reason =>
+                        reason.Criterion !=
+                        Vaguei.Domain.Enums.JobMatchCriterion.ProfessionalRole)
+                    .Select(reason => $"• {reason.Description}"))
+            : string.Empty;
 
-        Skills = result.Reasons
+        Skills = showCompatibility
+            ? result.Reasons
             .Where(reason =>
                 reason.Criterion ==
                     Vaguei.Domain.Enums.JobMatchCriterion.Skill &&
@@ -33,7 +41,8 @@ public sealed class JobResultItemViewModel
             .Select(description =>
                 description["Competência compatível: ".Length..]
                     .TrimEnd('.'))
-            .ToArray();
+            .ToArray()
+            : [];
 
         Published = FormatPublishedAt(
             result.Job.PublishedAt,
@@ -49,6 +58,12 @@ public sealed class JobResultItemViewModel
     public string WorkModel { get; }
 
     public string Score { get; }
+
+    public bool ShowCompatibility { get; }
+
+    public bool HasReasons => !string.IsNullOrWhiteSpace(Reasons);
+
+    public bool HasSkills => Skills.Count > 0;
 
     public string Source { get; }
 
