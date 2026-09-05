@@ -32,6 +32,8 @@ public sealed class MainViewModelTests
         Assert.Equal(
             ["Qualquer modelo", "Remoto", "Híbrido", "Presencial"],
             viewModel.WorkModelOptions);
+        Assert.Equal(7, viewModel.EmploymentTypeOptions.Count);
+        Assert.Equal(7, viewModel.SeniorityOptions.Count);
         Assert.True(viewModel.ShowEmptyState);
     }
 
@@ -208,6 +210,41 @@ public sealed class MainViewModelTests
     }
 
     [Fact]
+    public async Task RefreshJobsCommand_AppliesAllAdvancedFilters()
+    {
+        var source = new StubJobSource();
+        var viewModel = CreateViewModel(source);
+        viewModel.DesiredRole = "Analista";
+        viewModel.EmploymentTypeIndex = 3;
+        viewModel.SeniorityIndex = 5;
+        viewModel.LocationFilter = " Manaus ";
+
+        await viewModel.RefreshJobsCommand.ExecuteAsync(null);
+
+        var query = Assert.IsType<JobSearchQuery>(source.LastQuery);
+        Assert.Contains(EmploymentType.Contract, query.EmploymentTypes);
+        Assert.Contains(SeniorityLevel.Senior, query.SeniorityLevels);
+        Assert.Contains("Manaus", query.Locations);
+    }
+
+    [Fact]
+    public void ClearAdvancedFiltersCommand_ResetsEveryAdvancedFilter()
+    {
+        var viewModel = CreateViewModel(new StubJobSource());
+        viewModel.WorkModelIndex = 1;
+        viewModel.EmploymentTypeIndex = 2;
+        viewModel.SeniorityIndex = 3;
+        viewModel.LocationFilter = "Manaus";
+
+        viewModel.ClearAdvancedFiltersCommand.Execute(null);
+
+        Assert.Equal(0, viewModel.WorkModelIndex);
+        Assert.Equal(0, viewModel.EmploymentTypeIndex);
+        Assert.Equal(0, viewModel.SeniorityIndex);
+        Assert.Empty(viewModel.LocationFilter);
+    }
+
+    [Fact]
     public async Task RefreshJobsCommand_DoesNotLimitResultsToFifty()
     {
         var filePath = CreateTemporaryResume();
@@ -263,6 +300,22 @@ public sealed class MainViewModelTests
         Assert.Contains(
             "Nenhum resultado relacionado",
             viewModel.StatusMessage);
+    }
+
+    [Fact]
+    public async Task DirectSearch_ShowsDismissibleNoticeWhenEverySourceFails()
+    {
+        var viewModel = CreateViewModel(new StubJobSource { ShouldFail = true });
+        viewModel.DesiredRole = "Analista";
+
+        await viewModel.RefreshJobsCommand.ExecuteAsync(null);
+
+        Assert.True(viewModel.IsConnectionNoticeVisible);
+        Assert.Contains("conexão", viewModel.ConnectionNoticeMessage);
+
+        viewModel.DismissConnectionNoticeCommand.Execute(null);
+
+        Assert.False(viewModel.IsConnectionNoticeVisible);
     }
 
     [Fact]
@@ -393,12 +446,19 @@ public sealed class MainViewModelTests
 
         public int ResultCount { get; init; } = 1;
 
+        public bool ShouldFail { get; init; }
+
         public async Task<IEnumerable<JobPosting>> SearchAsync(
             JobSearchQuery query,
             CancellationToken cancellationToken = default)
         {
             LastQuery = query;
             SearchCount++;
+
+            if (ShouldFail)
+            {
+                throw new HttpRequestException("Sem conexão.");
+            }
 
             if (_searchGate is not null)
             {

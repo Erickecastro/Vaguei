@@ -7,6 +7,7 @@ using Vaguei.Desktop.ViewModels;
 using Vaguei.Desktop.Views;
 using Vaguei.ResumeParser.Parsers;
 using Vaguei.ResumeParser.Services;
+using Vaguei.Infrastructure;
 
 namespace Vaguei.Desktop;
 
@@ -42,7 +43,8 @@ public partial class App : Avalonia.Application
                 DataContext = new MainViewModel(
                     parserService,
                     new ResumeAnalyzer(),
-                    new JobSearchOrchestrator(sources))
+                    new JobSearchOrchestrator(sources),
+                    new JsonFavoriteJobStore())
             };
         }
 

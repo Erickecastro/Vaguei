@@ -31,8 +31,11 @@ Software development is the initial validation domain because it reflects the fi
 * Brazil-only and Brazil-plus-international scopes
 * Publication filters for 24 hours, 3 days, 7 days, 30 days, and 3 months
 * Work-model filter for remote, hybrid, and on-site opportunities
+* Advanced filters for location, contract type, and seniority
+* Locally persisted favorite jobs
 * Loading and search-attention states that keep work off the UI thread
 * Source failure warnings without interrupting successful providers
+* Dismissible connection warning with automatic timeout when every source is unreachable
 * Original job link for every result
 
 ### Resume processing
@@ -195,6 +198,7 @@ The score is intentionally explainable and deterministic. It is not a hiring pre
 * The initial skill and role taxonomies are strongest for software development.
 * Matching does not yet model education, language proficiency, years of experience, compensation, or mandatory location constraints in depth.
 * Results are fetched live and cached only in memory for five minutes; there is no persistent local index yet.
+* Favorites are stored only on the current device and are not synchronized.
 * Accessibility, localization, installers, update delivery, and end-to-end UI automation still need production validation.
 
 # Roadmap
@@ -204,9 +208,8 @@ The score is intentionally explainable and deterministic. It is not a hiring pre
 * Add richer per-source diagnostics and an optional persistent cache
 * Expand authorized public career sources and Brazilian employer coverage
 * Broaden role and skill taxonomies beyond software development
-* Add job-detail filters for seniority, contract type, and location
 * Improve cross-source deduplication with canonical employer identities
-* Add saved/favorite jobs and locally persisted search preferences
+* Add locally persisted search preferences and an optional favorites view
 * Add accessibility checks and automated desktop UI tests
 
 ### Matching evolution

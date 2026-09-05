@@ -93,6 +93,25 @@ public sealed class JobSearchOrchestratorTests
         Assert.Equal(
             "Fonte com erro",
             failure.Source);
+        Assert.False(result.AllSourcesFailed);
+    }
+
+    [Fact]
+    public async Task SearchAsync_ReportsWhenEverySourceFails()
+    {
+        var orchestrator = new JobSearchOrchestrator(
+        [
+            new FailingJobSource("Fonte A"),
+            new FailingJobSource("Fonte B")
+        ]);
+
+        var result = await orchestrator.SearchAsync(
+            new CandidateProfile(),
+            new JobSearchPreferences(),
+            ReferenceTime);
+
+        Assert.True(result.AllSourcesFailed);
+        Assert.Equal(2, result.SourceFailures.Count);
     }
 
     [Fact]

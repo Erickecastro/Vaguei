@@ -11,6 +11,7 @@ public sealed class JobSearchOrchestrator
     private readonly JobSearchQueryBuilder _queryBuilder;
     private readonly JobGeographyFilter _geographyFilter;
     private readonly JobFreshnessFilter _freshnessFilter;
+    private readonly JobAttributeFilter _attributeFilter;
     private readonly JobDeduplicator _deduplicator;
     private readonly JobMatcher _matcher;
 
@@ -21,6 +22,7 @@ public sealed class JobSearchOrchestrator
             new JobSearchQueryBuilder(),
             new JobGeographyFilter(),
             new JobFreshnessFilter(),
+            new JobAttributeFilter(),
             new JobDeduplicator(),
             new JobMatcher())
     {
@@ -31,6 +33,7 @@ public sealed class JobSearchOrchestrator
         JobSearchQueryBuilder queryBuilder,
         JobGeographyFilter geographyFilter,
         JobFreshnessFilter freshnessFilter,
+        JobAttributeFilter attributeFilter,
         JobDeduplicator deduplicator,
         JobMatcher matcher)
     {
@@ -38,6 +41,7 @@ public sealed class JobSearchOrchestrator
         ArgumentNullException.ThrowIfNull(queryBuilder);
         ArgumentNullException.ThrowIfNull(geographyFilter);
         ArgumentNullException.ThrowIfNull(freshnessFilter);
+        ArgumentNullException.ThrowIfNull(attributeFilter);
         ArgumentNullException.ThrowIfNull(deduplicator);
         ArgumentNullException.ThrowIfNull(matcher);
 
@@ -45,6 +49,7 @@ public sealed class JobSearchOrchestrator
         _queryBuilder = queryBuilder;
         _geographyFilter = geographyFilter;
         _freshnessFilter = freshnessFilter;
+        _attributeFilter = attributeFilter;
         _deduplicator = deduplicator;
         _matcher = matcher;
     }
@@ -82,8 +87,11 @@ public sealed class JobSearchOrchestrator
             preferences,
             referenceTime);
 
-        var uniqueJobs = _deduplicator.Deduplicate(
-            freshJobs);
+        var attributeAllowedJobs = _attributeFilter.Filter(
+            freshJobs,
+            preferences);
+
+        var uniqueJobs = _deduplicator.Deduplicate(attributeAllowedJobs);
 
         var matches = uniqueJobs
             .Select(job =>
@@ -104,7 +112,9 @@ public sealed class JobSearchOrchestrator
                 .Select(result => result.Failure!)
                 .ToArray(),
             CollectedJobCount = collectedJobs.Length,
-            UniqueJobCount = uniqueJobs.Count
+            UniqueJobCount = uniqueJobs.Count,
+            AllSourcesFailed = sourceResults.Length > 0 &&
+                               sourceResults.All(result => result.Failure is not null)
         };
     }
 

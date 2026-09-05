@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Vaguei.Application.Services;
+using Vaguei.Application.Interfaces;
 using Vaguei.Domain.Entities;
 using Vaguei.Domain.Enums;
 using Vaguei.Domain.Models;
@@ -14,8 +15,11 @@ public partial class MainViewModel : ViewModelBase
     private readonly ResumeParserService _parserService;
     private readonly ResumeAnalyzer _resumeAnalyzer;
     private readonly JobSearchOrchestrator _searchOrchestrator;
+    private readonly IFavoriteJobStore? _favoriteStore;
+    private readonly HashSet<string> _favoriteKeys;
     private CandidateProfile? _currentProfile;
     private string _detectedProfessionalTitle = string.Empty;
+    private CancellationTokenSource? _connectionNoticeCancellation;
 
     [ObservableProperty]
     private string _selectedFileName = "Nenhum currículo";
@@ -57,6 +61,15 @@ public partial class MainViewModel : ViewModelBase
     private int _workModelIndex;
 
     [ObservableProperty]
+    private int _employmentTypeIndex;
+
+    [ObservableProperty]
+    private int _seniorityIndex;
+
+    [ObservableProperty]
+    private string _locationFilter = string.Empty;
+
+    [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(RefreshJobsCommand))]
     [NotifyPropertyChangedFor(nameof(ShowEmptyState))]
     private bool _isBusy;
@@ -72,14 +85,25 @@ public partial class MainViewModel : ViewModelBase
     [NotifyPropertyChangedFor(nameof(ShowEmptyState))]
     private bool _hasResults;
 
+    [ObservableProperty]
+    private bool _isConnectionNoticeVisible;
+
+    [ObservableProperty]
+    private string _connectionNoticeMessage =
+        "Sem conexão com a internet. Verifique sua rede e tente novamente.";
+
     public MainViewModel(
         ResumeParserService parserService,
         ResumeAnalyzer resumeAnalyzer,
-        JobSearchOrchestrator searchOrchestrator)
+        JobSearchOrchestrator searchOrchestrator,
+        IFavoriteJobStore? favoriteStore = null)
     {
         _parserService = parserService;
         _resumeAnalyzer = resumeAnalyzer;
         _searchOrchestrator = searchOrchestrator;
+        _favoriteStore = favoriteStore;
+        _favoriteKeys = favoriteStore?.Load().ToHashSet(StringComparer.OrdinalIgnoreCase) ??
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     }
 
     public ObservableCollection<JobResultItemViewModel> Jobs { get; } = [];
@@ -107,6 +131,28 @@ public partial class MainViewModel : ViewModelBase
         "Remoto",
         "Híbrido",
         "Presencial"
+    ];
+
+    public IReadOnlyList<string> EmploymentTypeOptions { get; } =
+    [
+        "Qualquer contrato",
+        "Tempo integral",
+        "Meio período",
+        "Contrato",
+        "Temporário",
+        "Freelance",
+        "Estágio"
+    ];
+
+    public IReadOnlyList<string> SeniorityOptions { get; } =
+    [
+        "Qualquer senioridade",
+        "Estágio",
+        "Trainee",
+        "Júnior",
+        "Pleno",
+        "Sênior",
+        "Liderança"
     ];
 
     public bool ShowEmptyState => !IsBusy && !HasResults;
@@ -190,6 +236,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand(CanExecute = nameof(CanRefreshJobs))]
     private async Task RefreshJobsAsync()
     {
+        DismissConnectionNotice();
         var profile = _currentProfile ?? new CandidateProfile();
 
         IsSearchAttentionActive = false;
@@ -259,6 +306,15 @@ public partial class MainViewModel : ViewModelBase
         RefreshJobsCommand.NotifyCanExecuteChanged();
     }
 
+    [RelayCommand]
+    private void ClearAdvancedFilters()
+    {
+        WorkModelIndex = 0;
+        EmploymentTypeIndex = 0;
+        SeniorityIndex = 0;
+        LocationFilter = string.Empty;
+    }
+
     partial void OnSearchScopeIndexChanged(
         int value)
     {
@@ -284,6 +340,25 @@ public partial class MainViewModel : ViewModelBase
         if (selectedWorkModel is not null)
         {
             preferences.WorkModels.Add(selectedWorkModel.Value);
+        }
+
+        var selectedEmploymentType = GetSelectedEmploymentType();
+
+        if (selectedEmploymentType is not null)
+        {
+            preferences.EmploymentTypes.Add(selectedEmploymentType.Value);
+        }
+
+        var selectedSeniority = GetSelectedSeniority();
+
+        if (selectedSeniority is not null)
+        {
+            preferences.SeniorityLevels.Add(selectedSeniority.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(LocationFilter))
+        {
+            preferences.Cities.Add(LocationFilter.Trim());
         }
 
         var directSearch = DesiredRole.Trim();
@@ -313,10 +388,18 @@ public partial class MainViewModel : ViewModelBase
             Jobs.Add(
                 new JobResultItemViewModel(
                     match,
-                    showCompatibility: _currentProfile is not null));
+                    showCompatibility: _currentProfile is not null,
+                    isFavorite: IsFavorite(match),
+                    favoriteChanged: OnFavoriteChanged));
         }
 
         HasResults = Jobs.Count > 0;
+
+        if (result.AllSourcesFailed)
+        {
+            ShowConnectionNotice();
+        }
+
         SourceWarnings = string.Join(
             Environment.NewLine,
             result.SourceFailures.Select(failure =>
@@ -329,6 +412,49 @@ public partial class MainViewModel : ViewModelBase
             : _currentProfile is null
                 ? $"{Jobs.Count} oportunidades encontradas para “{directSearch}”."
                 : $"{Jobs.Count} oportunidades encontradas e ordenadas por compatibilidade.";
+    }
+
+    [RelayCommand]
+    private void DismissConnectionNotice()
+    {
+        _connectionNoticeCancellation?.Cancel();
+        _connectionNoticeCancellation?.Dispose();
+        _connectionNoticeCancellation = null;
+        IsConnectionNoticeVisible = false;
+    }
+
+    private void ShowConnectionNotice()
+    {
+        DismissConnectionNotice();
+        IsConnectionNoticeVisible = true;
+        _connectionNoticeCancellation = new CancellationTokenSource();
+        _ = AutoDismissConnectionNoticeAsync(_connectionNoticeCancellation.Token);
+    }
+
+    private async Task AutoDismissConnectionNoticeAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(7), cancellationToken);
+            IsConnectionNoticeVisible = false;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
+    }
+
+    private bool IsFavorite(JobMatchResult match)
+    {
+        var probe = new JobResultItemViewModel(match);
+        return _favoriteKeys.Contains(probe.FavoriteKey);
+    }
+
+    private void OnFavoriteChanged(string key, bool isFavorite)
+    {
+        if (isFavorite) _favoriteKeys.Add(key); else _favoriteKeys.Remove(key);
+        try { _favoriteStore?.Save(_favoriteKeys); }
+        catch (IOException) { SourceWarnings = "Não foi possível salvar os favoritos localmente."; }
+        catch (UnauthorizedAccessException) { SourceWarnings = "Não foi possível salvar os favoritos localmente."; }
     }
 
     private JobPublicationWindow GetPublicationWindow()
@@ -354,6 +480,28 @@ public partial class MainViewModel : ViewModelBase
             _ => null
         };
     }
+
+    private EmploymentType? GetSelectedEmploymentType() => EmploymentTypeIndex switch
+    {
+        1 => EmploymentType.FullTime,
+        2 => EmploymentType.PartTime,
+        3 => EmploymentType.Contract,
+        4 => EmploymentType.Temporary,
+        5 => EmploymentType.Freelance,
+        6 => EmploymentType.Internship,
+        _ => null
+    };
+
+    private SeniorityLevel? GetSelectedSeniority() => SeniorityIndex switch
+    {
+        1 => SeniorityLevel.Internship,
+        2 => SeniorityLevel.Trainee,
+        3 => SeniorityLevel.Junior,
+        4 => SeniorityLevel.MidLevel,
+        5 => SeniorityLevel.Senior,
+        6 => SeniorityLevel.Lead,
+        _ => null
+    };
 
     private void PopulateProfileSkills(
         CandidateProfile profile)

@@ -13,4 +13,6 @@ public sealed class JobSearchExecutionResult
     public int CollectedJobCount { get; init; }
 
     public int UniqueJobCount { get; init; }
+
+    public bool AllSourcesFailed { get; init; }
 }

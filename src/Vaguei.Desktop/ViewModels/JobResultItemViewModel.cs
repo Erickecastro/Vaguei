@@ -1,13 +1,23 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Vaguei.Application.Interfaces;
 using Vaguei.Domain.Models;
 
 namespace Vaguei.Desktop.ViewModels;
 
-public sealed class JobResultItemViewModel
+public sealed partial class JobResultItemViewModel : ObservableObject
 {
+    private readonly Action<string, bool>? _favoriteChanged;
+
     public JobResultItemViewModel(
         JobMatchResult result,
-        bool showCompatibility = true)
+        bool showCompatibility = true,
+        bool isFavorite = false,
+        Action<string, bool>? favoriteChanged = null)
     {
+        _favoriteChanged = favoriteChanged;
+        FavoriteKey = CreateFavoriteKey(result);
+        _isFavorite = isFavorite;
         Title = result.Job.Title;
         Company = result.Job.Company;
         Location = result.Job.Location.RawLocation ?? "Local não informado";
@@ -74,6 +84,29 @@ public sealed class JobResultItemViewModel
     public IReadOnlyCollection<string> Skills { get; }
 
     public string Published { get; }
+
+    public string FavoriteKey { get; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FavoriteSymbol))]
+    private bool _isFavorite;
+
+    public string FavoriteSymbol => IsFavorite ? "★" : "☆";
+
+    [RelayCommand]
+    private void ToggleFavorite()
+    {
+        IsFavorite = !IsFavorite;
+        _favoriteChanged?.Invoke(FavoriteKey, IsFavorite);
+    }
+
+    private static string CreateFavoriteKey(JobMatchResult result)
+    {
+        var job = result.Job;
+        if (!string.IsNullOrWhiteSpace(job.SourcePostingId))
+            return $"{job.Source}:{job.SourcePostingId}";
+        return job.Url?.AbsoluteUri ?? $"{job.Company}|{job.Title}|{job.Location.RawLocation}";
+    }
 
     private static string FormatPublishedAt(
         DateTimeOffset? publishedAt,

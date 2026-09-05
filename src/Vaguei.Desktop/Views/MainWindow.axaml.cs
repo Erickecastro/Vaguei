@@ -143,9 +143,12 @@ public partial class MainWindow : Window
             : SplitViewDisplayMode.Inline;
         SidebarSplitView.OpenPaneLength = 250;
         CompactSidebarButton.IsVisible = isCompact;
-        JobSearchField.Width = isCompact ? 180 : 420;
         PublicationSelector.Width = isCompact ? 130 : 190;
         WorkModelSelector.Width = isCompact ? 140 : 160;
+        LocationFilterField.Width = isCompact ? 150 : 220;
+        EmploymentTypeSelector.Width = isCompact ? 140 : 180;
+        SenioritySelector.Width = isCompact ? 150 : 190;
+        ClearFiltersButton.Width = isCompact ? 80 : 100;
 
         if (_isCompactLayout != isCompact)
         {
