@@ -19,6 +19,29 @@ public sealed class JobSearchTermGenerator
             SkillCategory.Mobile
         ];
 
+    private static readonly (Regex Pattern, string[] Variants)[]
+        DesiredRoleVariants =
+        [
+            (new Regex(@"\b(est[aá]gio|estagi[aá]ri[oa]|intern(ship)?)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+                ["estagio", "estagiário", "estagiaria", "internship", "intern"]),
+            (new Regex(@"\b(analista de dados|data analyst)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+                ["analista de dados", "data analyst"]),
+            (new Regex(@"\b(cientista de dados|data scientist)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+                ["cientista de dados", "data scientist"]),
+            (new Regex(@"\b(engenheir[oa] de software|software engineer)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+                ["engenheiro de software", "software engineer", "software developer"]),
+            (new Regex(@"\bdesenvolvedor[a]?\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+                ["desenvolvedor", "developer"]),
+            (new Regex(@"\b(recursos humanos|human resources)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+                ["recursos humanos", "human resources", "people operations"]),
+            (new Regex(@"\b(contador[a]?|accountant)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+                ["contador", "accountant"]),
+            (new Regex(@"\b(enfermeir[oa]|nurse)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+                ["enfermeiro", "nurse"]),
+            (new Regex(@"\b(log[ií]stica|logistics)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+                ["logística", "logistics"])
+        ];
+
     public IReadOnlyCollection<string> Generate(
         CandidateProfile profile,
         JobSearchPreferences preferences)
@@ -64,19 +87,18 @@ public sealed class JobSearchTermGenerator
         List<string> terms,
         string role)
     {
-        if (!Regex.IsMatch(
-                role,
-                @"\b(est[aá]gio|estagi[aá]ri[oa]|intern(ship)?)\b",
-                RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        foreach (var expansion in DesiredRoleVariants)
         {
-            return;
-        }
+            if (!expansion.Pattern.IsMatch(role))
+            {
+                continue;
+            }
 
-        AddDistinct(terms, "estagio");
-        AddDistinct(terms, "estagiário");
-        AddDistinct(terms, "estagiaria");
-        AddDistinct(terms, "internship");
-        AddDistinct(terms, "intern");
+            foreach (var variant in expansion.Variants)
+            {
+                AddDistinct(terms, variant);
+            }
+        }
     }
 
     private static void AddRoleVariants(

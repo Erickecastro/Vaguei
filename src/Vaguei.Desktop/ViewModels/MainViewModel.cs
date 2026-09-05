@@ -463,8 +463,8 @@ public partial class MainViewModel : ViewModelBase
                 ? $"Nenhum resultado relacionado a “{directSearch}”. Tente outro cargo, tecnologia ou empresa."
                 : "Nenhuma vaga foi encontrada pelas fontes atuais com este filtro."
             : _currentProfile is null
-                ? $"{_allJobs.Count} oportunidades encontradas para “{directSearch}”."
-                : $"{_allJobs.Count} oportunidades encontradas e ordenadas por compatibilidade.";
+                ? $"{_allJobs.Count} oportunidades encontradas para “{directSearch}” em {result.SourcesWithResults} fontes."
+                : $"{_allJobs.Count} oportunidades encontradas em {result.SourcesWithResults} fontes e ordenadas por compatibilidade.";
     }
 
     [RelayCommand]

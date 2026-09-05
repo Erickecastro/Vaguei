@@ -10,9 +10,13 @@ public sealed class JobSearchExecutionResult
 
     public required IReadOnlyCollection<JobSourceFailure> SourceFailures { get; init; }
 
+    public required IReadOnlyCollection<JobSourceSearchSummary> SourceSummaries { get; init; }
+
     public int CollectedJobCount { get; init; }
 
     public int UniqueJobCount { get; init; }
 
     public bool AllSourcesFailed { get; init; }
+
+    public int SourcesWithResults => SourceSummaries.Count(summary => summary.JobCount > 0);
 }

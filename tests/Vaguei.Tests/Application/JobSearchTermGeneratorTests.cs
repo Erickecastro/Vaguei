@@ -174,6 +174,27 @@ public sealed class JobSearchTermGeneratorTests
         Assert.Contains("intern", terms);
     }
 
+    [Theory]
+    [InlineData("Analista de Dados", "data analyst")]
+    [InlineData("Engenheira de Software", "software engineer")]
+    [InlineData("Recursos Humanos", "human resources")]
+    [InlineData("Contadora", "accountant")]
+    [InlineData("Enfermeira", "nurse")]
+    [InlineData("Logística", "logistics")]
+    public void Generate_ExpandsControlledBilingualRoleVariants(
+        string search,
+        string expectedVariant)
+    {
+        var preferences = new JobSearchPreferences();
+        preferences.DesiredRoles.Add(search);
+
+        var terms = new JobSearchTermGenerator().Generate(
+            new CandidateProfile(),
+            preferences);
+
+        Assert.Contains(expectedVariant, terms, StringComparer.OrdinalIgnoreCase);
+    }
+
     [Fact]
     public void Generate_IgnoresEmptyProfessionalTitle()
     {

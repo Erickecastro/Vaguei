@@ -51,11 +51,13 @@ Software development is the initial validation domain because it reflects the fi
 ### Search and matching
 
 * Parallel source orchestration and isolated provider failures
+* Per-source result diagnostics for measuring real search coverage
 * Shared concurrency limit, per-source timeout, one retry for transient network failures, and a five-minute in-memory query cache limited to 32 entries per source
 * Brazilian location recognition and national-only filtering
 * Publication-date filtering
 * Duplicate removal using stable provider identifiers plus company, title, location, URL, and description similarity
 * Role normalization and controlled search-term expansion, including Portuguese and English internship variants
+* Controlled bilingual variants for common technology, data, HR, accounting, healthcare, and logistics roles
 * Compatibility based on role and skills, with penalties for missing core or required skills
 * Compatibility is displayed only when a resume has been analyzed
 * Ranking by compatibility and recency, with compatibility hidden for direct searches without a resume

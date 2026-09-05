@@ -300,6 +300,26 @@ public sealed class ArbeitnowJobSourceTests
             job.PublishedAt);
     }
 
+    [Fact]
+    public async Task SearchAsync_FollowsPublicPaginationLinks()
+    {
+        const string firstPage =
+            """
+            {"data":[{"slug":"one","company_name":"A","title":"Analista","url":"https://example.com/one","location":"Brasil"}],"links":{"next":"https://www.arbeitnow.com/api/job-board-api?page=2"}}
+            """;
+        const string secondPage =
+            """
+            {"data":[{"slug":"two","company_name":"B","title":"Analista","url":"https://example.com/two","location":"Brasil"}],"links":{"next":null}}
+            """;
+        var handler = new PagedHttpMessageHandler(firstPage, secondPage);
+        using var httpClient = new HttpClient(handler);
+
+        var jobs = await new ArbeitnowJobSource(httpClient).SearchAsync(new JobSearchQuery());
+
+        Assert.Equal(2, jobs.Count());
+        Assert.Equal(2, handler.RequestCount);
+    }
+
     private static HttpClient CreateHttpClient(
         string json)
     {
@@ -329,6 +349,28 @@ public sealed class ArbeitnowJobSourceTests
                 };
 
             return Task.FromResult(response);
+        }
+    }
+
+    private sealed class PagedHttpMessageHandler(
+        string firstPage,
+        string secondPage) : HttpMessageHandler
+    {
+        public int RequestCount { get; private set; }
+
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            RequestCount++;
+            var content = request.RequestUri?.Query.Contains("page=2", StringComparison.Ordinal) == true
+                ? secondPage
+                : firstPage;
+
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(content, Encoding.UTF8, "application/json")
+            });
         }
     }
 }

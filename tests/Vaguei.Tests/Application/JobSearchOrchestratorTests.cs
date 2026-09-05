@@ -59,6 +59,8 @@ public sealed class JobSearchOrchestratorTests
             "Analista de Dados",
             result.Matches.First().Job.Title);
         Assert.Empty(result.SourceFailures);
+        Assert.Equal(2, result.SourceSummaries.Count);
+        Assert.Equal(2, result.SourcesWithResults);
     }
 
     [Fact]

@@ -10,6 +10,7 @@ namespace Vaguei.Collectors.Sources;
 
 public sealed class ArbeitnowJobSource : IJobSource
 {
+    private const int MaximumPages = 3;
     private readonly HttpClient _httpClient;
     private readonly JobSkillRequirementAnalyzer _requirementAnalyzer;
 
@@ -25,17 +26,27 @@ public sealed class ArbeitnowJobSource : IJobSource
         JobSearchQuery query,
         CancellationToken cancellationToken = default)
     {
-        var response =
-            await _httpClient.GetFromJsonAsync<ArbeitnowResponse>(
-                "https://www.arbeitnow.com/api/job-board-api",
+        var pages = new List<ArbeitnowJob>();
+        string? nextPage = "https://www.arbeitnow.com/api/job-board-api?page=1";
+
+        for (var page = 0; page < MaximumPages && nextPage is not null; page++)
+        {
+            var response = await _httpClient.GetFromJsonAsync<ArbeitnowResponse>(
+                nextPage,
                 cancellationToken);
 
-        if (response is null)
-        {
-            return [];
+            if (response is null)
+            {
+                break;
+            }
+
+            pages.AddRange(response.Data);
+            nextPage = string.IsNullOrWhiteSpace(response.Links.Next)
+                ? null
+                : response.Links.Next;
         }
 
-        var jobs = response.Data
+        var jobs = pages
             .Select(MapJob)
             .Where(job => MatchesQuery(job, query))
             .ToList();
@@ -150,6 +161,15 @@ public sealed class ArbeitnowJobSource : IJobSource
     {
         [JsonPropertyName("data")]
         public List<ArbeitnowJob> Data { get; init; } = [];
+
+        [JsonPropertyName("links")]
+        public ArbeitnowLinks Links { get; init; } = new();
+    }
+
+    private sealed class ArbeitnowLinks
+    {
+        [JsonPropertyName("next")]
+        public string? Next { get; init; }
     }
 
     private sealed class ArbeitnowJob

@@ -111,6 +111,12 @@ public sealed class JobSearchOrchestrator
                 .Where(result => result.Failure is not null)
                 .Select(result => result.Failure!)
                 .ToArray(),
+            SourceSummaries = sourceResults
+                .Select(result => new JobSourceSearchSummary(
+                    result.Source,
+                    result.Jobs.Count,
+                    result.Failure is null))
+                .ToArray(),
             CollectedJobCount = collectedJobs.Length,
             UniqueJobCount = uniqueJobs.Count,
             AllSourcesFailed = sourceResults.Length > 0 &&
@@ -130,6 +136,7 @@ public sealed class JobSearchOrchestrator
                 cancellationToken);
 
             return new SourceSearchResult(
+                source.Name,
                 jobs.ToArray(),
                 null);
         }
@@ -141,6 +148,7 @@ public sealed class JobSearchOrchestrator
         catch (Exception exception)
         {
             return new SourceSearchResult(
+                source.Name,
                 [],
                 new JobSourceFailure(
                     source.Name,
@@ -149,6 +157,7 @@ public sealed class JobSearchOrchestrator
     }
 
     private sealed record SourceSearchResult(
+        string Source,
         IReadOnlyCollection<JobPosting> Jobs,
         JobSourceFailure? Failure);
 }
