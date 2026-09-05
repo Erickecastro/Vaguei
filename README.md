@@ -42,6 +42,7 @@ Software development is the initial validation domain because it reflects the fi
 * Dismissible connection warning with automatic timeout when every source is unreachable
 * Original job link for every result
 * In-app About area covering purpose, privacy, terms, licenses, and source authorization status
+* Fixed compact footer with copyright, license, and third-party vacancy attribution
 
 ### Resume processing
 
@@ -196,6 +197,8 @@ For a per-user Linux installation without `sudo`:
 This publishes a self-contained build, installs the desktop entry and the required freedesktop icon sizes, and refreshes the available desktop caches when supported. See [`packaging/linux/README.md`](packaging/linux/README.md) for details.
 
 An experimental Android prototype is now planned while desktop remains the primary product. Avalonia 12 and .NET 10 allow the domain, application, collectors, and most UI resources to be shared, but Android needs a separate entry project, platform document picker, lifecycle handling, secure storage, and small-screen navigation. See the [mobile prototype plan](docs/MOBILE_PROTOTYPE.md).
+
+The first Android debug prototype now compiles in the separate [`Vaguei.Mobile.slnx`](Vaguei.Mobile.slnx) solution. It provides direct job search, a scrollable result list, source attribution, original links, and a compact mobile footer. Resume import and full desktop feature parity are intentionally deferred until platform document handling and shared presentation components are implemented.
 
 # Matching Model
 

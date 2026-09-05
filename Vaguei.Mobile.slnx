@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Vaguei.Android/Vaguei.Android.csproj" />
+    <Project Path="src/Vaguei.Application/Vaguei.Application.csproj" />
+    <Project Path="src/Vaguei.Collectors/Vaguei.Collectors.csproj" />
+    <Project Path="src/Vaguei.Domain/Vaguei.Domain.csproj" />
+    <Project Path="src/Vaguei.Mobile/Vaguei.Mobile.csproj" />
+  </Folder>
+</Solution>

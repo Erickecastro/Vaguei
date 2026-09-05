@@ -1,0 +1,32 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Vaguei.Mobile.App"
+             RequestedThemeVariant="Default">
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key="MobilePageBrush" Color="#F6F7FB"/>
+          <SolidColorBrush x:Key="MobileSurfaceBrush" Color="#FFFFFF"/>
+          <SolidColorBrush x:Key="MobileTextBrush" Color="#1A1D26"/>
+          <SolidColorBrush x:Key="MobileSecondaryBrush" Color="#626879"/>
+          <SolidColorBrush x:Key="MobileOutlineBrush" Color="#DDE1EA"/>
+          <SolidColorBrush x:Key="MobileAccentBrush" Color="#5856D6"/>
+          <SolidColorBrush x:Key="MobileAccentTextBrush" Color="#FFFFFF"/>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key="MobilePageBrush" Color="#121212"/>
+          <SolidColorBrush x:Key="MobileSurfaceBrush" Color="#1B1B1B"/>
+          <SolidColorBrush x:Key="MobileTextBrush" Color="#F2F2F2"/>
+          <SolidColorBrush x:Key="MobileSecondaryBrush" Color="#B5B5B5"/>
+          <SolidColorBrush x:Key="MobileOutlineBrush" Color="#383838"/>
+          <SolidColorBrush x:Key="MobileAccentBrush" Color="#E5E5E5"/>
+          <SolidColorBrush x:Key="MobileAccentTextBrush" Color="#161616"/>
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+  <Application.Styles>
+    <FluentTheme/>
+  </Application.Styles>
+</Application>

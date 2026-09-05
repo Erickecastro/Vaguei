@@ -10,7 +10,8 @@ O objetivo inicial é validar busca, filtros, resultados, tema, abertura de vaga
 
 - .NET SDK 10.0.400 instalado.
 - Android SDK e `adb` encontrados.
-- Workload `.NET for Android` ainda não instalado.
+- Workload `.NET for Android` instalada.
+- Primeiro APK de debug compilado com sucesso.
 - O projeto atual usa uma `Window` desktop com barra de título e redimensionamento próprios; esses elementos não devem ser levados para Android.
 
 ## Arquitetura proposta
@@ -30,13 +31,24 @@ A extração de `Vaguei.UI` deve acontecer gradualmente. A tela desktop atual n�
 
 ## Primeira entrega
 
-1. Instalar o workload Android com o SDK oficial da Microsoft.
-2. Criar `Vaguei.UI` e mover recursos de tema e componentes independentes de `Window`.
-3. Criar `Vaguei.Android` com `net10.0-android` e `AvaloniaMainActivity`.
-4. Implementar navegação mobile em uma única coluna.
-5. Adaptar seleção de documentos e armazenamento local ao Android.
-6. Validar conectividade, abertura de URLs e ciclo de vida.
-7. Gerar somente APK de debug para emulador ou dispositivo de teste.
+1. Validar o APK de debug em emulador e dispositivo físico.
+2. Extrair gradualmente recursos e componentes independentes de `Window`.
+3. Adaptar seleção de documentos e armazenamento local ao Android.
+4. Implementar os filtros avançados e o resumo do currículo em navegação mobile.
+5. Validar conectividade, abertura de URLs, rotação e ciclo de vida.
+6. Manter builds de teste sem assinatura de produção.
+
+## Compilar o protótipo
+
+O Fedora está configurado globalmente com JDK 25, mas o .NET Android 10 requer JDK 21. A build aponta explicitamente para o JDK compatível e não altera o Java do sistema:
+
+```bash
+dotnet build src/Vaguei.Android/Vaguei.Android.csproj \
+  -p:AndroidSdkDirectory=/home/ericke/Android/Sdk \
+  -p:JavaSdkDirectory=/usr/lib/jvm/java-21-temurin-jdk
+```
+
+O APK de debug é gerado sob `src/Vaguei.Android/bin/Debug/net10.0-android/`. A pasta `bin` e arquivos `*.apk` são ignorados pelo Git.
 
 ## Segurança
 
@@ -53,4 +65,3 @@ A extração de `Vaguei.UI` deve acontecer gradualmente. A tela desktop atual n�
 - Acessibilidade, teclado, rotação e retomada do aplicativo foram testados.
 - Política de privacidade descreve corretamente o comportamento mobile.
 - Builds são reproduzíveis e assinadas fora do repositório.
-

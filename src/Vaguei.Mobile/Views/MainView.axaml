@@ -1,0 +1,58 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Vaguei.Mobile.ViewModels"
+             x:Class="Vaguei.Mobile.Views.MainView"
+             x:DataType="vm:MobileMainViewModel"
+             Background="{DynamicResource MobilePageBrush}"
+             Foreground="{DynamicResource MobileTextBrush}">
+  <UserControl.Styles>
+    <Style Selector="Border.card"><Setter Property="Background" Value="{DynamicResource MobileSurfaceBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource MobileOutlineBrush}"/><Setter Property="BorderThickness" Value="1"/><Setter Property="CornerRadius" Value="14"/></Style>
+    <Style Selector="TextBlock.secondary"><Setter Property="Foreground" Value="{DynamicResource MobileSecondaryBrush}"/><Setter Property="FontSize" Value="12"/></Style>
+  </UserControl.Styles>
+  <Grid Margin="18,14,18,10" RowDefinitions="Auto,16,Auto,10,Auto,12,*,Auto">
+    <Grid ColumnDefinitions="Auto,12,*">
+      <Image Width="44" Height="44" Source="/Assets/logo-light-56.png" Stretch="Uniform"/>
+      <StackPanel Grid.Column="2" VerticalAlignment="Center">
+        <TextBlock FontSize="22" FontWeight="Bold" Text="Vaguei"/>
+        <TextBlock Classes="secondary" Text="Protótipo Android experimental"/>
+      </StackPanel>
+    </Grid>
+
+    <Grid Grid.Row="2" ColumnDefinitions="*,10,Auto">
+      <TextBox MinHeight="48" Padding="14,8" CornerRadius="10" VerticalContentAlignment="Center"
+               Background="{DynamicResource MobileSurfaceBrush}" BorderBrush="{DynamicResource MobileOutlineBrush}"
+               Text="{Binding Query, Mode=TwoWay}" PlaceholderText="Cargo, tecnologia ou empresa"/>
+      <Button Grid.Column="2" MinWidth="98" CornerRadius="10" Padding="16,8"
+              Background="{DynamicResource MobileAccentBrush}" Foreground="{DynamicResource MobileAccentTextBrush}"
+              FontWeight="SemiBold" Command="{Binding SearchCommand}" Content="Pesquisar"/>
+    </Grid>
+
+    <StackPanel Grid.Row="4" Spacing="6">
+      <TextBlock FontSize="18" FontWeight="Bold" Text="Oportunidades"/>
+      <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding Status}"/>
+      <ProgressBar Height="4" IsIndeterminate="True" IsVisible="{Binding IsBusy}"/>
+    </StackPanel>
+
+    <ScrollViewer Grid.Row="6">
+      <ItemsControl ItemsSource="{Binding Jobs}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:MobileJobItem">
+            <Border Classes="card" Padding="16" Margin="0,0,0,10">
+              <Grid RowDefinitions="Auto,Auto,Auto,12,Auto" ColumnDefinitions="*,Auto">
+                <TextBlock Grid.ColumnSpan="2" FontSize="16" FontWeight="Bold" TextWrapping="Wrap" Text="{Binding Title}"/>
+                <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Margin="0,4,0,0" Classes="secondary" FontWeight="SemiBold" Text="{Binding Company}"/>
+                <TextBlock Grid.Row="2" Grid.ColumnSpan="2" Margin="0,2,0,0" Classes="secondary" TextWrapping="Wrap" Text="{Binding Location}"/>
+                <TextBlock Grid.Row="4" VerticalAlignment="Center" Classes="secondary" Text="{Binding Source}"/>
+                <Button Grid.Row="4" Grid.Column="1" Padding="15,8" CornerRadius="9" Tag="{Binding Url}" Click="OnOpenJobClick" Content="Abrir  ›"/>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+
+    <TextBlock Grid.Row="7" Margin="0,6,0,0" HorizontalAlignment="Center" FontSize="10"
+               Foreground="{DynamicResource MobileSecondaryBrush}"
+               Text="© 2026 Vaguei · MIT · Vagas pertencem às fontes indicadas"/>
+  </Grid>
+</UserControl>
