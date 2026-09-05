@@ -20,7 +20,9 @@ public sealed class GreenhouseJobSource : IJobSource
             ["ebanx"] = "EBANX",
             ["monks"] = "Monks",
             ["quintoandar"] = "QuintoAndar",
-            ["gympass"] = "Wellhub"
+            ["gympass"] = "Wellhub",
+            ["alphasights"] = "AlphaSights",
+            ["wildlifestudios"] = "Wildlife Studios"
         };
 
     private readonly HttpClient _httpClient;

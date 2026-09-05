@@ -51,6 +51,17 @@ public sealed class JobSourceCatalogTests
         }
     }
 
+    [Fact]
+    public void CreateDefault_IncludesValidatedBrazilianEmployers()
+    {
+        var catalog = JobSourceCatalog.CreateDefault();
+
+        Assert.Equal("CI&T", catalog.Lever["ciandt"]);
+        Assert.Equal("dLocal", catalog.Lever["dlocal"]);
+        Assert.Equal("Wildlife Studios", catalog.Greenhouse["wildlifestudios"]);
+        Assert.Equal("AlphaSights", catalog.Greenhouse["alphasights"]);
+    }
+
     private static string CreateTemporaryCatalog(string contents)
     {
         var path = Path.Combine(

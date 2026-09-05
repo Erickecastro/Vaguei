@@ -183,7 +183,7 @@ internal static partial class JobSourceMapping
     private static partial Regex SearchTermPattern();
 
     [GeneratedRegex(
-        @"(?:^|[\s,;/()\-])(brasil|brazil|s[aã]o paulo|rio de janeiro|belo horizonte|curitiba|porto alegre|bras[ií]lia|recife|salvador|campinas|florian[oó]polis|manaus|fortaleza|goi[aâ]nia|vit[oó]ria|barueri|osasco|amazonas|bahia|cear[aá]|esp[ií]rito santo|goi[aá]s|maranh[aã]o|paran[aá]|pernambuco|santa catarina|rio grande do sul)(?:$|[\s,;/()\-])",
+        @"(?:^|[\s,;/()\-])(brasil|brazil|s[aã]o paulo|rio de janeiro|belo horizonte|curitiba|porto alegre|bras[ií]lia|recife|salvador|campinas|florian[oó]polis|manaus|fortaleza|goi[aâ]nia|vit[oó]ria|barueri|osasco|guarulhos|sorocaba|santos|ribeir[aã]o preto|s[aã]o jos[eé] dos campos|niter[oó]i|joinville|blumenau|londrina|maring[aá]|uber[aâ]ndia|contagem|caxias do sul|amazonas|bahia|cear[aá]|esp[ií]rito santo|goi[aá]s|maranh[aã]o|paran[aá]|pernambuco|santa catarina|rio grande do sul)(?:$|[\s,;/()\-])",
         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex BrazilPattern();
 

@@ -79,7 +79,7 @@ Vaguei currently reads anonymous, read-only job data from public endpoints or pu
 * SmartRecruiters
 * Workable
 
-The repository contains a curated employer catalog for sources that require a board, tenant, site, company, or account identifier. This includes the public Sidia page on InHire and a mix of Brazilian and international employers across the other providers. The shared catalog lives in [`config/job-sources.json`](config/job-sources.json), is copied into Desktop and CLI builds, and falls back to validated built-in defaults when it is missing or malformed.
+The repository contains a curated employer catalog for sources that require a board, tenant, site, company, or account identifier. This includes the public Sidia page on InHire and Brazilian coverage such as CI&T, Wildlife Studios, dLocal, EBANX, QuintoAndar, Wellhub, and others across the supported providers. The shared catalog lives in [`config/job-sources.json`](config/job-sources.json), is copied into Desktop and CLI builds, and falls back to validated built-in defaults when it is missing or malformed.
 
 The current integration does **not** scrape authenticated or protected pages. LinkedIn, Gupy, Catho, and similar platforms will only be integrated through an official API, an approved partnership, an employer-owned public feed, or another method explicitly permitted by their terms. Vaguei does not attempt to bypass authentication, anti-bot protection, rate limits, or access controls.
 
