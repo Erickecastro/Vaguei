@@ -42,7 +42,8 @@ public partial class App : Avalonia.Application
                 new AshbyJobSource(_httpClient),
                 new GreenhouseJobSource(_httpClient),
                 new InHireJobSource(_httpClient),
-                new LeverJobSource(_httpClient)
+                new LeverJobSource(_httpClient),
+                new SmartRecruitersJobSource(_httpClient)
             };
 
             desktop.MainWindow = new MainWindow

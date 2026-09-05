@@ -7,6 +7,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using Vaguei.Desktop.ViewModels;
 
 namespace Vaguei.Desktop.Views;
@@ -15,6 +16,7 @@ public partial class MainWindow : Window
 {
     private const double NarrowLayoutThreshold = 1080;
     private bool? _isCompactLayout;
+    private bool _isThemeTransitioning;
 
     private static readonly FilePickerFileType ResumeFileType = new("Currículos")
     {
@@ -25,12 +27,12 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        Transitions =
+        ThemeTransitionOverlay.Transitions =
         [
             new DoubleTransition
             {
                 Property = OpacityProperty,
-                Duration = TimeSpan.FromMilliseconds(180)
+                Duration = TimeSpan.FromMilliseconds(320)
             }
         ];
 
@@ -61,23 +63,45 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs eventArgs)
     {
-        if (Avalonia.Application.Current is null)
+        if (Avalonia.Application.Current is null || _isThemeTransitioning)
         {
             return;
         }
 
-        Opacity = 0.88;
-        await Task.Delay(90);
+        _isThemeTransitioning = true;
+        var currentTheme = Avalonia.Application.Current.ActualThemeVariant;
+        ThemeTransitionOverlay.Background = new SolidColorBrush(
+            currentTheme == ThemeVariant.Dark
+                ? Color.Parse("#121212")
+                : Color.Parse("#F6F7FB"));
+        ThemeTransitionOverlay.Transitions = null;
+        ThemeTransitionOverlay.Opacity = 1;
+        ThemeTransitionOverlay.IsVisible = true;
 
         var requestedTheme =
-            Avalonia.Application.Current.ActualThemeVariant == ThemeVariant.Dark
+            currentTheme == ThemeVariant.Dark
                 ? ThemeVariant.Light
                 : ThemeVariant.Dark;
 
         Avalonia.Application.Current.RequestedThemeVariant = requestedTheme;
         UpdateThemeVisuals(requestedTheme);
 
-        Opacity = 1;
+        await Dispatcher.UIThread.InvokeAsync(
+            () => { },
+            DispatcherPriority.Render);
+
+        ThemeTransitionOverlay.Transitions =
+        [
+            new DoubleTransition
+            {
+                Property = OpacityProperty,
+                Duration = TimeSpan.FromMilliseconds(320)
+            }
+        ];
+        ThemeTransitionOverlay.Opacity = 0;
+        await Task.Delay(340);
+        ThemeTransitionOverlay.IsVisible = false;
+        _isThemeTransitioning = false;
     }
 
     private void OnWindowOpened(
@@ -135,8 +159,38 @@ public partial class MainWindow : Window
 
         DarkThemeLogo.IsVisible = isDark;
         LightThemeLogo.IsVisible = !isDark;
+        TitleDarkThemeLogo.IsVisible = isDark;
+        TitleLightThemeLogo.IsVisible = !isDark;
         ScopeSelector.Foreground = foreground;
         ScopeLocationIcon.Foreground = foreground;
+    }
+
+    private void OnMinimizeClick(object? sender, RoutedEventArgs eventArgs) =>
+        WindowState = WindowState.Minimized;
+
+    private void OnMaximizeClick(object? sender, RoutedEventArgs eventArgs) =>
+        ToggleMaximizedState();
+
+    private void OnCloseClick(object? sender, RoutedEventArgs eventArgs) =>
+        Close();
+
+    private void OnResizeGripPointerPressed(
+        object? sender,
+        PointerPressedEventArgs eventArgs)
+    {
+        if (sender is Control { Tag: string edgeName } &&
+            Enum.TryParse<WindowEdge>(edgeName, out var edge) &&
+            eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
+            BeginResizeDrag(edge, eventArgs);
+        }
+    }
+
+    private void ToggleMaximizedState()
+    {
+        WindowState = WindowState == WindowState.Maximized
+            ? WindowState.Normal
+            : WindowState.Maximized;
     }
 
     private void OnOpenJobClick(

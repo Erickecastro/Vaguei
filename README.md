@@ -33,7 +33,7 @@ Software development is the initial validation domain because it reflects the fi
 * Job requirement classification
 * Job source orchestration and failure isolation
 * Duplicate job removal
-* Public Ashby, Greenhouse, InHire, and Lever job board integrations
+* Public Ashby, Greenhouse, InHire, Lever, and SmartRecruiters job board integrations
 * Brazilian job location recognition
 * Cross-platform execution
 
@@ -132,9 +132,10 @@ dotnet run --project src/Vaguei.Desktop
 ```
 
 The current collector searches Arbeitnow and a curated catalog of public Ashby,
-Greenhouse, InHire, and Lever career pages. This includes the official public
-Sidia feed on InHire. The catalog can be extended without scraping protected job
-platforms, and results always preserve the original application URL.
+Greenhouse, InHire, Lever, and SmartRecruiters career pages. This includes the
+official public Sidia feed on InHire and a mixed catalog of large and small
+employers on SmartRecruiters. The catalog can be extended without scraping
+protected job platforms, and results always preserve the original application URL.
 
 The window and Windows executable embed the Vaguei icon. Linux packages should
 also install the files under `packaging/linux`; see

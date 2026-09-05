@@ -165,7 +165,8 @@ try
             new AshbyJobSource(httpClient),
             new GreenhouseJobSource(httpClient),
             new InHireJobSource(httpClient),
-            new LeverJobSource(httpClient)
+            new LeverJobSource(httpClient),
+            new SmartRecruitersJobSource(httpClient)
         ]);
 
     var searchResult = await orchestrator.SearchAsync(
