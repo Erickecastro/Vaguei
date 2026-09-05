@@ -18,6 +18,8 @@ public partial class MainWindow : Window
     private const double NarrowLayoutThreshold = 1080;
     private bool? _isCompactLayout;
     private bool _isThemeTransitioning;
+    private bool _isExitConfirmationOpen;
+    private bool _allowClose;
     private readonly IThemePreferenceStore? _themePreferenceStore;
 
     private static readonly FilePickerFileType ResumeFileType = new("Currículos")
@@ -51,6 +53,7 @@ public partial class MainWindow : Window
         SizeChanged += OnWindowSizeChanged;
         PropertyChanged += OnWindowPropertyChanged;
         Opened += OnWindowOpened;
+        Closing += OnWindowClosing;
     }
 
     private async void OnChooseFileClick(
@@ -254,6 +257,37 @@ public partial class MainWindow : Window
 
     private void OnCloseClick(object? sender, RoutedEventArgs eventArgs) =>
         Close();
+
+    private async void OnWindowClosing(
+        object? sender,
+        WindowClosingEventArgs eventArgs)
+    {
+        if (_allowClose)
+        {
+            return;
+        }
+
+        eventArgs.Cancel = true;
+        if (_isExitConfirmationOpen)
+        {
+            return;
+        }
+
+        _isExitConfirmationOpen = true;
+        try
+        {
+            var confirmed = await new ExitConfirmationWindow().ShowDialog<bool>(this);
+            if (confirmed)
+            {
+                _allowClose = true;
+                Close();
+            }
+        }
+        finally
+        {
+            _isExitConfirmationOpen = false;
+        }
+    }
 
     private void OnTitleBarPointerPressed(
         object? sender,

@@ -20,6 +20,7 @@ public static class JobSourceFactory
             new AshbyJobSource(httpClient, catalog.Ashby),
             new GreenhouseJobSource(httpClient, catalog.Greenhouse),
             new InHireJobSource(httpClient, catalog.InHire),
+            new JobicyJobSource(httpClient),
             new LeverJobSource(httpClient, catalog.Lever),
             new SmartRecruitersJobSource(httpClient, catalog.SmartRecruiters),
             new WorkableJobSource(httpClient, catalog.Workable)

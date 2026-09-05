@@ -74,6 +74,7 @@ Vaguei currently reads anonymous, read-only job data from public endpoints or pu
 * Ashby
 * Greenhouse
 * InHire
+* Jobicy
 * Lever
 * SmartRecruiters
 * Workable
@@ -237,6 +238,8 @@ The score is intentionally explainable and deterministic. It is not a hiring pre
 Vaguei should collect only the information required to search and rank vacancies. Resume analysis is local in the current version, and unnecessary contact or identity data is sanitized before profile analysis.
 
 New providers must use documented APIs, explicitly public employer feeds, licensed aggregators, or written authorization. Credentials must never be committed to the repository, and a provider failure must never expose resume contents in logs or diagnostics.
+
+Jobicy results retain the canonical Jobicy vacancy URL and source attribution. Its public feed is cached for one hour so changing local filters does not generate unnecessary API traffic.
 
 # Contributing
 

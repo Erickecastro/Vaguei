@@ -1,0 +1,33 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Vaguei.Desktop.Views.ExitConfirmationWindow"
+        Width="410" Height="210" CanResize="False" ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner" WindowDecorations="None"
+        TransparencyLevelHint="Transparent" Background="Transparent"
+        Title="Confirmar saída">
+  <Border Margin="10" Padding="24" CornerRadius="16"
+          Background="{DynamicResource SurfaceBrush}"
+          BorderBrush="{DynamicResource OutlineBrush}" BorderThickness="1">
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
+      <TextBlock FontSize="20" FontWeight="Bold" Text="Fechar o Vaguei?"/>
+      <TextBlock Grid.Row="1" Margin="0,10,0,0" TextWrapping="Wrap"
+                 Foreground="{DynamicResource SecondaryTextBrush}"
+                 Text="A pesquisa atual será encerrada, mas suas preferências e vagas salvas continuarão disponíveis."/>
+      <StackPanel Grid.Row="3" Margin="0,20,0,0" HorizontalAlignment="Right"
+                  Orientation="Horizontal" Spacing="10">
+        <Button Width="100" Height="40" CornerRadius="10"
+                Background="{DynamicResource SoftSurfaceBrush}"
+                Foreground="{DynamicResource PrimaryTextBrush}"
+                BorderBrush="{DynamicResource OutlineBrush}" BorderThickness="1"
+                HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                Click="OnCancelClick" Content="Cancelar"/>
+        <Button Width="100" Height="40" CornerRadius="10"
+                Background="{DynamicResource AccentBrush}"
+                Foreground="{DynamicResource AccentTextBrush}"
+                BorderThickness="0" HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center" FontWeight="SemiBold"
+                Click="OnConfirmClick" Content="Fechar"/>
+      </StackPanel>
+    </Grid>
+  </Border>
+</Window>
