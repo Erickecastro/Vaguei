@@ -22,6 +22,7 @@ public static class JobSourceFactory
             new InHireJobSource(httpClient, catalog.InHire),
             new JobicyJobSource(httpClient),
             new LeverJobSource(httpClient, catalog.Lever),
+            new RemotiveJobSource(httpClient),
             new SmartRecruitersJobSource(httpClient, catalog.SmartRecruiters),
             new WorkableJobSource(httpClient, catalog.Workable)
         };

@@ -71,6 +71,33 @@ public sealed class JobGeographyFilterTests
         Assert.False(result);
     }
 
+    [Theory]
+    [InlineData("Manaus", "Manaus - AM")]
+    [InlineData("AM", "Distrito Industrial, AM")]
+    [InlineData("Sao Paulo", "São Paulo, SP")]
+    public void IsAllowed_ExplicitLocation_MatchesAcrossFormats(
+        string requestedLocation,
+        string jobLocation)
+    {
+        var preferences = new JobSearchPreferences();
+        preferences.Cities.Add(requestedLocation);
+
+        Assert.True(new JobGeographyFilter().IsAllowed(
+            CreateJob(jobLocation),
+            preferences));
+    }
+
+    [Fact]
+    public void IsAllowed_ExplicitLocation_RejectsAnotherBrazilianCity()
+    {
+        var preferences = new JobSearchPreferences();
+        preferences.Cities.Add("Manaus");
+
+        Assert.False(new JobGeographyFilter().IsAllowed(
+            CreateJob("São Paulo, Brasil"),
+            preferences));
+    }
+
     private static JobPosting CreateJob(
         string? rawLocation)
     {

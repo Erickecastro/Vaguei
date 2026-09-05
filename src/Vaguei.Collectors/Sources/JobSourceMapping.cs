@@ -25,7 +25,8 @@ internal static partial class JobSourceMapping
     public static JobLocation MapLocation(string? rawLocation)
     {
         var normalized = PlainText(rawLocation);
-        var isBrazil = BrazilPattern().IsMatch(normalized);
+        var isBrazil = BrazilPattern().IsMatch(normalized) ||
+                       BrazilStateCodePattern().IsMatch(normalized);
 
         return new JobLocation
         {
@@ -187,6 +188,11 @@ internal static partial class JobSourceMapping
         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex BrazilPattern();
 
+    [GeneratedRegex(
+        @"(?:^|[\s,;/()\-])(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)(?:$|[\s,;/()\-])",
+        RegexOptions.CultureInvariant)]
+    private static partial Regex BrazilStateCodePattern();
+
     [GeneratedRegex(@"\b(hybrid|h[ií]brid[oa])\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex HybridPattern();
 
@@ -199,7 +205,7 @@ internal static partial class JobSourceMapping
     [GeneratedRegex(@"\b(intern(ship)?|est[aá]gio|estagi[aá]ri[oa])\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex InternshipPattern();
 
-    [GeneratedRegex(@"\b(part[ -]?time|meio per[ií]odo)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+    [GeneratedRegex(@"\b(part[ _-]?time|meio per[ií]odo)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex PartTimePattern();
 
     [GeneratedRegex(@"\b(contract(or)?|pj)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
@@ -211,6 +217,6 @@ internal static partial class JobSourceMapping
     [GeneratedRegex(@"\b(freelance|freelancer)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex FreelancePattern();
 
-    [GeneratedRegex(@"\b(full[ -]?time|tempo integral|permanent)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+    [GeneratedRegex(@"\b(full[ _-]?time|tempo integral|permanent)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex FullTimePattern();
 }

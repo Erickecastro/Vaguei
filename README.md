@@ -76,6 +76,7 @@ Vaguei currently reads anonymous, read-only job data from public endpoints or pu
 * InHire
 * Jobicy
 * Lever
+* Remotive
 * SmartRecruiters
 * Workable
 
@@ -239,7 +240,7 @@ Vaguei should collect only the information required to search and rank vacancies
 
 New providers must use documented APIs, explicitly public employer feeds, licensed aggregators, or written authorization. Credentials must never be committed to the repository, and a provider failure must never expose resume contents in logs or diagnostics.
 
-Jobicy results retain the canonical Jobicy vacancy URL and source attribution. Its public feed is cached for one hour so changing local filters does not generate unnecessary API traffic.
+Jobicy and Remotive results retain their canonical vacancy URLs and source attribution. Their public feeds are cached locally according to provider guidance, so changing filters does not generate unnecessary API traffic.
 
 # Contributing
 
