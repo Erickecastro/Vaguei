@@ -24,8 +24,8 @@
     <Style Selector="Button.window:pointerover"><Setter Property="Background" Value="Transparent"/></Style>
     <Style Selector="Button.window:pressed"><Setter Property="Background" Value="Transparent"/></Style>
     <Style Selector="Border.windowCircle"><Setter Property="Width" Value="24"/><Setter Property="Height" Value="24"/><Setter Property="CornerRadius" Value="12"/><Setter Property="Background" Value="Transparent"/></Style>
-    <Style Selector="Button.window:pointerover Border.windowCircle"><Setter Property="Background" Value="{DynamicResource SoftSurfaceBrush}"/></Style>
-    <Style Selector="Button.window:pressed Border.windowCircle"><Setter Property="Background" Value="{DynamicResource OutlineBrush}"/></Style>
+    <Style Selector="Button.window:pointerover Border.windowCircle"><Setter Property="Background" Value="{DynamicResource WindowControlHoverBrush}"/></Style>
+    <Style Selector="Button.window:pressed Border.windowCircle"><Setter Property="Background" Value="{DynamicResource WindowControlPressedBrush}"/></Style>
     <Style Selector="Button.window:focus-visible Border.windowCircle"><Setter Property="BorderBrush" Value="{DynamicResource PrimaryTextBrush}"/><Setter Property="BorderThickness" Value="1"/></Style>
     <Style Selector="Button.window.close:pointerover"><Setter Property="Foreground" Value="White"/></Style>
     <Style Selector="Button.window.close:pointerover Border.windowCircle"><Setter Property="Background" Value="#C42B1C"/></Style>
@@ -108,10 +108,11 @@
       </Border>
 
       <Grid Grid.Row="1" Margin="34,8,30,28" RowDefinitions="64,*">
-        <Grid x:Name="SearchControlsGrid" Grid.Row="0" ColumnDefinitions="Auto,10,Auto,10,132,*" Margin="0,8">
+        <Grid x:Name="SearchControlsGrid" Grid.Row="0" ColumnDefinitions="Auto,10,Auto,10,Auto,10,132,*" Margin="0,8">
           <Grid x:Name="JobSearchField" Width="420" Height="48"><TextBox Classes="searchbox" Height="48" VerticalContentAlignment="Center" Text="{Binding DesiredRole, Mode=TwoWay}" PlaceholderText="Buscar vagas (cargo, tecnologia, empresa...)"/><Path Width="17" Height="17" Margin="13,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="Uniform" Fill="Transparent" IsHitTestVisible="False" Stroke="{DynamicResource PrimaryTextBrush}" StrokeThickness="2" Data="M8,2 A6,6 0 1 0 8,14 A6,6 0 1 0 8,2 M13,13 L18,18"/></Grid>
           <ComboBox x:Name="PublicationSelector" Grid.Column="2" Classes="selector" Width="190" Height="48" ItemsSource="{Binding PublicationWindows}" SelectedIndex="{Binding PublicationWindowIndex}" ToolTip.Tip="Período de publicação das vagas"/>
-          <Button Grid.Column="4" Classes="primary search" Classes.attention="{Binding IsSearchAttentionActive}" Command="{Binding RefreshJobsCommand}" Content="Pesquisar"/>
+          <ComboBox x:Name="WorkModelSelector" Grid.Column="4" Classes="selector" Width="160" Height="48" ItemsSource="{Binding WorkModelOptions}" SelectedIndex="{Binding WorkModelIndex}" ToolTip.Tip="Modelo de trabalho"/>
+          <Button Grid.Column="6" Classes="primary search" Classes.attention="{Binding IsSearchAttentionActive}" Command="{Binding RefreshJobsCommand}" Content="Pesquisar"/>
         </Grid>
         <Grid Grid.Row="1" Margin="0,14,0,0" RowDefinitions="Auto,*">
           <Grid Margin="2,0,2,10" ColumnDefinitions="*,Auto"><StackPanel><TextBlock Classes="title" Text="Oportunidades encontradas"/><TextBlock Classes="subtitle" Text="{Binding ResultsSubtitle}"/></StackPanel><Border Grid.Column="1" VerticalAlignment="Center" Padding="13,6" CornerRadius="15" Background="{DynamicResource AccentSoftBrush}"><TextBlock Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold" Text="{Binding Jobs.Count, StringFormat='{}{0} vagas'}"/></Border></Grid>

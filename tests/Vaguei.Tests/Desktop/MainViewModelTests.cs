@@ -2,6 +2,7 @@ using Vaguei.Application.Interfaces;
 using Vaguei.Application.Services;
 using Vaguei.Desktop.ViewModels;
 using Vaguei.Domain.Entities;
+using Vaguei.Domain.Enums;
 using Vaguei.Domain.Models;
 using Vaguei.ResumeParser.Services;
 
@@ -28,6 +29,9 @@ public sealed class MainViewModelTests
             ],
             viewModel.PublicationWindows);
         Assert.Equal(3, viewModel.PublicationWindowIndex);
+        Assert.Equal(
+            ["Qualquer modelo", "Remoto", "Híbrido", "Presencial"],
+            viewModel.WorkModelOptions);
         Assert.True(viewModel.ShowEmptyState);
     }
 
@@ -187,6 +191,20 @@ public sealed class MainViewModelTests
         {
             File.Delete(filePath);
         }
+    }
+
+    [Fact]
+    public async Task RefreshJobsCommand_AppliesSelectedWorkModel()
+    {
+        var source = new StubJobSource();
+        var viewModel = CreateViewModel(source);
+        viewModel.DesiredRole = "Analista";
+        viewModel.WorkModelIndex = 2;
+
+        await viewModel.RefreshJobsCommand.ExecuteAsync(null);
+
+        var query = Assert.IsType<JobSearchQuery>(source.LastQuery);
+        Assert.Contains(WorkModel.Hybrid, query.WorkModels);
     }
 
     [Fact]

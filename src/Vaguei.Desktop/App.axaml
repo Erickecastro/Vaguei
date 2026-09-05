@@ -19,6 +19,8 @@
           <SolidColorBrush x:Key="AccentSoftBrush" Color="#ECEBFF" />
           <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="SuccessBrush" Color="#1F8A70" />
+          <SolidColorBrush x:Key="WindowControlHoverBrush" Color="#E1E4EB" />
+          <SolidColorBrush x:Key="WindowControlPressedBrush" Color="#D4D8E1" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
           <SolidColorBrush x:Key="PageBackgroundBrush" Color="#121212" />
@@ -34,6 +36,8 @@
           <SolidColorBrush x:Key="AccentSoftBrush" Color="#303030" />
           <SolidColorBrush x:Key="AccentTextBrush" Color="#161616" />
           <SolidColorBrush x:Key="SuccessBrush" Color="#CCCCCC" />
+          <SolidColorBrush x:Key="WindowControlHoverBrush" Color="#424242" />
+          <SolidColorBrush x:Key="WindowControlPressedBrush" Color="#505050" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
     </ResourceDictionary>

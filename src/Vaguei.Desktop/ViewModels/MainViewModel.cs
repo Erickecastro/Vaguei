@@ -54,6 +54,9 @@ public partial class MainViewModel : ViewModelBase
     private int _publicationWindowIndex = 3;
 
     [ObservableProperty]
+    private int _workModelIndex;
+
+    [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(RefreshJobsCommand))]
     [NotifyPropertyChangedFor(nameof(ShowEmptyState))]
     private bool _isBusy;
@@ -96,6 +99,14 @@ public partial class MainViewModel : ViewModelBase
         "Últimos 7 dias",
         "Últimos 30 dias",
         "Últimos 3 meses"
+    ];
+
+    public IReadOnlyList<string> WorkModelOptions { get; } =
+    [
+        "Qualquer modelo",
+        "Remoto",
+        "Híbrido",
+        "Presencial"
     ];
 
     public bool ShowEmptyState => !IsBusy && !HasResults;
@@ -268,6 +279,13 @@ public partial class MainViewModel : ViewModelBase
             PublicationWindow = GetPublicationWindow()
         };
 
+        var selectedWorkModel = GetSelectedWorkModel();
+
+        if (selectedWorkModel is not null)
+        {
+            preferences.WorkModels.Add(selectedWorkModel.Value);
+        }
+
         var directSearch = DesiredRole.Trim();
 
         if (IsValidDirectSearch(directSearch) &&
@@ -323,6 +341,17 @@ public partial class MainViewModel : ViewModelBase
             3 => JobPublicationWindow.Last30Days,
             4 => JobPublicationWindow.Last3Months,
             _ => JobPublicationWindow.Last30Days
+        };
+    }
+
+    private WorkModel? GetSelectedWorkModel()
+    {
+        return WorkModelIndex switch
+        {
+            1 => WorkModel.Remote,
+            2 => WorkModel.Hybrid,
+            3 => WorkModel.OnSite,
+            _ => null
         };
     }
 

@@ -30,6 +30,7 @@ Software development is the initial validation domain because it reflects the fi
 * Direct search by role, technology, or company
 * Brazil-only and Brazil-plus-international scopes
 * Publication filters for 24 hours, 3 days, 7 days, 30 days, and 3 months
+* Work-model filter for remote, hybrid, and on-site opportunities
 * Loading and search-attention states that keep work off the UI thread
 * Source failure warnings without interrupting successful providers
 * Original job link for every result
@@ -203,7 +204,7 @@ The score is intentionally explainable and deterministic. It is not a hiring pre
 * Add richer per-source diagnostics and an optional persistent cache
 * Expand authorized public career sources and Brazilian employer coverage
 * Broaden role and skill taxonomies beyond software development
-* Add job-detail filters for work model, seniority, contract type, and location
+* Add job-detail filters for seniority, contract type, and location
 * Improve deduplication using canonical employer identities and stable posting identifiers
 * Add saved/favorite jobs and locally persisted search preferences
 * Add accessibility checks and automated desktop UI tests
