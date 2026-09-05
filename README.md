@@ -47,6 +47,7 @@ Software development is the initial validation domain because it reflects the fi
 ### Search and matching
 
 * Parallel source orchestration and isolated provider failures
+* Shared concurrency limit, per-source timeout, one retry for transient network failures, and a five-minute in-memory query cache limited to 32 entries per source
 * Brazilian location recognition and national-only filtering
 * Publication-date filtering
 * Cross-source duplicate removal using company, title, location, URL, and description similarity
@@ -192,14 +193,14 @@ The score is intentionally explainable and deterministic. It is not a hiring pre
 * Search breadth is constrained by the configured public sources and employers.
 * The initial skill and role taxonomies are strongest for software development.
 * Matching does not yet model education, language proficiency, years of experience, compensation, or mandatory location constraints in depth.
-* Results are fetched live; there is no persistent local index or cache yet.
+* Results are fetched live and cached only in memory for five minutes; there is no persistent local index yet.
 * Accessibility, localization, installers, update delivery, and end-to-end UI automation still need production validation.
 
 # Roadmap
 
 ### Near term
 
-* Add bounded concurrency, timeouts, retries, caching, and per-source diagnostics
+* Add richer per-source diagnostics and an optional persistent cache
 * Expand authorized public career sources and Brazilian employer coverage
 * Broaden role and skill taxonomies beyond software development
 * Add job-detail filters for work model, seniority, contract type, and location
