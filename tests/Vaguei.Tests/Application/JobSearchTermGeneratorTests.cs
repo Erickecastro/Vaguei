@@ -157,6 +157,24 @@ public sealed class JobSearchTermGeneratorTests
     }
 
     [Fact]
+    public void Generate_ExpandsInternshipSearchIntent()
+    {
+        var preferences = new JobSearchPreferences();
+        preferences.DesiredRoles.Add("Estágio");
+
+        var terms = new JobSearchTermGenerator().Generate(
+            new CandidateProfile(),
+            preferences);
+
+        Assert.Contains("Estágio", terms);
+        Assert.Contains("estagio", terms);
+        Assert.Contains("estagiário", terms);
+        Assert.Contains("estagiaria", terms);
+        Assert.Contains("internship", terms);
+        Assert.Contains("intern", terms);
+    }
+
+    [Fact]
     public void Generate_IgnoresEmptyProfessionalTitle()
     {
         var profile =

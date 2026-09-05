@@ -1,4 +1,5 @@
 using Vaguei.Application.Catalogs;
+using System.Text.RegularExpressions;
 using Vaguei.Domain.Entities;
 using Vaguei.Domain.Enums;
 using Vaguei.Domain.Models;
@@ -35,6 +36,10 @@ public sealed class JobSearchTermGenerator
                 AddDistinct(
                     terms,
                     role);
+
+                AddDesiredRoleVariants(
+                    terms,
+                    role);
             }
 
             return terms;
@@ -53,6 +58,25 @@ public sealed class JobSearchTermGenerator
             profile);
 
         return terms;
+    }
+
+    private static void AddDesiredRoleVariants(
+        List<string> terms,
+        string role)
+    {
+        if (!Regex.IsMatch(
+                role,
+                @"\b(est[aá]gio|estagi[aá]ri[oa]|intern(ship)?)\b",
+                RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            return;
+        }
+
+        AddDistinct(terms, "estagio");
+        AddDistinct(terms, "estagiário");
+        AddDistinct(terms, "estagiaria");
+        AddDistinct(terms, "internship");
+        AddDistinct(terms, "intern");
     }
 
     private static void AddRoleVariants(

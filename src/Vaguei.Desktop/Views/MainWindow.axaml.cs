@@ -143,6 +143,7 @@ public partial class MainWindow : Window
             : SplitViewDisplayMode.Inline;
         SidebarSplitView.OpenPaneLength = 250;
         CompactSidebarButton.IsVisible = isCompact;
+        HeaderIntro.IsVisible = !isCompact;
         PublicationSelector.Width = isCompact ? 130 : 190;
         WorkModelSelector.Width = isCompact ? 140 : 160;
         LocationFilterField.Width = isCompact ? 150 : 220;
