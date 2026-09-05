@@ -9,12 +9,18 @@ public static class JobSourceFactory
     public static IReadOnlyCollection<IJobSource> Create(
         HttpClient httpClient,
         JobSourceCatalog? catalog = null,
-        string? joobleApiKey = null)
+        string? joobleApiKey = null,
+        TimeSpan? sourceTimeout = null,
+        int retryCount = 1,
+        int maximumConcurrentSources = 3)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
         catalog ??= JobSourceCatalog.Load();
 
-        var concurrencyGate = new SemaphoreSlim(3, 3);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maximumConcurrentSources);
+        var concurrencyGate = new SemaphoreSlim(
+            maximumConcurrentSources,
+            maximumConcurrentSources);
         var sources = new List<IJobSource>
         {
             new ArbeitnowJobSource(httpClient),
@@ -38,9 +44,9 @@ public static class JobSourceFactory
             .Select(source => (IJobSource)new ResilientJobSource(
                 source,
                 concurrencyGate,
-                timeout: TimeSpan.FromSeconds(25),
+                timeout: sourceTimeout ?? TimeSpan.FromSeconds(25),
                 cacheDuration: TimeSpan.FromMinutes(5),
-                retryCount: 1,
+                retryCount: retryCount,
                 maximumCacheEntries: 32))
             .ToArray();
     }

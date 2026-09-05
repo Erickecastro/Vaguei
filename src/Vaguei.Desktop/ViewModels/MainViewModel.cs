@@ -18,6 +18,9 @@ public partial class MainViewModel : ViewModelBase
     private readonly JobSearchOrchestrator _searchOrchestrator;
     private readonly IFavoriteJobStore? _favoriteStore;
     private readonly IJobSearchSettingsStore? _searchSettingsStore;
+    private readonly TimeSpan _searchTimeout;
+    private readonly Func<bool>? _networkAvailable;
+    private readonly bool _showDetailedSourceWarnings;
     private readonly HashSet<string> _favoriteKeys;
     private readonly List<JobResultItemViewModel> _allJobs = [];
     private bool _searchSettingsLoaded;
@@ -25,6 +28,8 @@ public partial class MainViewModel : ViewModelBase
     private CandidateProfile? _currentProfile;
     private string _detectedProfessionalTitle = string.Empty;
     private CancellationTokenSource? _connectionNoticeCancellation;
+    private CancellationTokenSource? _activeSearchCancellation;
+    private bool _connectionLostDuringSearch;
 
     [ObservableProperty]
     private string _selectedFileName = "Nenhum currículo";
@@ -111,13 +116,19 @@ public partial class MainViewModel : ViewModelBase
         ResumeAnalyzer resumeAnalyzer,
         JobSearchOrchestrator searchOrchestrator,
         IFavoriteJobStore? favoriteStore = null,
-        IJobSearchSettingsStore? searchSettingsStore = null)
+        IJobSearchSettingsStore? searchSettingsStore = null,
+        TimeSpan? searchTimeout = null,
+        Func<bool>? networkAvailable = null,
+        bool showDetailedSourceWarnings = true)
     {
         _parserService = parserService;
         _resumeAnalyzer = resumeAnalyzer;
         _searchOrchestrator = searchOrchestrator;
         _favoriteStore = favoriteStore;
         _searchSettingsStore = searchSettingsStore;
+        _searchTimeout = searchTimeout ?? TimeSpan.FromMinutes(2);
+        _networkAvailable = networkAvailable;
+        _showDetailedSourceWarnings = showDetailedSourceWarnings;
         _favoriteKeys = favoriteStore?.Load().ToHashSet(StringComparer.OrdinalIgnoreCase) ??
             new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -283,16 +294,51 @@ public partial class MainViewModel : ViewModelBase
     private async Task RefreshJobsAsync()
     {
         DismissConnectionNotice();
+
+        if (_networkAvailable?.Invoke() == false)
+        {
+            StatusMessage = "Sem conexão. Conecte-se à internet e tente novamente.";
+            ShowConnectionNotice();
+            return;
+        }
+
         var profile = _currentProfile ?? new CandidateProfile();
+        using var timeoutSource = new CancellationTokenSource(_searchTimeout);
+        _activeSearchCancellation = timeoutSource;
+        _connectionLostDuringSearch = false;
 
         IsSearchAttentionActive = false;
         IsBusy = true;
 
         try
         {
-            await SearchJobsAsync(
+            var searchTask = SearchJobsAsync(
                 profile,
-                CancellationToken.None);
+                timeoutSource.Token);
+            var completedTask = await Task.WhenAny(
+                searchTask,
+                Task.Delay(_searchTimeout, timeoutSource.Token));
+
+            if (completedTask != searchTask)
+            {
+                timeoutSource.Cancel();
+                _ = ObserveAbandonedSearchAsync(searchTask);
+                StatusMessage = _connectionLostDuringSearch
+                    ? "Busca interrompida: conexão perdida."
+                    : "A busca demorou mais que o esperado. Tente novamente.";
+                ShowConnectionNotice();
+                return;
+            }
+
+            await searchTask;
+        }
+        catch (OperationCanceledException)
+            when (timeoutSource.IsCancellationRequested)
+        {
+            StatusMessage = _connectionLostDuringSearch
+                ? "Busca interrompida: conexão perdida."
+                : "A busca demorou mais que o esperado. Tente novamente.";
+            ShowConnectionNotice();
         }
         catch (Exception exception)
         {
@@ -300,7 +346,39 @@ public partial class MainViewModel : ViewModelBase
         }
         finally
         {
+            if (ReferenceEquals(_activeSearchCancellation, timeoutSource))
+            {
+                _activeSearchCancellation = null;
+            }
             IsBusy = false;
+        }
+    }
+
+    public void HandleNetworkAvailabilityChanged(bool isAvailable)
+    {
+        if (isAvailable) return;
+
+        ConnectionNoticeMessage = "Sem conexão com a internet. Verifique sua rede e tente novamente.";
+        _connectionLostDuringSearch = IsBusy;
+        _activeSearchCancellation?.Cancel();
+
+        if (IsBusy)
+        {
+            StatusMessage = "Busca interrompida: conexão perdida.";
+        }
+
+        ShowConnectionNotice();
+    }
+
+    private static async Task ObserveAbandonedSearchAsync(Task searchTask)
+    {
+        try
+        {
+            await searchTask.ConfigureAwait(false);
+        }
+        catch
+        {
+            // A interface já informou o timeout; apenas observa a tarefa abandonada.
         }
     }
 
@@ -445,6 +523,8 @@ public partial class MainViewModel : ViewModelBase
                 .ConfigureAwait(false),
             cancellationToken);
 
+        cancellationToken.ThrowIfCancellationRequested();
+
         Jobs.Clear();
         _allJobs.Clear();
 
@@ -467,10 +547,14 @@ public partial class MainViewModel : ViewModelBase
             ShowConnectionNotice();
         }
 
-        SourceWarnings = string.Join(
-            Environment.NewLine,
-            result.SourceFailures.Select(failure =>
-                $"{failure.Source}: {failure.Message}"));
+        SourceWarnings = result.AllSourcesFailed || result.SourceFailures.Count == 0
+            ? string.Empty
+            : _showDetailedSourceWarnings
+                ? string.Join(
+                    Environment.NewLine,
+                    result.SourceFailures.Select(failure =>
+                        $"{failure.Source}: {failure.Message}"))
+                : $"{result.SourceFailures.Count} fontes ficaram indisponíveis nesta busca.";
 
         SourceCoverageSummary = CreateSourceCoverageSummary(
             result.SourceSummaries);

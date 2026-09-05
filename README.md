@@ -198,7 +198,7 @@ This publishes a self-contained build, installs the desktop entry and the requir
 
 An experimental Android prototype is now planned while desktop remains the primary product. Avalonia 12 and .NET 10 allow the domain, application, collectors, and most UI resources to be shared, but Android needs a separate entry project, platform document picker, lifecycle handling, secure storage, and small-screen navigation. See the [mobile prototype plan](docs/MOBILE_PROTOTYPE.md).
 
-The first Android debug prototype now compiles in the separate [`Vaguei.Mobile.slnx`](Vaguei.Mobile.slnx) solution. It provides direct job search, a scrollable result list, source attribution, original links, and a compact mobile footer. Resume import and full desktop feature parity are intentionally deferred until platform document handling and shared presentation components are implemented.
+The Android debug prototype compiles in the separate [`Vaguei.Mobile.slnx`](Vaguei.Mobile.slnx) solution. It reuses the desktop search ViewModel and provides a four-second mobile introduction, local resume import, direct and profile-based search, compact expandable filters, favorites, compatibility explanations, source diagnostics, connectivity feedback, persistent theme, the same five institutional tabs as desktop, original links, and a compact footer. Mobile searches use shorter per-source limits, an overall timeout, and network-loss cancellation so an unavailable provider cannot leave the interface loading indefinitely. The Android Activity is locked to portrait. Desktop-only window operations are replaced by Android-native behavior. See the [device testing guide](docs/ANDROID_TESTING.md).
 
 # Matching Model
 

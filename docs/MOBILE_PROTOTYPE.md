@@ -4,14 +4,14 @@
 
 Um protótipo Android é viável no ecossistema atual porque Avalonia 12 suporta Android com .NET 10. Ele deve ser criado como um projeto de entrada separado, referenciando uma camada compartilhada, sem converter o executável desktop em um projeto Android.
 
-O objetivo inicial é validar busca, filtros, resultados, tema, abertura de vagas e seleção de currículo em um emulador. Fidelidade visual, publicação na loja e iOS ficam fora do primeiro experimento.
+O objetivo inicial é validar busca, filtros, resultados, tema, favoritos, compatibilidade, abertura de vagas e seleção de currículo em um aparelho. Publicação na loja e iOS ficam fora do primeiro experimento.
 
 ## Estado do ambiente em 5 de setembro de 2026
 
 - .NET SDK 10.0.400 instalado.
 - Android SDK e `adb` encontrados.
 - Workload `.NET for Android` instalada.
-- Primeiro APK de debug compilado com sucesso.
+- APK de debug com a lógica funcional compartilhada do desktop compilado com sucesso.
 - O projeto atual usa uma `Window` desktop com barra de título e redimensionamento próprios; esses elementos não devem ser levados para Android.
 
 ## Arquitetura proposta
@@ -29,13 +29,31 @@ Vaguei.Android         Activity, permissões e ciclo de vida Android
 
 A extração de `Vaguei.UI` deve acontecer gradualmente. A tela desktop atual não deve ser duplicada inteira, pois isso criaria duas interfaces difíceis de manter.
 
-## Primeira entrega
+## Funcionalidades adaptadas
+
+- Pesquisa direta e pesquisa baseada no currículo.
+- Importação local de PDF, DOCX, ODT e TXT pelo seletor Android.
+- Remoção do arquivo temporário logo após a análise.
+- Escopo Brasil e Brasil + exterior.
+- Filtros de período, localização, modelo, contrato e senioridade.
+- Limpeza de filtros, favoritos persistentes e visualização de salvas.
+- Introdução mobile de quatro segundos, com logo fixa e saída em fade.
+- Filtros avançados em painel recolhível para preservar a área de resultados.
+- Timeout geral de busca e política de rede mobile sem repetição demorada.
+- Cancelamento imediato ao perder a conexão e mensagens técnicas resumidas na tela pequena.
+- Orientação bloqueada em retrato e cinco abas institucionais equivalentes ao desktop.
+- Compatibilidade, justificativas e competências nos resultados.
+- Diagnóstico de fontes, carregamento e aviso de falta de conexão.
+- Tema claro/escuro persistente e área institucional Sobre.
+- Abertura da candidatura no navegador original.
+
+## Próximas entregas
 
 1. Validar o APK de debug em emulador e dispositivo físico.
 2. Extrair gradualmente recursos e componentes independentes de `Window`.
-3. Adaptar seleção de documentos e armazenamento local ao Android.
-4. Implementar os filtros avançados e o resumo do currículo em navegação mobile.
-5. Validar conectividade, abertura de URLs, rotação e ciclo de vida.
+3. Validar seletor de documentos, armazenamento, rotação e retomada em aparelho real.
+4. Refinar acessibilidade, tamanhos de toque e comportamento com teclado virtual.
+5. Extrair os ViewModels para uma biblioteca de apresentação compartilhada definitiva.
 6. Manter builds de teste sem assinatura de produção.
 
 ## Compilar o protótipo
@@ -49,6 +67,8 @@ dotnet build src/Vaguei.Android/Vaguei.Android.csproj \
 ```
 
 O APK de debug é gerado sob `src/Vaguei.Android/bin/Debug/net10.0-android/`. A pasta `bin` e arquivos `*.apk` são ignorados pelo Git.
+
+Consulte o [roteiro de instalação e testes](ANDROID_TESTING.md).
 
 ## Segurança
 

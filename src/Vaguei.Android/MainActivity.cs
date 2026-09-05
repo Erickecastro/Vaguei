@@ -9,6 +9,7 @@ namespace Vaguei.Android;
     Theme = "@style/VagueiTheme.NoActionBar",
     Icon = "@drawable/icon",
     MainLauncher = true,
+    ScreenOrientation = ScreenOrientation.Portrait,
     ConfigurationChanges = ConfigChanges.Orientation |
                            ConfigChanges.ScreenSize |
                            ConfigChanges.UiMode)]

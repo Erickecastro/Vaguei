@@ -1,58 +1,79 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:vm="using:Vaguei.Mobile.ViewModels"
-             x:Class="Vaguei.Mobile.Views.MainView"
-             x:DataType="vm:MobileMainViewModel"
-             Background="{DynamicResource MobilePageBrush}"
-             Foreground="{DynamicResource MobileTextBrush}">
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:vm="using:Vaguei.Desktop.ViewModels" x:Class="Vaguei.Mobile.Views.MainView" x:DataType="vm:MainViewModel" Background="{DynamicResource MobilePageBrush}" Foreground="{DynamicResource MobileTextBrush}">
   <UserControl.Styles>
-    <Style Selector="Border.card"><Setter Property="Background" Value="{DynamicResource MobileSurfaceBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource MobileOutlineBrush}"/><Setter Property="BorderThickness" Value="1"/><Setter Property="CornerRadius" Value="14"/></Style>
+    <Style Selector="Border.card"><Setter Property="Background" Value="{DynamicResource MobileSurfaceBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource MobileOutlineBrush}"/><Setter Property="BorderThickness" Value="1"/><Setter Property="CornerRadius" Value="18"/></Style>
     <Style Selector="TextBlock.secondary"><Setter Property="Foreground" Value="{DynamicResource MobileSecondaryBrush}"/><Setter Property="FontSize" Value="12"/></Style>
+    <Style Selector="TextBlock.section"><Setter Property="FontSize" Value="14"/><Setter Property="FontWeight" Value="Bold"/><Setter Property="Margin" Value="0,10,0,2"/></Style>
+    <Style Selector="TextBlock.body"><Setter Property="FontSize" Value="12"/><Setter Property="LineHeight" Value="18"/><Setter Property="TextWrapping" Value="Wrap"/><Setter Property="Foreground" Value="{DynamicResource MobileSecondaryBrush}"/></Style>
+    <Style Selector="Border.note"><Setter Property="Background" Value="{DynamicResource MobilePageBrush}"/><Setter Property="CornerRadius" Value="12"/><Setter Property="Padding" Value="12"/></Style>
+    <Style Selector="Button"><Setter Property="CornerRadius" Value="12"/><Setter Property="HorizontalContentAlignment" Value="Center"/><Setter Property="VerticalContentAlignment" Value="Center"/></Style>
+    <Style Selector="Button.primary"><Setter Property="Background" Value="{DynamicResource MobileAccentBrush}"/><Setter Property="Foreground" Value="{DynamicResource MobileAccentTextBrush}"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Padding" Value="15,10"/></Style>
+    <Style Selector="Button.primary.attention"><Setter Property="BorderBrush" Value="{DynamicResource MobileTextBrush}"/><Setter Property="BorderThickness" Value="3"/><Style.Animations><Animation Duration="0:0:0.72" IterationCount="INFINITE" PlaybackDirection="Alternate"><KeyFrame Cue="0%"><Setter Property="Opacity" Value="1"/></KeyFrame><KeyFrame Cue="100%"><Setter Property="Opacity" Value="0.55"/></KeyFrame></Animation></Style.Animations></Style>
+    <Style Selector="Button.icon"><Setter Property="Width" Value="40"/><Setter Property="Height" Value="40"/><Setter Property="Padding" Value="0"/><Setter Property="CornerRadius" Value="20"/><Setter Property="FontSize" Value="17"/></Style>
+    <Style Selector="ComboBox.filter"><Setter Property="MinHeight" Value="43"/><Setter Property="FontSize" Value="12"/><Setter Property="CornerRadius" Value="11"/><Setter Property="Background" Value="{DynamicResource MobileSurfaceBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource MobileOutlineBrush}"/></Style>
+    <Style Selector="TextBox.filter"><Setter Property="MinHeight" Value="43"/><Setter Property="FontSize" Value="13"/><Setter Property="Padding" Value="12,7"/><Setter Property="CornerRadius" Value="11"/><Setter Property="VerticalContentAlignment" Value="Center"/></Style>
   </UserControl.Styles>
-  <Grid Margin="18,14,18,10" RowDefinitions="Auto,16,Auto,10,Auto,12,*,Auto">
-    <Grid ColumnDefinitions="Auto,12,*">
-      <Image Width="44" Height="44" Source="/Assets/logo-light-56.png" Stretch="Uniform"/>
-      <StackPanel Grid.Column="2" VerticalAlignment="Center">
-        <TextBlock FontSize="22" FontWeight="Bold" Text="Vaguei"/>
-        <TextBlock Classes="secondary" Text="Protótipo Android experimental"/>
-      </StackPanel>
+  <Grid>
+    <Grid Margin="16,12,16,8" RowDefinitions="Auto,10,Auto,10,Auto,10,Auto,10,*,Auto">
+      <Grid ColumnDefinitions="Auto,9,*,Auto,7,Auto">
+        <Grid Width="42" Height="42"><Image x:Name="LightLogo" Source="/Assets/logo-light-56.png"/><Image x:Name="DarkLogo" Source="/Assets/logo-dark-56.png"/></Grid>
+        <StackPanel Grid.Column="2" VerticalAlignment="Center"><TextBlock FontSize="20" FontWeight="Bold" Text="Vaguei"/><TextBlock Classes="secondary" FontSize="10" Text="Sua próxima oportunidade"/></StackPanel>
+        <Button Grid.Column="3" Classes="icon" FontSize="22" FontWeight="Bold" Click="OnAboutClick" Content="i" AutomationProperties.Name="Sobre o Vaguei"/><Button Grid.Column="5" Classes="icon" FontSize="29" Click="OnThemeClick" Content="◐" AutomationProperties.Name="Alternar tema"/>
+      </Grid>
+      <Border Grid.Row="2" Classes="card" Padding="14"><Grid RowDefinitions="Auto,8,Auto" ColumnDefinitions="*,Auto">
+        <StackPanel VerticalAlignment="Center"><TextBlock FontSize="15" FontWeight="Bold" Text="Currículo"/><TextBlock Classes="secondary" TextTrimming="CharacterEllipsis" Text="{Binding SelectedFileName}"/></StackPanel><Button Grid.Column="1" Classes="primary" MinWidth="88" Click="OnChooseResumeClick" Content="Anexar"/>
+        <Grid Grid.Row="2" Grid.ColumnSpan="2" IsVisible="{Binding HasProfile}" ColumnDefinitions="*,Auto"><StackPanel><TextBlock FontWeight="SemiBold" Text="{Binding CandidateName}"/><TextBlock Classes="secondary" Text="{Binding ProfessionalTitle}"/><ItemsControl Margin="0,5,0,0" ItemsSource="{Binding ProfileSkills}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate><Border Margin="0,0,4,4" Padding="6,2" CornerRadius="8" Background="{DynamicResource MobilePageBrush}"><TextBlock FontSize="9.5" Text="{Binding}"/></Border></DataTemplate></ItemsControl.ItemTemplate></ItemsControl><TextBlock Classes="secondary" FontSize="10" FontStyle="Italic" IsVisible="{Binding HasAdditionalSkills}" Text="{Binding AdditionalSkillCount, StringFormat='e mais {0} competências'}"/></StackPanel><Button Grid.Column="1" Classes="icon" Width="36" Height="36" CornerRadius="18" FontSize="20" Command="{Binding RemoveResumeCommand}" Content="×" AutomationProperties.Name="Remover currículo"/></Grid>
+      </Grid></Border>
+      <Grid Grid.Row="4" RowDefinitions="Auto,8,Auto"><TextBox Classes="filter" MinHeight="48" FontSize="14" Text="{Binding DesiredRole, Mode=TwoWay}" PlaceholderText="Cargo, tecnologia ou empresa"/><Grid Grid.Row="2" ColumnDefinitions="*,8,Auto,8,Auto"><Button Classes="primary" Classes.attention="{Binding IsSearchAttentionActive}" Command="{Binding RefreshJobsCommand}" Content="Pesquisar"/><Button Grid.Column="2" MinWidth="78" Padding="12,9" Click="OnFiltersClick" Content="Filtros"/><Button Grid.Column="4" Classes="icon" Command="{Binding ToggleFavoritesFilterCommand}" Content="★" AutomationProperties.Name="Exibir vagas salvas"/></Grid></Grid>
+      <Border x:Name="FiltersPanel" Grid.Row="6" Classes="card" Padding="13" IsVisible="False"><Grid RowDefinitions="Auto,8,Auto,8,Auto,10,Auto">
+        <Grid ColumnDefinitions="*,Auto"><TextBlock VerticalAlignment="Center" FontSize="15" FontWeight="Bold" Text="Filtros da busca"/><Button Grid.Column="1" Classes="icon" Width="34" Height="34" CornerRadius="17" FontSize="18" Click="OnFiltersCloseClick" Content="×"/></Grid>
+        <Grid Grid.Row="2" ColumnDefinitions="*,8,*"><ComboBox Classes="filter" ItemsSource="{Binding SearchScopes}" SelectedIndex="{Binding SearchScopeIndex}"/><ComboBox Grid.Column="2" Classes="filter" ItemsSource="{Binding PublicationWindows}" SelectedIndex="{Binding PublicationWindowIndex}"/></Grid>
+        <Grid Grid.Row="4" ColumnDefinitions="*,8,*"><TextBox Classes="filter" Text="{Binding LocationFilter, Mode=TwoWay}" PlaceholderText="Cidade ou estado"/><ComboBox Grid.Column="2" Classes="filter" ItemsSource="{Binding WorkModelOptions}" SelectedIndex="{Binding WorkModelIndex}"/></Grid>
+        <Grid Grid.Row="6" RowDefinitions="Auto,8,Auto"><Grid ColumnDefinitions="*,8,*"><ComboBox Classes="filter" ItemsSource="{Binding EmploymentTypeOptions}" SelectedIndex="{Binding EmploymentTypeIndex}"/><ComboBox Grid.Column="2" Classes="filter" ItemsSource="{Binding SeniorityOptions}" SelectedIndex="{Binding SeniorityIndex}"/></Grid><Button Grid.Row="2" HorizontalAlignment="Left" Padding="13,8" Command="{Binding ClearAdvancedFiltersCommand}" IsEnabled="{Binding HasActiveFilters}" Content="Limpar filtros"/></Grid>
+      </Grid></Border>
+      <Grid Grid.Row="8" RowDefinitions="Auto,8,*"><StackPanel><Grid ColumnDefinitions="*,Auto"><TextBlock FontSize="19" FontWeight="Bold" Text="Oportunidades"/><TextBlock Grid.Column="1" VerticalAlignment="Center" FontWeight="SemiBold" Text="{Binding Jobs.Count, StringFormat='{}{0} vagas'}"/></Grid><TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding StatusMessage}"/><TextBlock Classes="secondary" FontSize="9.5" TextWrapping="Wrap" Text="{Binding SourceCoverageSummary}"/><TextBlock Classes="secondary" FontSize="9.5" TextWrapping="Wrap" Text="{Binding SourceWarnings}"/><ProgressBar Margin="0,7,0,0" Height="4" IsIndeterminate="True" IsVisible="{Binding IsBusy}"/></StackPanel>
+        <ScrollViewer Grid.Row="2"><StackPanel><Border Classes="card" Padding="22" IsVisible="{Binding ShowEmptyState}"><StackPanel HorizontalAlignment="Center" Spacing="5"><TextBlock TextAlignment="Center" FontWeight="Bold" Text="{Binding EmptyStateTitle}"/><TextBlock Classes="secondary" TextAlignment="Center" TextWrapping="Wrap" Text="{Binding EmptyStateDescription}"/></StackPanel></Border><ItemsControl ItemsSource="{Binding Jobs}"><ItemsControl.ItemTemplate><DataTemplate x:DataType="vm:JobResultItemViewModel"><Border Classes="card" Padding="14" Margin="0,0,0,9"><StackPanel><TextBlock FontSize="15" FontWeight="Bold" TextWrapping="Wrap" Text="{Binding Title}"/><TextBlock Classes="secondary" FontWeight="SemiBold" Text="{Binding Company}"/><TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding Location}"/><TextBlock Margin="0,6,0,0" IsVisible="{Binding ShowCompatibility}" FontWeight="SemiBold" Text="{Binding Score, StringFormat='Compatibilidade: {0}'}"/><TextBlock Margin="0,5,0,0" IsVisible="{Binding HasReasons}" FontSize="10" TextWrapping="Wrap" Text="{Binding Reasons}"/><ItemsControl Margin="0,5,0,0" IsVisible="{Binding HasSkills}" ItemsSource="{Binding Skills}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate><Border Margin="0,0,4,4" Padding="6,2" CornerRadius="8" Background="{DynamicResource MobilePageBrush}"><TextBlock FontSize="9.5" Text="{Binding}"/></Border></DataTemplate></ItemsControl.ItemTemplate></ItemsControl><Grid Margin="0,9,0,0" ColumnDefinitions="*,Auto,7,Auto"><StackPanel><TextBlock Classes="secondary" FontSize="10" Text="{Binding Source}"/><TextBlock Classes="secondary" FontSize="10" Text="{Binding Published}"/></StackPanel><Button Grid.Column="1" Classes="icon" Width="38" Height="38" CornerRadius="19" FontSize="17" Command="{Binding ToggleFavoriteCommand}" Content="{Binding FavoriteSymbol}"/><Button Grid.Column="3" Padding="13,7" Tag="{Binding Url}" Click="OnOpenJobClick" Content="Abrir  ›"/></Grid></StackPanel></Border></DataTemplate></ItemsControl.ItemTemplate></ItemsControl></StackPanel></ScrollViewer>
+      </Grid>
+      <TextBlock Grid.Row="9" HorizontalAlignment="Center" FontSize="9" Foreground="{DynamicResource MobileSecondaryBrush}" Text="© 2026 Vaguei · MIT · Fontes indicadas em cada vaga"/>
     </Grid>
-
-    <Grid Grid.Row="2" ColumnDefinitions="*,10,Auto">
-      <TextBox MinHeight="48" Padding="14,8" CornerRadius="10" VerticalContentAlignment="Center"
-               Background="{DynamicResource MobileSurfaceBrush}" BorderBrush="{DynamicResource MobileOutlineBrush}"
-               Text="{Binding Query, Mode=TwoWay}" PlaceholderText="Cargo, tecnologia ou empresa"/>
-      <Button Grid.Column="2" MinWidth="98" CornerRadius="10" Padding="16,8"
-              Background="{DynamicResource MobileAccentBrush}" Foreground="{DynamicResource MobileAccentTextBrush}"
-              FontWeight="SemiBold" Command="{Binding SearchCommand}" Content="Pesquisar"/>
-    </Grid>
-
-    <StackPanel Grid.Row="4" Spacing="6">
-      <TextBlock FontSize="18" FontWeight="Bold" Text="Oportunidades"/>
-      <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding Status}"/>
-      <ProgressBar Height="4" IsIndeterminate="True" IsVisible="{Binding IsBusy}"/>
-    </StackPanel>
-
-    <ScrollViewer Grid.Row="6">
-      <ItemsControl ItemsSource="{Binding Jobs}">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate x:DataType="vm:MobileJobItem">
-            <Border Classes="card" Padding="16" Margin="0,0,0,10">
-              <Grid RowDefinitions="Auto,Auto,Auto,12,Auto" ColumnDefinitions="*,Auto">
-                <TextBlock Grid.ColumnSpan="2" FontSize="16" FontWeight="Bold" TextWrapping="Wrap" Text="{Binding Title}"/>
-                <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Margin="0,4,0,0" Classes="secondary" FontWeight="SemiBold" Text="{Binding Company}"/>
-                <TextBlock Grid.Row="2" Grid.ColumnSpan="2" Margin="0,2,0,0" Classes="secondary" TextWrapping="Wrap" Text="{Binding Location}"/>
-                <TextBlock Grid.Row="4" VerticalAlignment="Center" Classes="secondary" Text="{Binding Source}"/>
-                <Button Grid.Row="4" Grid.Column="1" Padding="15,8" CornerRadius="9" Tag="{Binding Url}" Click="OnOpenJobClick" Content="Abrir  ›"/>
-              </Grid>
-            </Border>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
-    </ScrollViewer>
-
-    <TextBlock Grid.Row="7" Margin="0,6,0,0" HorizontalAlignment="Center" FontSize="10"
-               Foreground="{DynamicResource MobileSecondaryBrush}"
-               Text="© 2026 Vaguei · MIT · Vagas pertencem às fontes indicadas"/>
+    <Border x:Name="AboutBackdrop" ZIndex="20" IsVisible="False" Background="#88000000">
+      <Border Margin="12,28,12,22" Padding="18" CornerRadius="26" ClipToBounds="True" Background="{DynamicResource MobileSurfaceBrush}" BorderBrush="{DynamicResource MobileOutlineBrush}" BorderThickness="1">
+        <Grid RowDefinitions="Auto,12,*">
+          <Grid ColumnDefinitions="*,Auto"><TextBlock VerticalAlignment="Center" FontSize="21" FontWeight="Bold" Text="Sobre o Vaguei"/><Button Grid.Column="1" Classes="icon" FontSize="26" Click="OnAboutCloseClick" Content="×" AutomationProperties.Name="Fechar"/></Grid>
+          <TabControl Grid.Row="2" FontSize="10">
+            <TabItem Header="Sobre"><ScrollViewer Margin="3,12,3,3"><StackPanel>
+              <TextBlock Classes="section" Text="Nosso propósito"/><TextBlock Classes="body" Text="O Vaguei é um aplicativo experimental que ajuda pessoas de diferentes áreas a descobrir, filtrar e organizar oportunidades profissionais. As vagas mantêm a fonte e o endereço original para que a candidatura aconteça no canal oficial."/>
+              <Border Classes="note" Margin="0,10,0,0"><TextBlock Classes="body" Text="O Vaguei não é afiliado às empresas ou plataformas exibidas e não garante entrevistas ou contratações. A disponibilidade depende das fontes autorizadas."/></Border>
+              <TextBlock Classes="section" Text="Como funciona"/><TextBlock Classes="body" Text="A busca consulta APIs e páginas públicas permitidas, normaliza os resultados, remove duplicidades e aplica filtros. Quando um currículo é anexado, sua análise acontece localmente e a compatibilidade é apenas uma estimativa explicável, não uma decisão de contratação."/>
+              <TextBlock Classes="section" Text="Fontes atuais"/><TextBlock Classes="body" Text="Arbeitnow, Ashby, Greenhouse, InHire, Jobicy, Lever, Remotive, SmartRecruiters e Workable. Jooble é ativada quando uma chave oficial é configurada."/>
+            </StackPanel></ScrollViewer></TabItem>
+            <TabItem Header="Privacidade"><ScrollViewer Margin="3,12,3,3"><StackPanel>
+              <TextBlock Classes="section" Text="Processamento local"/><TextBlock Classes="body" Text="O currículo é processado no dispositivo. A versão atual não possui conta, backend, telemetria nem upload do arquivo. Dados de contato desnecessários são descartados antes da análise de perfil."/>
+              <TextBlock Classes="section" Text="Dados armazenados"/><TextBlock Classes="body" Text="Tema, preferências de busca e favoritos ficam no armazenamento local. As palavras e localidades pesquisadas são enviadas às fontes de vagas necessárias; o arquivo do currículo não é enviado."/>
+              <TextBlock Classes="section" Text="Sites externos"/><TextBlock Classes="body" Text="Ao abrir uma vaga, você passa a utilizar o site da empresa ou plataforma e deve consultar a política de privacidade daquele serviço."/>
+              <Border Classes="note" Margin="0,12,0,0"><TextBlock Classes="body" Text="Esta descrição reflete a arquitetura atual. Novas funções com conta, sincronização ou backend exigirão atualização da política e revisão de conformidade com a LGPD."/></Border>
+            </StackPanel></ScrollViewer></TabItem>
+            <TabItem Header="Termos"><ScrollViewer Margin="3,12,3,3"><StackPanel>
+              <TextBlock Classes="section" Text="Uso das vagas"/><TextBlock Classes="body" Text="Confirme empresa, requisitos, validade e endereço antes de se candidatar. O Vaguei não cobra pela candidatura e recomenda não realizar pagamentos solicitados por supostos recrutadores."/>
+              <TextBlock Classes="section" Text="Uso responsável"/><TextBlock Classes="body" Text="Não use o aplicativo para candidaturas automatizadas ou em massa, coleta de dados de terceiros, fraude, violação de controles de acesso ou atividade contrária à lei e aos termos das fontes."/>
+              <TextBlock Classes="section" Text="Limitações"/><TextBlock Classes="body" Text="Fontes externas podem alterar ou interromper seus serviços. Conteúdo e datas podem mudar, e não existe garantia de cobertura completa ou disponibilidade contínua."/>
+              <TextBlock Classes="section" Text="Propriedade intelectual"/><TextBlock Classes="body" Text="Marcas e anúncios permanecem sob os direitos de seus titulares. Sua exibição não implica afiliação ou endosso."/>
+            </StackPanel></ScrollViewer></TabItem>
+            <TabItem Header="Licenças"><ScrollViewer Margin="3,12,3,3"><StackPanel>
+              <TextBlock Classes="section" Text="Vaguei — MIT License"/><TextBlock Classes="body" Text="Copyright © 2026 Ericke Castro. O software pode ser usado, copiado, modificado e distribuído nos termos da licença MIT, mantendo o aviso de copyright e a licença. O software é fornecido sem garantias."/>
+              <TextBlock Classes="section" Text="Conteúdo de terceiros"/><TextBlock Classes="body" Text="A licença MIT do código não concede direitos sobre marcas, logotipos, descrições de vagas ou dados fornecidos por terceiros. Cada integração permanece sujeita aos termos e requisitos de atribuição de sua fonte."/>
+              <Border Classes="note" Margin="0,12,0,0"><TextBlock Classes="body" Text="Documentos completos no repositório: LICENSE, docs/TERMS_OF_USE.md, docs/PRIVACY.md, docs/PARTNERSHIPS.md e docs/PARTNERSHIP_REQUEST_TEMPLATES.md."/></Border>
+            </StackPanel></ScrollViewer></TabItem>
+            <TabItem Header="Fontes"><ScrollViewer Margin="3,12,3,3"><StackPanel>
+              <TextBlock Classes="section" Text="Integrações disponíveis"/><TextBlock Classes="body" Text="Arbeitnow, Ashby, Greenhouse, InHire, Jobicy, Lever, Remotive, SmartRecruiters e Workable utilizam endpoints públicos ou páginas de carreira permitidas. Jooble está implementada e é ativada somente com uma chave oficial."/>
+              <TextBlock Classes="section" Text="Parcerias em preparação"/><TextBlock Classes="body" Text="Gupy é a prioridade nacional e exige aprovação do Vaguei como job board parceiro. InfoJobs, Jobbol e Catho também dependem de autorização específica para distribuição de seus catálogos."/>
+              <TextBlock Classes="section" Text="Fonte restrita"/><TextBlock Classes="body" Text="O LinkedIn não oferece uma API pública para importar livremente seu catálogo. O Vaguei não coleta páginas protegidas e só fará uma integração após contrato e autorização explícita."/>
+              <Border Classes="note" Margin="0,12,0,0"><TextBlock Classes="body" Text="Toda vaga mantém sua plataforma de origem e o link oficial. Uma fonte pode ser desativada independentemente se seus termos, autorização ou disponibilidade mudarem."/></Border>
+            </StackPanel></ScrollViewer></TabItem>
+          </TabControl>
+        </Grid>
+      </Border>
+    </Border>
+    <Border ZIndex="30" IsVisible="{Binding IsConnectionNoticeVisible}" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="18" Padding="15,9" CornerRadius="14" Background="{DynamicResource MobileTextBrush}"><Grid ColumnDefinitions="*,Auto"><TextBlock MaxWidth="270" VerticalAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource MobilePageBrush}" Text="{Binding ConnectionNoticeMessage}"/><Button Grid.Column="1" Classes="icon" Width="32" Height="32" CornerRadius="16" FontSize="18" Background="Transparent" Foreground="{DynamicResource MobilePageBrush}" Command="{Binding DismissConnectionNoticeCommand}" Content="×"/></Grid></Border>
+    <Border x:Name="IntroPanel" ZIndex="50" Background="{DynamicResource MobilePageBrush}"><Border.Transitions><Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.7"/></Transitions></Border.Transitions><StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="18"><Grid Width="104" Height="82"><Image x:Name="IntroLightLogo" Stretch="Uniform" Source="/Assets/LOGO-black.png"/><Image x:Name="IntroDarkLogo" Stretch="Uniform" Source="/Assets/LOGO-white.png"/></Grid><TextBlock HorizontalAlignment="Center" FontSize="28" FontWeight="Bold" Text="Vaguei"/><TextBlock Width="260" TextAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource MobileSecondaryBrush}" Text="Seu currículo, novas oportunidades."/></StackPanel></Border>
   </Grid>
 </UserControl>

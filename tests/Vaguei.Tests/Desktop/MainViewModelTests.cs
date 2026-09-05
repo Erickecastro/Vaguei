@@ -382,6 +382,60 @@ public sealed class MainViewModelTests
     }
 
     [Fact]
+    public async Task RefreshJobsCommand_ReleasesInterfaceWhenSourceIgnoresCancellation()
+    {
+        var source = new StubJobSource { IgnoreCancellation = true };
+        source.BlockNextSearch();
+        var viewModel = CreateViewModel(
+            source,
+            searchTimeout: TimeSpan.FromMilliseconds(40));
+        viewModel.DesiredRole = "Analista";
+
+        await viewModel.RefreshJobsCommand.ExecuteAsync(null);
+
+        Assert.False(viewModel.IsBusy);
+        Assert.True(viewModel.RefreshJobsCommand.CanExecute(null));
+        Assert.Contains("demorou mais", viewModel.StatusMessage);
+        source.ReleaseSearch();
+    }
+
+    [Fact]
+    public async Task RefreshJobsCommand_DoesNotStartWithoutConnection()
+    {
+        var source = new StubJobSource();
+        var viewModel = CreateViewModel(source, networkAvailable: () => false);
+        viewModel.DesiredRole = "Analista";
+
+        await viewModel.RefreshJobsCommand.ExecuteAsync(null);
+
+        Assert.Equal(0, source.SearchCount);
+        Assert.False(viewModel.IsBusy);
+        Assert.True(viewModel.IsConnectionNoticeVisible);
+        Assert.Contains("Sem conexão", viewModel.StatusMessage);
+    }
+
+    [Fact]
+    public async Task ConnectionLoss_ReleasesRunningSearchImmediately()
+    {
+        var source = new StubJobSource { IgnoreCancellation = true };
+        source.BlockNextSearch();
+        var viewModel = CreateViewModel(
+            source,
+            searchTimeout: TimeSpan.FromMinutes(1),
+            networkAvailable: () => true);
+        viewModel.DesiredRole = "Analista";
+
+        var searchTask = viewModel.RefreshJobsCommand.ExecuteAsync(null);
+        Assert.True(viewModel.IsBusy);
+        viewModel.HandleNetworkAvailabilityChanged(false);
+        await searchTask;
+
+        Assert.False(viewModel.IsBusy);
+        Assert.Contains("conexão perdida", viewModel.StatusMessage);
+        source.ReleaseSearch();
+    }
+
+    [Fact]
     public async Task RemoveResumeCommand_ClearsProfileAndResults()
     {
         var filePath = CreateTemporaryResume();
@@ -443,7 +497,9 @@ public sealed class MainViewModelTests
     }
 
     private static MainViewModel CreateViewModel(
-        StubJobSource source)
+        StubJobSource source,
+        TimeSpan? searchTimeout = null,
+        Func<bool>? networkAvailable = null)
     {
         return new MainViewModel(
             new ResumeParserService(
@@ -451,7 +507,9 @@ public sealed class MainViewModelTests
                 new StubResumeParser()
             ]),
             new ResumeAnalyzer(),
-            new JobSearchOrchestrator([source]));
+            new JobSearchOrchestrator([source]),
+            searchTimeout: searchTimeout,
+            networkAvailable: networkAvailable);
     }
 
     private static string CreateTemporaryResume()
@@ -510,6 +568,8 @@ public sealed class MainViewModelTests
 
         public bool ShouldFail { get; init; }
 
+        public bool IgnoreCancellation { get; init; }
+
         public async Task<IEnumerable<JobPosting>> SearchAsync(
             JobSearchQuery query,
             CancellationToken cancellationToken = default)
@@ -524,8 +584,14 @@ public sealed class MainViewModelTests
 
             if (_searchGate is not null)
             {
-                await _searchGate.Task.WaitAsync(
-                    cancellationToken);
+                if (IgnoreCancellation)
+                {
+                    await _searchGate.Task;
+                }
+                else
+                {
+                    await _searchGate.Task.WaitAsync(cancellationToken);
+                }
             }
 
             var jobs = Enumerable.Range(1, ResultCount)
