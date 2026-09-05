@@ -10,10 +10,6 @@ public partial class AboutWindow : Window
     public AboutWindow()
     {
         InitializeComponent();
-        AboutTitleBar.AddHandler(
-            PointerPressedEvent,
-            OnTitleBarPointerPressed,
-            RoutingStrategies.Tunnel);
         Opened += (_, _) => UpdateThemeLogo();
     }
 
@@ -26,8 +22,7 @@ public partial class AboutWindow : Window
 
     private void OnTitleBarPointerPressed(object? sender, PointerPressedEventArgs eventArgs)
     {
-        if (eventArgs.Source is Button ||
-            !eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        if (!eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
         {
             return;
         }

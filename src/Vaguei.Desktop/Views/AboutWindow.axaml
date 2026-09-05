@@ -15,8 +15,10 @@
   <Border CornerRadius="12" ClipToBounds="True" Background="{DynamicResource PageBackgroundBrush}" BorderBrush="{DynamicResource OutlineBrush}" BorderThickness="1">
     <Grid RowDefinitions="40,*">
       <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource OutlineBrush}" BorderThickness="0,0,0,1">
-        <Grid x:Name="AboutTitleBar" ColumnDefinitions="*,Auto">
-          <TextBlock Margin="16,0" VerticalAlignment="Center" FontWeight="SemiBold" Text="Sobre o Vaguei"/>
+        <Grid ColumnDefinitions="*,Auto">
+          <Border Grid.Column="0" Background="Transparent" PointerPressed="OnTitleBarPointerPressed">
+            <TextBlock Margin="16,0" VerticalAlignment="Center" IsHitTestVisible="False" FontWeight="SemiBold" Text="Sobre o Vaguei"/>
+          </Border>
           <Button Grid.Column="1" Width="40" Height="40" Padding="0" Background="Transparent" BorderThickness="0" Click="OnCloseClick" ToolTip.Tip="Fechar">
             <Border Width="26" Height="26" CornerRadius="13" Background="{DynamicResource SoftSurfaceBrush}">
               <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" Text="×"/>

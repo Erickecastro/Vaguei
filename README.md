@@ -257,9 +257,18 @@ Project governance documents are versioned with the code:
 * [Privacy](docs/PRIVACY.md)
 * [Integrations and Partnerships](docs/PARTNERSHIPS.md)
 * [Partnership Request Templates](docs/PARTNERSHIP_REQUEST_TEMPLATES.md)
+* [Security Policy](SECURITY.md)
 * [MIT License](LICENSE)
 
 These documents describe the current experimental application. They require legal review, an official contact channel, and an explicit acceptance/versioning mechanism before commercial distribution or remote personal-data processing.
+
+Before committing changes, run the local credential check:
+
+```bash
+./scripts/check-secrets.sh
+```
+
+The check complements review and repository secret scanning; it does not make committing credentials safe. If a credential ever reaches Git history, revoke and rotate it immediately.
 
 # Contributing
 

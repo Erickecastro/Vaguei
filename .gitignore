@@ -37,6 +37,21 @@ Desktop.ini
 .env
 .env.*
 !.env.example
+appsettings.*.json
+secrets.json
+*.secret
+*.secrets
+
+# Credentials, signing material, and private keys
+*.pem
+*.key
+*.pfx
+*.p12
+*.jks
+*.keystore
+*.mobileprovision
+credentials.json
+service-account*.json
 
 *.pdf
 *.docx
