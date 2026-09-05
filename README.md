@@ -31,8 +31,8 @@ Software development is the initial validation domain because it reflects the fi
 * Brazil-only and Brazil-plus-international scopes
 * Publication filters for 24 hours, 3 days, 7 days, 30 days, and 3 months
 * Work-model filter for remote, hybrid, and on-site opportunities
-* Advanced filters for location, contract type, and seniority
-* Locally persisted favorite jobs
+* Advanced filters for location, contract type, and seniority, persisted locally between sessions
+* Locally persisted favorite jobs with a saved-results filter
 * Loading and search-attention states that keep work off the UI thread
 * Source failure warnings without interrupting successful providers
 * Dismissible connection warning with automatic timeout when every source is unreachable

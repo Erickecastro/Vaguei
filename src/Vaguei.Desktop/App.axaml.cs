@@ -44,7 +44,8 @@ public partial class App : Avalonia.Application
                     parserService,
                     new ResumeAnalyzer(),
                     new JobSearchOrchestrator(sources),
-                    new JsonFavoriteJobStore())
+                    new JsonFavoriteJobStore(),
+                    new JsonJobSearchSettingsStore())
             };
         }
 

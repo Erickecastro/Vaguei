@@ -380,6 +380,39 @@ public sealed class MainViewModelTests
         }
     }
 
+    [Fact]
+    public async Task ToggleFavoritesFilter_ShowsOnlyFavoriteResults()
+    {
+        var viewModel = CreateViewModel(new StubJobSource { ResultCount = 2 });
+        viewModel.DesiredRole = "Analista";
+        await viewModel.RefreshJobsCommand.ExecuteAsync(null);
+
+        viewModel.Jobs[0].ToggleFavoriteCommand.Execute(null);
+        viewModel.ToggleFavoritesFilterCommand.Execute(null);
+
+        var favorite = Assert.Single(viewModel.Jobs);
+        Assert.True(favorite.IsFavorite);
+        Assert.Equal("Mostrar todas", viewModel.FavoritesFilterLabel);
+
+        viewModel.ToggleFavoritesFilterCommand.Execute(null);
+
+        Assert.Equal(2, viewModel.Jobs.Count);
+    }
+
+    [Fact]
+    public async Task ToggleFavoritesFilter_ExplainsEmptySavedResults()
+    {
+        var viewModel = CreateViewModel(new StubJobSource());
+        viewModel.DesiredRole = "Analista";
+        await viewModel.RefreshJobsCommand.ExecuteAsync(null);
+
+        viewModel.ToggleFavoritesFilterCommand.Execute(null);
+
+        Assert.Empty(viewModel.Jobs);
+        Assert.Contains("Nenhuma vaga salva", viewModel.EmptyStateTitle);
+        Assert.True(viewModel.ShowEmptyState);
+    }
+
     private static MainViewModel CreateViewModel(
         StubJobSource source)
     {

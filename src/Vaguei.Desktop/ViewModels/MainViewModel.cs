@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Vaguei.Application.Models;
 using Vaguei.Application.Services;
 using Vaguei.Application.Interfaces;
 using Vaguei.Domain.Entities;
@@ -16,7 +17,10 @@ public partial class MainViewModel : ViewModelBase
     private readonly ResumeAnalyzer _resumeAnalyzer;
     private readonly JobSearchOrchestrator _searchOrchestrator;
     private readonly IFavoriteJobStore? _favoriteStore;
+    private readonly IJobSearchSettingsStore? _searchSettingsStore;
     private readonly HashSet<string> _favoriteKeys;
+    private readonly List<JobResultItemViewModel> _allJobs = [];
+    private bool _searchSettingsLoaded;
     private CandidateProfile? _currentProfile;
     private string _detectedProfessionalTitle = string.Empty;
     private CancellationTokenSource? _connectionNoticeCancellation;
@@ -89,6 +93,12 @@ public partial class MainViewModel : ViewModelBase
     private bool _isConnectionNoticeVisible;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FavoritesFilterLabel))]
+    [NotifyPropertyChangedFor(nameof(EmptyStateTitle))]
+    [NotifyPropertyChangedFor(nameof(EmptyStateDescription))]
+    private bool _showOnlyFavorites;
+
+    [ObservableProperty]
     private string _connectionNoticeMessage =
         "Sem conexão com a internet. Verifique sua rede e tente novamente.";
 
@@ -96,14 +106,25 @@ public partial class MainViewModel : ViewModelBase
         ResumeParserService parserService,
         ResumeAnalyzer resumeAnalyzer,
         JobSearchOrchestrator searchOrchestrator,
-        IFavoriteJobStore? favoriteStore = null)
+        IFavoriteJobStore? favoriteStore = null,
+        IJobSearchSettingsStore? searchSettingsStore = null)
     {
         _parserService = parserService;
         _resumeAnalyzer = resumeAnalyzer;
         _searchOrchestrator = searchOrchestrator;
         _favoriteStore = favoriteStore;
+        _searchSettingsStore = searchSettingsStore;
         _favoriteKeys = favoriteStore?.Load().ToHashSet(StringComparer.OrdinalIgnoreCase) ??
             new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        var settings = searchSettingsStore?.Load() ?? new JobSearchSettings();
+        SearchScopeIndex = Math.Clamp(settings.SearchScopeIndex, 0, SearchScopes.Count - 1);
+        PublicationWindowIndex = Math.Clamp(settings.PublicationWindowIndex, 0, PublicationWindows.Count - 1);
+        WorkModelIndex = Math.Clamp(settings.WorkModelIndex, 0, WorkModelOptions.Count - 1);
+        EmploymentTypeIndex = Math.Clamp(settings.EmploymentTypeIndex, 0, EmploymentTypeOptions.Count - 1);
+        SeniorityIndex = Math.Clamp(settings.SeniorityIndex, 0, SeniorityOptions.Count - 1);
+        LocationFilter = settings.LocationFilter?.Trim() ?? string.Empty;
+        _searchSettingsLoaded = true;
     }
 
     public ObservableCollection<JobResultItemViewModel> Jobs { get; } = [];
@@ -159,6 +180,18 @@ public partial class MainViewModel : ViewModelBase
 
     public bool HasAdditionalSkills => AdditionalSkillCount > 0;
 
+    public string FavoritesFilterLabel => ShowOnlyFavorites
+        ? "Mostrar todas"
+        : "Somente salvas";
+
+    public string EmptyStateTitle => ShowOnlyFavorites
+        ? "Nenhuma vaga salva nesta pesquisa"
+        : "Suas vagas aparecerão aqui";
+
+    public string EmptyStateDescription => ShowOnlyFavorites
+        ? "Marque a estrela de uma oportunidade para encontrá-la aqui."
+        : "Envie seu currículo ou pesquise diretamente por cargo, tecnologia ou empresa.";
+
     public string ResultsSubtitle => HasProfile
         ? "Ordenadas por compatibilidade e recência"
         : "Resultados da pesquisa direta ordenados por recência";
@@ -180,6 +213,7 @@ public partial class MainViewModel : ViewModelBase
         RefreshJobsCommand.NotifyCanExecuteChanged();
         SourceWarnings = string.Empty;
         Jobs.Clear();
+        _allJobs.Clear();
         SelectedFileName = Path.GetFileName(filePath);
         StatusMessage = "Analisando currículo...";
 
@@ -243,6 +277,7 @@ public partial class MainViewModel : ViewModelBase
         IsBusy = true;
         HasResults = false;
         Jobs.Clear();
+        _allJobs.Clear();
 
         try
         {
@@ -297,6 +332,7 @@ public partial class MainViewModel : ViewModelBase
         AdditionalSkillCount = 0;
         ProfileSkills.Clear();
         Jobs.Clear();
+        _allJobs.Clear();
         SourceWarnings = string.Empty;
         HasProfile = false;
         HasResults = false;
@@ -319,6 +355,20 @@ public partial class MainViewModel : ViewModelBase
         int value)
     {
         IncludeInternational = value == 1;
+        PersistSearchSettings();
+    }
+
+    partial void OnPublicationWindowIndexChanged(int value) => PersistSearchSettings();
+    partial void OnWorkModelIndexChanged(int value) => PersistSearchSettings();
+    partial void OnEmploymentTypeIndexChanged(int value) => PersistSearchSettings();
+    partial void OnSeniorityIndexChanged(int value) => PersistSearchSettings();
+    partial void OnLocationFilterChanged(string value) => PersistSearchSettings();
+
+    [RelayCommand]
+    private void ToggleFavoritesFilter()
+    {
+        ShowOnlyFavorites = !ShowOnlyFavorites;
+        ApplyVisibleJobFilter();
     }
 
     private async Task SearchJobsAsync(
@@ -382,16 +432,19 @@ public partial class MainViewModel : ViewModelBase
             cancellationToken);
 
         Jobs.Clear();
+        _allJobs.Clear();
 
         foreach (var match in result.Matches)
         {
-            Jobs.Add(
+            _allJobs.Add(
                 new JobResultItemViewModel(
                     match,
                     showCompatibility: _currentProfile is not null,
                     isFavorite: IsFavorite(match),
                     favoriteChanged: OnFavoriteChanged));
         }
+
+        ApplyVisibleJobFilter();
 
         HasResults = Jobs.Count > 0;
 
@@ -405,13 +458,13 @@ public partial class MainViewModel : ViewModelBase
             result.SourceFailures.Select(failure =>
                 $"{failure.Source}: {failure.Message}"));
 
-        StatusMessage = Jobs.Count == 0
+        StatusMessage = _allJobs.Count == 0
             ? IsValidDirectSearch(directSearch)
                 ? $"Nenhum resultado relacionado a “{directSearch}”. Tente outro cargo, tecnologia ou empresa."
                 : "Nenhuma vaga foi encontrada pelas fontes atuais com este filtro."
             : _currentProfile is null
-                ? $"{Jobs.Count} oportunidades encontradas para “{directSearch}”."
-                : $"{Jobs.Count} oportunidades encontradas e ordenadas por compatibilidade.";
+                ? $"{_allJobs.Count} oportunidades encontradas para “{directSearch}”."
+                : $"{_allJobs.Count} oportunidades encontradas e ordenadas por compatibilidade.";
     }
 
     [RelayCommand]
@@ -455,6 +508,45 @@ public partial class MainViewModel : ViewModelBase
         try { _favoriteStore?.Save(_favoriteKeys); }
         catch (IOException) { SourceWarnings = "Não foi possível salvar os favoritos localmente."; }
         catch (UnauthorizedAccessException) { SourceWarnings = "Não foi possível salvar os favoritos localmente."; }
+
+        if (ShowOnlyFavorites)
+        {
+            ApplyVisibleJobFilter();
+        }
+    }
+
+    private void ApplyVisibleJobFilter()
+    {
+        Jobs.Clear();
+        foreach (var job in _allJobs.Where(job => !ShowOnlyFavorites || job.IsFavorite))
+        {
+            Jobs.Add(job);
+        }
+
+        HasResults = Jobs.Count > 0;
+    }
+
+    private void PersistSearchSettings()
+    {
+        if (!_searchSettingsLoaded || _searchSettingsStore is null)
+        {
+            return;
+        }
+
+        try
+        {
+            _searchSettingsStore.Save(new JobSearchSettings
+            {
+                SearchScopeIndex = SearchScopeIndex,
+                PublicationWindowIndex = PublicationWindowIndex,
+                WorkModelIndex = WorkModelIndex,
+                EmploymentTypeIndex = EmploymentTypeIndex,
+                SeniorityIndex = SeniorityIndex,
+                LocationFilter = LocationFilter
+            });
+        }
+        catch (IOException) { SourceWarnings = "Não foi possível salvar as preferências localmente."; }
+        catch (UnauthorizedAccessException) { SourceWarnings = "Não foi possível salvar as preferências localmente."; }
     }
 
     private JobPublicationWindow GetPublicationWindow()
