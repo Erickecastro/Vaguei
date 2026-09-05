@@ -54,6 +54,9 @@ public partial class MainViewModel : ViewModelBase
     private string _sourceWarnings = string.Empty;
 
     [ObservableProperty]
+    private string _sourceCoverageSummary = string.Empty;
+
+    [ObservableProperty]
     private bool _includeInternational;
 
     [ObservableProperty]
@@ -387,6 +390,7 @@ public partial class MainViewModel : ViewModelBase
     {
         StatusMessage = "Buscando novas oportunidades...";
         SourceWarnings = string.Empty;
+        SourceCoverageSummary = string.Empty;
 
         var preferences = new JobSearchPreferences
         {
@@ -467,6 +471,9 @@ public partial class MainViewModel : ViewModelBase
             Environment.NewLine,
             result.SourceFailures.Select(failure =>
                 $"{failure.Source}: {failure.Message}"));
+
+        SourceCoverageSummary = CreateSourceCoverageSummary(
+            result.SourceSummaries);
 
         StatusMessage = _allJobs.Count == 0
             ? IsValidDirectSearch(directSearch)
@@ -592,6 +599,21 @@ public partial class MainViewModel : ViewModelBase
             4 => JobPublicationWindow.Last3Months,
             _ => JobPublicationWindow.Last30Days
         };
+    }
+
+    private static string CreateSourceCoverageSummary(
+        IEnumerable<JobSourceSearchSummary> summaries)
+    {
+        var sources = summaries
+            .Where(summary => summary.JobCount > 0)
+            .OrderByDescending(summary => summary.JobCount)
+            .ThenBy(summary => summary.Source)
+            .Select(summary => $"{summary.Source} ({summary.JobCount})");
+        var value = string.Join(" · ", sources);
+
+        return string.IsNullOrWhiteSpace(value)
+            ? string.Empty
+            : $"Fontes: {value}";
     }
 
     private WorkModel? GetSelectedWorkModel()

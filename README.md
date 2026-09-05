@@ -24,6 +24,7 @@ Software development is the initial validation domain because it reflects the fi
 ### Desktop experience
 
 * Avalonia desktop interface with light and grayscale dark themes
+* Theme preference applied before window creation and persisted locally
 * Resume selection and drag-and-drop
 * Fixed candidate sidebar with adaptive overlay on narrow windows
 * Responsive, resizable, movable, and maximizable custom window
@@ -54,7 +55,7 @@ Software development is the initial validation domain because it reflects the fi
 ### Search and matching
 
 * Parallel source orchestration and isolated provider failures
-* Per-source result diagnostics for measuring real search coverage
+* Per-source result diagnostics, with contributing providers visible after each search
 * Shared concurrency limit, per-source timeout, one retry for transient network failures, and a five-minute in-memory query cache limited to 32 entries per source
 * Brazilian location recognition and national-only filtering
 * Publication-date filtering

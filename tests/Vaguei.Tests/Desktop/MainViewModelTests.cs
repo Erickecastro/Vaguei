@@ -321,6 +321,17 @@ public sealed class MainViewModelTests
     }
 
     [Fact]
+    public async Task DirectSearch_ReportsContributingSources()
+    {
+        var viewModel = CreateViewModel(new StubJobSource());
+        viewModel.DesiredRole = "Analista";
+
+        await viewModel.RefreshJobsCommand.ExecuteAsync(null);
+
+        Assert.Contains("Fonte simulada (1)", viewModel.SourceCoverageSummary);
+    }
+
+    [Fact]
     public async Task DirectSearch_ShowsDismissibleNoticeWhenEverySourceFails()
     {
         var viewModel = CreateViewModel(new StubJobSource { ShouldFail = true });

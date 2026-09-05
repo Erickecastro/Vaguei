@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Styling;
 using Vaguei.Application.Services;
 using Vaguei.Collectors.Configuration;
 using Vaguei.Desktop.ViewModels;
@@ -28,6 +29,11 @@ public partial class App : Avalonia.Application
         if (ApplicationLifetime is
             IClassicDesktopStyleApplicationLifetime desktop)
         {
+            var themeStore = new JsonThemePreferenceStore();
+            RequestedThemeVariant = themeStore.Load() == "Dark"
+                ? ThemeVariant.Dark
+                : ThemeVariant.Light;
+
             var parserService = new ResumeParserService(
             [
                 new OdtResumeParser(),
@@ -38,7 +44,7 @@ public partial class App : Avalonia.Application
 
             var sources = JobSourceFactory.Create(_httpClient);
 
-            desktop.MainWindow = new MainWindow
+            desktop.MainWindow = new MainWindow(themeStore)
             {
                 DataContext = new MainViewModel(
                     parserService,

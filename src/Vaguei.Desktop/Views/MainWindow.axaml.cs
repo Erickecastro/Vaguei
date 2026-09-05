@@ -8,6 +8,7 @@ using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using Vaguei.Application.Interfaces;
 using Vaguei.Desktop.ViewModels;
 
 namespace Vaguei.Desktop.Views;
@@ -17,6 +18,7 @@ public partial class MainWindow : Window
     private const double NarrowLayoutThreshold = 1080;
     private bool? _isCompactLayout;
     private bool _isThemeTransitioning;
+    private readonly IThemePreferenceStore? _themePreferenceStore;
 
     private static readonly FilePickerFileType ResumeFileType = new("Currículos")
     {
@@ -24,7 +26,13 @@ public partial class MainWindow : Window
     };
 
     public MainWindow()
+        : this(null)
     {
+    }
+
+    public MainWindow(IThemePreferenceStore? themePreferenceStore)
+    {
+        _themePreferenceStore = themePreferenceStore;
         InitializeComponent();
 
         ThemeTransitionOverlay.Transitions =
@@ -90,6 +98,7 @@ public partial class MainWindow : Window
 
         Avalonia.Application.Current.RequestedThemeVariant = requestedTheme;
         UpdateThemeVisuals(requestedTheme);
+        SaveThemePreference(requestedTheme);
 
         await Dispatcher.UIThread.InvokeAsync(
             () => { },
@@ -107,6 +116,17 @@ public partial class MainWindow : Window
         await Task.Delay(340);
         ThemeTransitionOverlay.IsVisible = false;
         _isThemeTransitioning = false;
+    }
+
+    private void SaveThemePreference(ThemeVariant themeVariant)
+    {
+        try
+        {
+            _themePreferenceStore?.Save(
+                themeVariant == ThemeVariant.Dark ? "Dark" : "Light");
+        }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
     }
 
     private async void OnWindowOpened(
