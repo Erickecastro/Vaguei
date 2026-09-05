@@ -65,7 +65,7 @@ public sealed class AshbyJobSource : IJobSource
                 true,
                 response?.Jobs
                     .Where(job => job.IsListed)
-                    .Select(job => MapJob(job, company))
+                    .Select(job => MapJob(job, boardName, company))
                     .ToArray() ?? []);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -78,7 +78,7 @@ public sealed class AshbyJobSource : IJobSource
         }
     }
 
-    private JobPosting MapJob(AshbyJob job, string company)
+    private JobPosting MapJob(AshbyJob job, string boardName, string company)
     {
         var posting = new JobPosting
         {
@@ -88,6 +88,9 @@ public sealed class AshbyJobSource : IJobSource
             Location = JobSourceMapping.MapLocation(job.Location),
             Url = Uri.TryCreate(job.JobUrl, UriKind.Absolute, out var uri) ? uri : null,
             Source = Name,
+            SourcePostingId = string.IsNullOrWhiteSpace(job.Id)
+                ? null
+                : $"{boardName}:{job.Id}",
             WorkModel = job.IsRemote == true
                 ? WorkModel.Remote
                 : JobSourceMapping.MapWorkModel(job.Location, job.WorkplaceType),
@@ -113,6 +116,9 @@ public sealed class AshbyJobSource : IJobSource
 
     private sealed class AshbyJob
     {
+        [JsonPropertyName("id")]
+        public string? Id { get; init; }
+
         [JsonPropertyName("title")]
         public string Title { get; init; } = string.Empty;
 

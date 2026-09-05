@@ -70,6 +70,43 @@ public sealed class JobDeduplicatorTests
         Assert.Single(result);
     }
 
+    [Fact]
+    public void Deduplicate_UsesStableSourceIdentityWhenContentChanges()
+    {
+        var first = CreateJob(
+            "Analista de Dados",
+            "Empresa Teste",
+            "Descrição publicada originalmente.",
+            "Fonte A");
+        first.SourcePostingId = "empresa:123";
+
+        var updated = CreateJob(
+            "Analista de Dados Sênior",
+            "Empresa Teste",
+            "Descrição completamente atualizada pela empresa.",
+            "Fonte A");
+        updated.SourcePostingId = "empresa:123";
+        updated.PublishedAt = first.PublishedAt?.AddHours(1);
+
+        var result = _deduplicator.Deduplicate([first, updated]);
+
+        var selected = Assert.Single(result);
+        Assert.Same(updated, selected);
+    }
+
+    [Fact]
+    public void Deduplicate_PreservesEqualIdentifiersFromDifferentSources()
+    {
+        var first = CreateJob("Vaga A", "Empresa A", "Descrição A", "Fonte A");
+        first.SourcePostingId = "123";
+        var second = CreateJob("Vaga B", "Empresa B", "Descrição B", "Fonte B");
+        second.SourcePostingId = "123";
+
+        var result = _deduplicator.Deduplicate([first, second]);
+
+        Assert.Equal(2, result.Count);
+    }
+
     private static JobPosting CreateJob(
         string title,
         string company,

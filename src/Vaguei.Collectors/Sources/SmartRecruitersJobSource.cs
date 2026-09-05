@@ -169,6 +169,7 @@ public sealed class SmartRecruitersJobSource : IJobSource
                 Location = JobSourceMapping.MapLocation(job.Location?.FullLocation),
                 Url = Uri.TryCreate(job.ApplyUrl, UriKind.Absolute, out var uri) ? uri : null,
                 Source = Name,
+                SourcePostingId = $"{identifier}:{summary.Id}",
                 WorkModel = job.Location?.Remote == true
                     ? Vaguei.Domain.Enums.WorkModel.Remote
                     : JobSourceMapping.MapWorkModel(

@@ -68,7 +68,7 @@ public sealed class LeverJobSource : IJobSource
 
             return new SiteResult(
                 true,
-                jobs?.Select(job => MapJob(job, company)).ToArray() ?? []);
+                jobs?.Select(job => MapJob(job, site, company)).ToArray() ?? []);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -80,7 +80,7 @@ public sealed class LeverJobSource : IJobSource
         }
     }
 
-    private JobPosting MapJob(LeverJob job, string company)
+    private JobPosting MapJob(LeverJob job, string siteName, string company)
     {
         var location = job.Categories?.Location;
         var description = string.Join(
@@ -99,6 +99,9 @@ public sealed class LeverJobSource : IJobSource
                 ? uri
                 : null,
             Source = Name,
+            SourcePostingId = string.IsNullOrWhiteSpace(job.Id)
+                ? null
+                : $"{siteName}:{job.Id}",
             WorkModel = JobSourceMapping.MapWorkModel(location, job.WorkplaceType),
             EmploymentType = JobSourceMapping.MapEmploymentType(job.Categories?.Commitment),
             PublishedAt = job.CreatedAt is > 0
@@ -118,6 +121,9 @@ public sealed class LeverJobSource : IJobSource
 
     private sealed class LeverJob
     {
+        [JsonPropertyName("id")]
+        public string? Id { get; init; }
+
         [JsonPropertyName("text")]
         public string Text { get; init; } = string.Empty;
 

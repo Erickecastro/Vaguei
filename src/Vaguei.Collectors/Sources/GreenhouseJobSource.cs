@@ -73,7 +73,7 @@ public sealed class GreenhouseJobSource : IJobSource
 
             return new BoardResult(
                 true,
-                response?.Jobs.Select(job => MapJob(job, company)).ToArray() ?? []);
+                response?.Jobs.Select(job => MapJob(job, boardToken, company)).ToArray() ?? []);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -85,7 +85,7 @@ public sealed class GreenhouseJobSource : IJobSource
         }
     }
 
-    private JobPosting MapJob(GreenhouseJob job, string company)
+    private JobPosting MapJob(GreenhouseJob job, string boardName, string company)
     {
         var posting = new JobPosting
         {
@@ -97,6 +97,7 @@ public sealed class GreenhouseJobSource : IJobSource
                 ? uri
                 : null,
             Source = Name,
+            SourcePostingId = job.Id == 0 ? null : $"{boardName}:{job.Id}",
             WorkModel = JobSourceMapping.MapWorkModel(job.Location?.Name),
             PublishedAt = job.UpdatedAt,
             Tags = job.Departments
@@ -119,6 +120,9 @@ public sealed class GreenhouseJobSource : IJobSource
 
     private sealed class GreenhouseJob
     {
+        [JsonPropertyName("id")]
+        public long Id { get; init; }
+
         [JsonPropertyName("title")]
         public string Title { get; init; } = string.Empty;
 

@@ -19,6 +19,8 @@ public sealed class JobPosting
 
     public string? Source { get; set; }
 
+    public string? SourcePostingId { get; set; }
+
     public EmploymentType EmploymentType { get; set; }
 
     public SeniorityLevel SeniorityLevel { get; set; }

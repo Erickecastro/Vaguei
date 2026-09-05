@@ -72,6 +72,10 @@ public sealed class ArbeitnowJobSourceTests
             "Arbeitnow",
             job.Source);
 
+        Assert.Equal(
+            "desenvolvedor-dotnet",
+            job.SourcePostingId);
+
         Assert.NotNull(job.Url);
 
         Assert.Contains("C#", job.Tags);

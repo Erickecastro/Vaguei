@@ -67,7 +67,7 @@ public sealed class WorkableJobSource : IJobSource
                 url,
                 cancellationToken);
             var jobs = response?.Jobs
-                .Select(job => MapJob(job, company))
+                .Select(job => MapJob(job, account, company))
                 .Where(job => JobSourceMapping.MatchesQuery(job, query))
                 .ToArray() ?? [];
 
@@ -83,7 +83,7 @@ public sealed class WorkableJobSource : IJobSource
         }
     }
 
-    private JobPosting MapJob(WorkableJob job, string company)
+    private JobPosting MapJob(WorkableJob job, string account, string company)
     {
         var location = string.Join(
             ", ",
@@ -97,6 +97,9 @@ public sealed class WorkableJobSource : IJobSource
             Location = JobSourceMapping.MapLocation(location),
             Url = Uri.TryCreate(job.Url, UriKind.Absolute, out var uri) ? uri : null,
             Source = Name,
+            SourcePostingId = string.IsNullOrWhiteSpace(job.Shortcode)
+                ? null
+                : $"{account}:{job.Shortcode}",
             WorkModel = job.Telecommuting
                 ? WorkModel.Remote
                 : JobSourceMapping.MapWorkModel(location, job.Description),
@@ -131,6 +134,9 @@ public sealed class WorkableJobSource : IJobSource
 
     private sealed class WorkableJob
     {
+        [JsonPropertyName("shortcode")]
+        public string? Shortcode { get; init; }
+
         [JsonPropertyName("title")]
         public string Title { get; init; } = string.Empty;
 

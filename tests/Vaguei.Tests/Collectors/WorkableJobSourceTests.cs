@@ -27,6 +27,7 @@ public sealed class WorkableJobSourceTests
         Assert.Equal(WorkModel.Remote, job.WorkModel);
         Assert.Equal(EmploymentType.FullTime, job.EmploymentType);
         Assert.Equal("Workable", job.Source);
+        Assert.Equal("empresa-exemplo:ABC123", job.SourcePostingId);
         Assert.Equal("C# e .NET obrigatórios.", job.Description);
         Assert.Equal("https://apply.workable.com/j/ABC123", job.Url?.ToString());
         Assert.Contains("Tecnologia", job.Tags);
@@ -56,6 +57,7 @@ public sealed class WorkableJobSourceTests
             const string json = """
                 {
                   "jobs": [{
+                    "shortcode": "ABC123",
                     "title": "Pessoa Desenvolvedora .NET",
                     "employment_type": "Full-time",
                     "telecommuting": true,

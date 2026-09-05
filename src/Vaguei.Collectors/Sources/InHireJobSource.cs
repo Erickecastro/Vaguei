@@ -131,6 +131,7 @@ public sealed class InHireJobSource : IJobSource
                 Location = JobSourceMapping.MapLocation(job.Location),
                 Url = Uri.TryCreate(summary.Link, UriKind.Absolute, out var uri) ? uri : null,
                 Source = Name,
+                SourcePostingId = $"{tenantId}:{summary.JobId}",
                 WorkModel = JobSourceMapping.MapWorkModel(job.Location, job.WorkplaceType),
                 EmploymentType = JobSourceMapping.MapEmploymentType(
                     string.Join(' ', job.ContractType)),

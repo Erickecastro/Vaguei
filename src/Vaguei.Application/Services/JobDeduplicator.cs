@@ -37,6 +37,11 @@ public sealed class JobDeduplicator
         JobPosting first,
         JobPosting second)
     {
+        if (HasSameSourceIdentity(first, second))
+        {
+            return true;
+        }
+
         if (!Normalize(first.Company).Equals(
                 Normalize(second.Company),
                 StringComparison.Ordinal) ||
@@ -71,6 +76,20 @@ public sealed class JobDeduplicator
                CalculateDescriptionOverlap(
                    firstDescription,
                    secondDescription) >= 0.8;
+    }
+
+    private static bool HasSameSourceIdentity(
+        JobPosting first,
+        JobPosting second)
+    {
+        return !string.IsNullOrWhiteSpace(first.Source) &&
+               !string.IsNullOrWhiteSpace(first.SourcePostingId) &&
+               !string.IsNullOrWhiteSpace(second.Source) &&
+               !string.IsNullOrWhiteSpace(second.SourcePostingId) &&
+               first.Source.Equals(second.Source, StringComparison.OrdinalIgnoreCase) &&
+               first.SourcePostingId.Equals(
+                   second.SourcePostingId,
+                   StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool IsPreferred(JobPosting candidate, JobPosting existing)

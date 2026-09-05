@@ -85,6 +85,7 @@ public sealed class ArbeitnowJobSource : IJobSource
                 : null,
 
             Source = "Arbeitnow",
+            SourcePostingId = job.Slug,
 
             WorkModel = job.Remote
                 ? WorkModel.Remote

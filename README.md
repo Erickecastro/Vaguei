@@ -51,7 +51,7 @@ Software development is the initial validation domain because it reflects the fi
 * Shared concurrency limit, per-source timeout, one retry for transient network failures, and a five-minute in-memory query cache limited to 32 entries per source
 * Brazilian location recognition and national-only filtering
 * Publication-date filtering
-* Cross-source duplicate removal using company, title, location, URL, and description similarity
+* Duplicate removal using stable provider identifiers plus company, title, location, URL, and description similarity
 * Role normalization and search-term generation
 * Compatibility based on role and skills, with penalties for missing core or required skills
 * Compatibility is displayed only when a resume has been analyzed
@@ -205,7 +205,7 @@ The score is intentionally explainable and deterministic. It is not a hiring pre
 * Expand authorized public career sources and Brazilian employer coverage
 * Broaden role and skill taxonomies beyond software development
 * Add job-detail filters for seniority, contract type, and location
-* Improve deduplication using canonical employer identities and stable posting identifiers
+* Improve cross-source deduplication with canonical employer identities
 * Add saved/favorite jobs and locally persisted search preferences
 * Add accessibility checks and automated desktop UI tests
 
