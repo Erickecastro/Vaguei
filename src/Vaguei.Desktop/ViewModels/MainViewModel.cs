@@ -15,6 +15,7 @@ public partial class MainViewModel : ViewModelBase
     private readonly ResumeAnalyzer _resumeAnalyzer;
     private readonly JobSearchOrchestrator _searchOrchestrator;
     private CandidateProfile? _currentProfile;
+    private string _detectedProfessionalTitle = string.Empty;
 
     [ObservableProperty]
     private string _selectedFileName = "Nenhum currículo selecionado";
@@ -139,6 +140,7 @@ public partial class MainViewModel : ViewModelBase
             _currentProfile = profile;
             CandidateName = profile.Name;
             ProfessionalTitle = profile.ProfessionalTitle;
+            _detectedProfessionalTitle = profile.ProfessionalTitle;
             DesiredRole = profile.ProfessionalTitle;
             PopulateProfileSkills(profile);
             ProfileSummary = CreateProfileSummary(profile);
@@ -212,6 +214,7 @@ public partial class MainViewModel : ViewModelBase
         SelectedFileName = "Nenhum currículo selecionado";
         CandidateName = string.Empty;
         ProfessionalTitle = string.Empty;
+        _detectedProfessionalTitle = string.Empty;
         DesiredRole = string.Empty;
         ProfileSummary = string.Empty;
         AdditionalSkillCount = 0;
@@ -246,7 +249,10 @@ public partial class MainViewModel : ViewModelBase
             PublicationWindow = GetPublicationWindow()
         };
 
-        if (!string.IsNullOrWhiteSpace(DesiredRole))
+        if (!string.IsNullOrWhiteSpace(DesiredRole) &&
+            !DesiredRole.Trim().Equals(
+                _detectedProfessionalTitle.Trim(),
+                StringComparison.OrdinalIgnoreCase))
         {
             preferences.DesiredRoles.Add(DesiredRole.Trim());
         }

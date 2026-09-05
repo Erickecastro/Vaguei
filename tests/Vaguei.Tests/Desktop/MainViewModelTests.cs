@@ -154,6 +154,8 @@ public sealed class MainViewModelTests
             await viewModel.RefreshJobsCommand.ExecuteAsync(null);
 
             Assert.Equal(1, source.SearchCount);
+            Assert.NotNull(source.LastQuery);
+            Assert.Contains("SQL", source.LastQuery.Keywords);
             Assert.False(viewModel.IsSearchAttentionActive);
             Assert.True(
                 viewModel.RefreshJobsCommand.CanExecute(null));
