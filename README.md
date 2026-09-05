@@ -195,7 +195,7 @@ For a per-user Linux installation without `sudo`:
 
 This publishes a self-contained build, installs the desktop entry and the required freedesktop icon sizes, and refreshes the available desktop caches when supported. See [`packaging/linux/README.md`](packaging/linux/README.md) for details.
 
-Android and iOS remain a later phase. A faithful mobile port will require responsive navigation, platform file pickers, lifecycle handling, secure local storage, accessibility validation, and dedicated device testing; sharing domain code does not by itself guarantee an identical mobile experience.
+An experimental Android prototype is now planned while desktop remains the primary product. Avalonia 12 and .NET 10 allow the domain, application, collectors, and most UI resources to be shared, but Android needs a separate entry project, platform document picker, lifecycle handling, secure storage, and small-screen navigation. See the [mobile prototype plan](docs/MOBILE_PROTOTYPE.md).
 
 # Matching Model
 
@@ -241,7 +241,9 @@ The score is intentionally explainable and deterministic. It is not a hiring pre
 
 * Produce reproducible Linux, Windows, and macOS release artifacts
 * Add installers, application metadata, signing, and update delivery
-* Begin Android and iOS work only after the desktop workflow and shared core are stable
+* Extract reusable presentation components into a shared UI project
+* Build an Android debug prototype before committing to store distribution
+* Begin iOS work only after the Android experiment and desktop workflow are stable
 
 # Privacy and Responsible Access
 

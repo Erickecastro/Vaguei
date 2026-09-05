@@ -52,6 +52,13 @@ secrets.json
 *.mobileprovision
 credentials.json
 service-account*.json
+local.properties
+
+# Mobile build and distribution artifacts
+*.apk
+*.aab
+*.ipa
+artifacts/
 
 *.pdf
 *.docx
