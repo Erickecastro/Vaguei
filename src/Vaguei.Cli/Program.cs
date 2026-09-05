@@ -166,7 +166,8 @@ try
             new GreenhouseJobSource(httpClient),
             new InHireJobSource(httpClient),
             new LeverJobSource(httpClient),
-            new SmartRecruitersJobSource(httpClient)
+            new SmartRecruitersJobSource(httpClient),
+            new WorkableJobSource(httpClient)
         ]);
 
     var searchResult = await orchestrator.SearchAsync(

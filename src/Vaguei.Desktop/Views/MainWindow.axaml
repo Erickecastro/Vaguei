@@ -2,7 +2,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:Vaguei.Desktop.ViewModels" x:Class="Vaguei.Desktop.Views.MainWindow" x:DataType="vm:MainViewModel"
         mc:Ignorable="d" d:DesignWidth="1440" d:DesignHeight="900" Width="1280" Height="820" MinWidth="680" MinHeight="600"
-        CanResize="True" WindowDecorations="None" ExtendClientAreaToDecorationsHint="True" Title="Vaguei" Icon="/Assets/vaguei.ico" Background="{DynamicResource PageBackgroundBrush}" Foreground="{DynamicResource PrimaryTextBrush}">
+        CanResize="True" WindowDecorations="None" ExtendClientAreaToDecorationsHint="True" TransparencyLevelHint="Transparent"
+        Title="Vaguei" Icon="/Assets/vaguei.ico" Background="Transparent" Foreground="{DynamicResource PrimaryTextBrush}">
   <Window.Styles>
     <Style Selector="TextBlock.hero"><Setter Property="FontSize" Value="34"/><Setter Property="FontWeight" Value="Bold"/><Setter Property="LineHeight" Value="39"/></Style>
     <Style Selector="TextBlock.title"><Setter Property="FontSize" Value="22"/><Setter Property="FontWeight" Value="Bold"/></Style>
@@ -16,7 +17,7 @@
     <Style Selector="Button.remove"><Setter Property="Width" Value="30"/><Setter Property="Height" Value="30"/><Setter Property="Padding" Value="7"/><Setter Property="CornerRadius" Value="15"/><Setter Property="Background" Value="Transparent"/></Style>
     <Style Selector="Button.open"><Setter Property="Width" Value="96"/><Setter Property="Height" Value="40"/><Setter Property="Padding" Value="0"/><Setter Property="HorizontalContentAlignment" Value="Center"/><Setter Property="VerticalContentAlignment" Value="Center"/><Setter Property="CornerRadius" Value="10"/><Setter Property="Background" Value="{DynamicResource SoftSurfaceBrush}"/><Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}"/><Setter Property="BorderThickness" Value="1"/></Style>
     <Style Selector="Button.open:pointerover"><Setter Property="Background" Value="{DynamicResource AccentSoftBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/></Style>
-    <Style Selector="Button.window"><Setter Property="Width" Value="36"/><Setter Property="Height" Value="30"/><Setter Property="Padding" Value="0"/><Setter Property="CornerRadius" Value="0"/><Setter Property="Background" Value="Transparent"/><Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/><Setter Property="BorderThickness" Value="0"/></Style>
+    <Style Selector="Button.window"><Setter Property="Width" Value="32"/><Setter Property="Height" Value="28"/><Setter Property="Padding" Value="0"/><Setter Property="CornerRadius" Value="0"/><Setter Property="Background" Value="Transparent"/><Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/><Setter Property="BorderThickness" Value="0"/></Style>
     <Style Selector="Button.window:pointerover"><Setter Property="Background" Value="{DynamicResource SoftSurfaceBrush}"/></Style>
     <Style Selector="Button.window.close:pointerover"><Setter Property="Background" Value="#C42B1C"/><Setter Property="Foreground" Value="White"/></Style>
     <Style Selector="Button.search.attention"><Setter Property="BorderBrush" Value="{DynamicResource PrimaryTextBrush}"/><Setter Property="BorderThickness" Value="3"/><Style.Animations><Animation Duration="0:0:0.72" IterationCount="INFINITE" PlaybackDirection="Alternate"><KeyFrame Cue="0%"><Setter Property="Opacity" Value="1"/></KeyFrame><KeyFrame Cue="100%"><Setter Property="Opacity" Value="0.52"/></KeyFrame></Animation></Style.Animations></Style>
@@ -26,15 +27,17 @@
     <Style Selector="ComboBoxItem"><Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/></Style>
   </Window.Styles>
 
+  <Border x:Name="WindowSurface" CornerRadius="12" ClipToBounds="True" Background="{DynamicResource PageBackgroundBrush}">
   <Grid>
-    <Grid RowDefinitions="30,*">
-      <Border x:Name="CustomTitleBar" WindowDecorationProperties.ElementRole="TitleBar" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource OutlineBrush}" BorderThickness="0,0,0,1">
+    <Grid RowDefinitions="28,*">
+      <Border x:Name="CustomTitleBar" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource OutlineBrush}" BorderThickness="0,0,0,1">
         <Grid ColumnDefinitions="Auto,*,Auto">
           <Grid Margin="10,0,0,0" Width="20" Height="20" VerticalAlignment="Center"><Image x:Name="TitleDarkThemeLogo" Source="/Assets/logo-dark.png" Stretch="Uniform"/><Image x:Name="TitleLightThemeLogo" Source="/Assets/logo-light.png" Stretch="Uniform"/></Grid>
+          <Border Grid.Column="1" Background="Transparent" PointerPressed="OnTitleBarPointerPressed"/>
           <StackPanel Grid.Column="2" Orientation="Horizontal">
-            <Button Classes="window" Click="OnMinimizeClick" ToolTip.Tip="Minimizar"><Grid Width="18" Height="18"><Ellipse Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.35"/><Path Width="8" Height="1" Stretch="Fill" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.4" Data="M0,0 L8,0"/></Grid></Button>
-            <Button Classes="window" Click="OnMaximizeClick" ToolTip.Tip="Maximizar ou restaurar"><Grid Width="18" Height="18"><Ellipse Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.35"/><Path Width="8" Height="8" Stretch="Uniform" Fill="Transparent" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.25" Data="M1,1 L7,1 L7,7 L1,7 Z"/></Grid></Button>
-            <Button Classes="window close" Click="OnCloseClick" ToolTip.Tip="Fechar"><Grid Width="18" Height="18"><Ellipse Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.35"/><Path Width="7" Height="7" Stretch="Uniform" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.4" Data="M1,1 L6,6 M6,1 L1,6"/></Grid></Button>
+            <Button Classes="window" Click="OnMinimizeClick" ToolTip.Tip="Minimizar"><Grid Width="16" Height="16"><Ellipse Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.25"/><Path Width="7" Height="1" Margin="1,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.3" Data="M0,0 L7,0"/></Grid></Button>
+            <Button Classes="window" Click="OnMaximizeClick" ToolTip.Tip="Maximizar ou restaurar"><Grid Width="16" Height="16"><Ellipse Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.25"/><Path Width="6" Height="6" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" Fill="Transparent" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.15" Data="M0.5,0.5 L5.5,0.5 L5.5,5.5 L0.5,5.5 Z"/></Grid></Button>
+            <Button Classes="window close" Click="OnCloseClick" ToolTip.Tip="Fechar"><Grid Width="16" Height="16"><Ellipse Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.25"/><Path Width="6" Height="6" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.3" Data="M0.5,0.5 L5.5,5.5 M5.5,0.5 L0.5,5.5"/></Grid></Button>
           </StackPanel>
         </Grid>
       </Border>
@@ -114,14 +117,15 @@
     </Grid>
     <Border x:Name="ThemeTransitionOverlay" IsVisible="False" IsHitTestVisible="False" Opacity="0" Background="{DynamicResource PageBackgroundBrush}"/>
     <Grid>
-      <Border Width="6" HorizontalAlignment="Left" Background="Transparent" Tag="West" PointerPressed="OnResizeGripPointerPressed"/>
-      <Border Width="6" HorizontalAlignment="Right" Background="Transparent" Tag="East" PointerPressed="OnResizeGripPointerPressed"/>
-      <Border Height="6" VerticalAlignment="Top" Background="Transparent" Tag="North" PointerPressed="OnResizeGripPointerPressed"/>
-      <Border Height="6" VerticalAlignment="Bottom" Background="Transparent" Tag="South" PointerPressed="OnResizeGripPointerPressed"/>
-      <Border Width="10" Height="10" HorizontalAlignment="Left" VerticalAlignment="Top" Background="Transparent" Tag="NorthWest" PointerPressed="OnResizeGripPointerPressed"/>
-      <Border Width="10" Height="10" HorizontalAlignment="Right" VerticalAlignment="Top" Background="Transparent" Tag="NorthEast" PointerPressed="OnResizeGripPointerPressed"/>
-      <Border Width="10" Height="10" HorizontalAlignment="Left" VerticalAlignment="Bottom" Background="Transparent" Tag="SouthWest" PointerPressed="OnResizeGripPointerPressed"/>
-      <Border Width="10" Height="10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="Transparent" Tag="SouthEast" PointerPressed="OnResizeGripPointerPressed"/>
+      <Border Width="8" HorizontalAlignment="Left" Background="#01000000" Cursor="SizeWestEast" Tag="West" PointerPressed="OnResizeGripPointerPressed"/>
+      <Border Width="8" HorizontalAlignment="Right" Background="#01000000" Cursor="SizeWestEast" Tag="East" PointerPressed="OnResizeGripPointerPressed"/>
+      <Border Height="8" VerticalAlignment="Top" Background="#01000000" Cursor="SizeNorthSouth" Tag="North" PointerPressed="OnResizeGripPointerPressed"/>
+      <Border Height="8" VerticalAlignment="Bottom" Background="#01000000" Cursor="SizeNorthSouth" Tag="South" PointerPressed="OnResizeGripPointerPressed"/>
+      <Border Width="14" Height="14" HorizontalAlignment="Left" VerticalAlignment="Top" Background="#01000000" Cursor="TopLeftCorner" Tag="NorthWest" PointerPressed="OnResizeGripPointerPressed"/>
+      <Border Width="14" Height="14" HorizontalAlignment="Right" VerticalAlignment="Top" Background="#01000000" Cursor="TopRightCorner" Tag="NorthEast" PointerPressed="OnResizeGripPointerPressed"/>
+      <Border Width="14" Height="14" HorizontalAlignment="Left" VerticalAlignment="Bottom" Background="#01000000" Cursor="BottomLeftCorner" Tag="SouthWest" PointerPressed="OnResizeGripPointerPressed"/>
+      <Border Width="14" Height="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="#01000000" Cursor="BottomRightCorner" Tag="SouthEast" PointerPressed="OnResizeGripPointerPressed"/>
     </Grid>
   </Grid>
+  </Border>
 </Window>

@@ -43,7 +43,8 @@ public partial class App : Avalonia.Application
                 new GreenhouseJobSource(_httpClient),
                 new InHireJobSource(_httpClient),
                 new LeverJobSource(_httpClient),
-                new SmartRecruitersJobSource(_httpClient)
+                new SmartRecruitersJobSource(_httpClient),
+                new WorkableJobSource(_httpClient)
             };
 
             desktop.MainWindow = new MainWindow

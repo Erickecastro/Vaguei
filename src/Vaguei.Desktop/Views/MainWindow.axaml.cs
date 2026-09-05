@@ -37,6 +37,7 @@ public partial class MainWindow : Window
         ];
 
         SizeChanged += OnWindowSizeChanged;
+        PropertyChanged += OnWindowPropertyChanged;
         Opened += OnWindowOpened;
     }
 
@@ -121,6 +122,18 @@ public partial class MainWindow : Window
         UpdateAdaptiveLayout(eventArgs.NewSize.Width);
     }
 
+    private void OnWindowPropertyChanged(
+        object? sender,
+        AvaloniaPropertyChangedEventArgs eventArgs)
+    {
+        if (eventArgs.Property == WindowStateProperty)
+        {
+            WindowSurface.CornerRadius = WindowState == WindowState.Maximized
+                ? new CornerRadius(0)
+                : new CornerRadius(12);
+        }
+    }
+
     private void UpdateAdaptiveLayout(
         double width)
     {
@@ -174,16 +187,37 @@ public partial class MainWindow : Window
     private void OnCloseClick(object? sender, RoutedEventArgs eventArgs) =>
         Close();
 
+    private void OnTitleBarPointerPressed(
+        object? sender,
+        PointerPressedEventArgs eventArgs)
+    {
+        if (!eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
+            return;
+        }
+
+        if (eventArgs.ClickCount == 2)
+        {
+            ToggleMaximizedState();
+            return;
+        }
+
+        BeginMoveDrag(eventArgs);
+    }
+
     private void OnResizeGripPointerPressed(
         object? sender,
         PointerPressedEventArgs eventArgs)
     {
-        if (sender is Control { Tag: string edgeName } &&
-            Enum.TryParse<WindowEdge>(edgeName, out var edge) &&
-            eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        if (WindowState != WindowState.Normal ||
+            sender is not Control { Tag: string edgeName } ||
+            !Enum.TryParse<WindowEdge>(edgeName, out var edge) ||
+            !eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
         {
-            BeginResizeDrag(edge, eventArgs);
+            return;
         }
+
+        BeginResizeDrag(edge, eventArgs);
     }
 
     private void ToggleMaximizedState()
