@@ -35,7 +35,8 @@ Software development is the initial validation domain because it reflects the fi
 * Locally persisted favorite jobs with a saved-results filter
 * Loading and search-attention states that keep work off the UI thread
 * Non-destructive refresh that keeps previous results visible until an updated search completes
-* Minimal startup introduction with theme-aware fade transitions
+* Theme-aware four-second startup introduction with a fixed logo and smooth fade sequence
+* Keyboard search submission with Enter
 * Source failure warnings without interrupting successful providers
 * Dismissible connection warning with automatic timeout when every source is unreachable
 * Original job link for every result

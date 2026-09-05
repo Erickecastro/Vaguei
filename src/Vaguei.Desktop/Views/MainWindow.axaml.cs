@@ -36,14 +36,9 @@ public partial class MainWindow : Window
             }
         ];
 
-        AppContent.Transitions = [CreateOpacityTransition(420)];
-        StartupSplash.Transitions = [CreateOpacityTransition(420)];
-        StartupIdentity.Transitions = [CreateOpacityTransition(360)];
-        StartupLogoContainer.Transitions =
-        [
-            new DoubleTransition { Property = WidthProperty, Duration = TimeSpan.FromMilliseconds(520) },
-            new DoubleTransition { Property = HeightProperty, Duration = TimeSpan.FromMilliseconds(520) }
-        ];
+        AppContent.Transitions = [CreateOpacityTransition(850)];
+        StartupSplash.Transitions = [CreateOpacityTransition(850)];
+        StartupIdentity.Transitions = [CreateOpacityTransition(750)];
 
         SizeChanged += OnWindowSizeChanged;
         PropertyChanged += OnWindowPropertyChanged;
@@ -127,15 +122,31 @@ public partial class MainWindow : Window
 
     private async Task PlayStartupIntroAsync()
     {
-        await Task.Delay(160);
+        await Dispatcher.UIThread.InvokeAsync(
+            () => { },
+            DispatcherPriority.Render);
+        await Task.Delay(300);
         StartupIdentity.Opacity = 1;
-        StartupLogoContainer.Width = 76;
-        StartupLogoContainer.Height = 76;
-        await Task.Delay(900);
+        await Task.Delay(2800);
         StartupSplash.Opacity = 0;
         AppContent.Opacity = 1;
-        await Task.Delay(440);
+        await Task.Delay(900);
         StartupSplash.IsVisible = false;
+    }
+
+    private void OnSearchFieldKeyDown(
+        object? sender,
+        KeyEventArgs eventArgs)
+    {
+        if (eventArgs.Key != Key.Enter ||
+            DataContext is not MainViewModel viewModel ||
+            !viewModel.RefreshJobsCommand.CanExecute(null))
+        {
+            return;
+        }
+
+        eventArgs.Handled = true;
+        viewModel.RefreshJobsCommand.Execute(null);
     }
 
     private static DoubleTransition CreateOpacityTransition(int milliseconds) =>

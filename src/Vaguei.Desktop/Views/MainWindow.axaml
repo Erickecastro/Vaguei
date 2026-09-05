@@ -117,7 +117,7 @@
       <Grid Grid.Row="1" Margin="34,8,30,28" RowDefinitions="116,*">
         <Grid x:Name="SearchControlsGrid" Grid.Row="0" RowDefinitions="48,8,48">
           <Grid ColumnDefinitions="*,10,Auto,10,Auto,10,132">
-            <Grid x:Name="JobSearchField" Height="48"><TextBox Classes="searchbox" Height="48" VerticalContentAlignment="Center" Text="{Binding DesiredRole, Mode=TwoWay}" PlaceholderText="Buscar vagas (cargo, tecnologia, empresa...)"/><Path Width="17" Height="17" Margin="13,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="Uniform" Fill="Transparent" IsHitTestVisible="False" Stroke="{DynamicResource PrimaryTextBrush}" StrokeThickness="2" Data="M8,2 A6,6 0 1 0 8,14 A6,6 0 1 0 8,2 M13,13 L18,18"/></Grid>
+            <Grid x:Name="JobSearchField" Height="48"><TextBox Classes="searchbox" Height="48" VerticalContentAlignment="Center" Text="{Binding DesiredRole, Mode=TwoWay}" PlaceholderText="Buscar vagas (cargo, tecnologia, empresa...)" KeyDown="OnSearchFieldKeyDown"/><Path Width="17" Height="17" Margin="13,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="Uniform" Fill="Transparent" IsHitTestVisible="False" Stroke="{DynamicResource PrimaryTextBrush}" StrokeThickness="2" Data="M8,2 A6,6 0 1 0 8,14 A6,6 0 1 0 8,2 M13,13 L18,18"/></Grid>
             <ComboBox x:Name="PublicationSelector" Grid.Column="2" Classes="selector" Width="190" Height="48" ItemsSource="{Binding PublicationWindows}" SelectedIndex="{Binding PublicationWindowIndex}" ToolTip.Tip="Período de publicação das vagas"/>
             <ComboBox x:Name="WorkModelSelector" Grid.Column="4" Classes="selector" Width="160" Height="48" ItemsSource="{Binding WorkModelOptions}" SelectedIndex="{Binding WorkModelIndex}" ToolTip.Tip="Modelo de trabalho"/>
             <Button Grid.Column="6" Classes="primary search" Classes.attention="{Binding IsSearchAttentionActive}" Command="{Binding RefreshJobsCommand}" Content="Pesquisar"/>
@@ -126,7 +126,7 @@
             <TextBox x:Name="LocationFilterField" Classes="filterbox" Width="220" Height="48" VerticalContentAlignment="Center" Text="{Binding LocationFilter, Mode=TwoWay}" PlaceholderText="Cidade ou estado"/>
             <ComboBox x:Name="EmploymentTypeSelector" Grid.Column="2" Classes="selector" Width="180" Height="48" ItemsSource="{Binding EmploymentTypeOptions}" SelectedIndex="{Binding EmploymentTypeIndex}" ToolTip.Tip="Tipo de contrato"/>
             <ComboBox x:Name="SenioritySelector" Grid.Column="4" Classes="selector" Width="190" Height="48" ItemsSource="{Binding SeniorityOptions}" SelectedIndex="{Binding SeniorityIndex}" ToolTip.Tip="Senioridade"/>
-            <Button x:Name="ClearFiltersButton" Grid.Column="6" Width="100" Height="48" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" CornerRadius="10" Background="{DynamicResource SoftSurfaceBrush}" Foreground="{DynamicResource PrimaryTextBrush}" BorderBrush="{DynamicResource OutlineBrush}" BorderThickness="1" Command="{Binding ClearAdvancedFiltersCommand}" Content="Limpar" ToolTip.Tip="Restaurar período e filtros"/>
+            <Button x:Name="ClearFiltersButton" Grid.Column="6" Width="100" Height="48" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" CornerRadius="10" Background="{DynamicResource SoftSurfaceBrush}" Foreground="{DynamicResource PrimaryTextBrush}" BorderBrush="{DynamicResource OutlineBrush}" BorderThickness="1" IsEnabled="{Binding HasActiveFilters}" Command="{Binding ClearAdvancedFiltersCommand}" Content="Limpar" ToolTip.Tip="Restaurar período e filtros"/>
           </Grid>
         </Grid>
         <Grid Grid.Row="1" Margin="0,14,0,0" RowDefinitions="Auto,*">
@@ -159,12 +159,15 @@
     </Grid>
     <Border x:Name="ThemeTransitionOverlay" IsVisible="False" IsHitTestVisible="False" Opacity="0" Background="{DynamicResource PageBackgroundBrush}"/>
     <Border x:Name="StartupSplash" ZIndex="50" Background="{DynamicResource PageBackgroundBrush}">
-      <StackPanel x:Name="StartupIdentity" Opacity="0" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
-        <Grid x:Name="StartupLogoContainer" Width="52" Height="52" HorizontalAlignment="Center">
-          <Image x:Name="StartupDarkThemeLogo" Source="/Assets/logo-dark-56.png" Stretch="Uniform" RenderOptions.BitmapInterpolationMode="HighQuality"/>
-          <Image x:Name="StartupLightThemeLogo" Source="/Assets/logo-light-56.png" Stretch="Uniform" RenderOptions.BitmapInterpolationMode="HighQuality"/>
+      <StackPanel x:Name="StartupIdentity" Width="500" Opacity="0" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
+        <Grid Width="84" Height="84" HorizontalAlignment="Center">
+          <Grid x:Name="StartupLogo" Width="76" Height="76" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Image x:Name="StartupDarkThemeLogo" Source="/Assets/logo-dark-56.png" Stretch="Uniform" RenderOptions.BitmapInterpolationMode="HighQuality"/>
+            <Image x:Name="StartupLightThemeLogo" Source="/Assets/logo-light-56.png" Stretch="Uniform" RenderOptions.BitmapInterpolationMode="HighQuality"/>
+          </Grid>
         </Grid>
-        <TextBlock FontSize="21" FontWeight="SemiBold" HorizontalAlignment="Center"
+        <TextBlock Width="500" FontSize="21" FontWeight="SemiBold" HorizontalAlignment="Center"
+                   TextAlignment="Center" TextWrapping="NoWrap"
                    Text="Seu currículo. Novas oportunidades."/>
       </StackPanel>
     </Border>

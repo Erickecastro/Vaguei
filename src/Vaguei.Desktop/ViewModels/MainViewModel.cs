@@ -21,6 +21,7 @@ public partial class MainViewModel : ViewModelBase
     private readonly HashSet<string> _favoriteKeys;
     private readonly List<JobResultItemViewModel> _allJobs = [];
     private bool _searchSettingsLoaded;
+    private CancellationTokenSource? _settingsSaveCancellation;
     private CandidateProfile? _currentProfile;
     private string _detectedProfessionalTitle = string.Empty;
     private CancellationTokenSource? _connectionNoticeCancellation;
@@ -179,6 +180,14 @@ public partial class MainViewModel : ViewModelBase
     public bool ShowEmptyState => !IsBusy && !HasResults;
 
     public bool HasAdditionalSkills => AdditionalSkillCount > 0;
+
+    public bool HasActiveFilters =>
+        PublicationWindowIndex != 3 ||
+        WorkModelIndex != 0 ||
+        EmploymentTypeIndex != 0 ||
+        SeniorityIndex != 0 ||
+        !string.IsNullOrWhiteSpace(LocationFilter) ||
+        ShowOnlyFavorites;
 
     public string FavoritesFilterLabel => ShowOnlyFavorites
         ? "Mostrar todas"
@@ -358,11 +367,12 @@ public partial class MainViewModel : ViewModelBase
         PersistSearchSettings();
     }
 
-    partial void OnPublicationWindowIndexChanged(int value) => PersistSearchSettings();
-    partial void OnWorkModelIndexChanged(int value) => PersistSearchSettings();
-    partial void OnEmploymentTypeIndexChanged(int value) => PersistSearchSettings();
-    partial void OnSeniorityIndexChanged(int value) => PersistSearchSettings();
-    partial void OnLocationFilterChanged(string value) => PersistSearchSettings();
+    partial void OnPublicationWindowIndexChanged(int value) => OnFilterChanged();
+    partial void OnWorkModelIndexChanged(int value) => OnFilterChanged();
+    partial void OnEmploymentTypeIndexChanged(int value) => OnFilterChanged();
+    partial void OnSeniorityIndexChanged(int value) => OnFilterChanged();
+    partial void OnLocationFilterChanged(string value) => OnFilterChanged();
+    partial void OnShowOnlyFavoritesChanged(bool value) => OnPropertyChanged(nameof(HasActiveFilters));
 
     [RelayCommand]
     private void ToggleFavoritesFilter()
@@ -533,18 +543,40 @@ public partial class MainViewModel : ViewModelBase
             return;
         }
 
+        var settings = new JobSearchSettings
+        {
+            SearchScopeIndex = SearchScopeIndex,
+            PublicationWindowIndex = PublicationWindowIndex,
+            WorkModelIndex = WorkModelIndex,
+            EmploymentTypeIndex = EmploymentTypeIndex,
+            SeniorityIndex = SeniorityIndex,
+            LocationFilter = LocationFilter
+        };
+
+        _settingsSaveCancellation?.Cancel();
+        _settingsSaveCancellation?.Dispose();
+        _settingsSaveCancellation = new CancellationTokenSource();
+        _ = PersistSearchSettingsAsync(settings, _settingsSaveCancellation.Token);
+    }
+
+    private void OnFilterChanged()
+    {
+        OnPropertyChanged(nameof(HasActiveFilters));
+        PersistSearchSettings();
+    }
+
+    private async Task PersistSearchSettingsAsync(
+        JobSearchSettings settings,
+        CancellationToken cancellationToken)
+    {
         try
         {
-            _searchSettingsStore.Save(new JobSearchSettings
-            {
-                SearchScopeIndex = SearchScopeIndex,
-                PublicationWindowIndex = PublicationWindowIndex,
-                WorkModelIndex = WorkModelIndex,
-                EmploymentTypeIndex = EmploymentTypeIndex,
-                SeniorityIndex = SeniorityIndex,
-                LocationFilter = LocationFilter
-            });
+            await Task.Delay(250, cancellationToken);
+            await Task.Run(
+                () => _searchSettingsStore!.Save(settings),
+                cancellationToken);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
         catch (IOException) { SourceWarnings = "Não foi possível salvar as preferências localmente."; }
         catch (UnauthorizedAccessException) { SourceWarnings = "Não foi possível salvar as preferências localmente."; }
     }
