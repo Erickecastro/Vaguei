@@ -18,7 +18,7 @@ public partial class MainViewModel : ViewModelBase
     private string _detectedProfessionalTitle = string.Empty;
 
     [ObservableProperty]
-    private string _selectedFileName = "Nenhum currículo selecionado";
+    private string _selectedFileName = "Nenhum currículo";
 
     [ObservableProperty]
     private string _statusMessage =
@@ -37,6 +37,7 @@ public partial class MainViewModel : ViewModelBase
     private string _desiredRole = string.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasAdditionalSkills))]
     private int _additionalSkillCount;
 
     [ObservableProperty]
@@ -96,6 +97,8 @@ public partial class MainViewModel : ViewModelBase
     ];
 
     public bool ShowEmptyState => !IsBusy && !HasResults;
+
+    public bool HasAdditionalSkills => AdditionalSkillCount > 0;
 
     public async Task ProcessResumeAsync(
         string filePath,
@@ -211,7 +214,7 @@ public partial class MainViewModel : ViewModelBase
         }
 
         _currentProfile = null;
-        SelectedFileName = "Nenhum currículo selecionado";
+        SelectedFileName = "Nenhum currículo";
         CandidateName = string.Empty;
         ProfessionalTitle = string.Empty;
         _detectedProfessionalTitle = string.Empty;
@@ -268,7 +271,7 @@ public partial class MainViewModel : ViewModelBase
 
         Jobs.Clear();
 
-        foreach (var match in result.Matches.Take(50))
+        foreach (var match in result.Matches)
         {
             Jobs.Add(
                 new JobResultItemViewModel(match));
@@ -308,7 +311,7 @@ public partial class MainViewModel : ViewModelBase
             .ThenBy(skill => skill.Name)
             .ToArray();
 
-        foreach (var skill in skills.Take(8))
+        foreach (var skill in skills.Take(6))
         {
             ProfileSkills.Add(skill.Name);
         }

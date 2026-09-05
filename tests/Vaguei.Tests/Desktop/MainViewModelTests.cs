@@ -190,6 +190,27 @@ public sealed class MainViewModelTests
     }
 
     [Fact]
+    public async Task RefreshJobsCommand_DoesNotLimitResultsToFifty()
+    {
+        var filePath = CreateTemporaryResume();
+
+        try
+        {
+            var source = new StubJobSource { ResultCount = 75 };
+            var viewModel = CreateViewModel(source);
+            await viewModel.ProcessResumeAsync(filePath);
+
+            await viewModel.RefreshJobsCommand.ExecuteAsync(null);
+
+            Assert.Equal(75, viewModel.Jobs.Count);
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
+    }
+
+    [Fact]
     public async Task RefreshJobsCommand_IsDisabledWhileSearchIsRunning()
     {
         var filePath = CreateTemporaryResume();
@@ -242,7 +263,7 @@ public sealed class MainViewModelTests
             Assert.Empty(viewModel.Jobs);
             Assert.Empty(viewModel.ProfileSkills);
             Assert.Empty(viewModel.DesiredRole);
-            Assert.Equal("Nenhum currículo selecionado", viewModel.SelectedFileName);
+            Assert.Equal("Nenhum currículo", viewModel.SelectedFileName);
             Assert.False(viewModel.RefreshJobsCommand.CanExecute(null));
         }
         finally
@@ -315,6 +336,8 @@ public sealed class MainViewModelTests
         public DateTimeOffset PublishedAt { get; init; } =
             DateTimeOffset.UtcNow.AddMinutes(-1);
 
+        public int ResultCount { get; init; } = 1;
+
         public async Task<IEnumerable<JobPosting>> SearchAsync(
             JobSearchQuery query,
             CancellationToken cancellationToken = default)
@@ -328,11 +351,11 @@ public sealed class MainViewModelTests
                     cancellationToken);
             }
 
-            IEnumerable<JobPosting> jobs =
-            [
+            var jobs = Enumerable.Range(1, ResultCount)
+                .Select(index =>
                 new JobPosting
                 {
-                    Title = "Analista de Dados",
+                    Title = $"Analista de Dados {index}",
                     Company = "Empresa Teste",
                     Description = "Consultas SQL.",
                     Source = Name,
@@ -341,8 +364,7 @@ public sealed class MainViewModelTests
                     {
                         RawLocation = "Brasil"
                     }
-                }
-            ];
+                });
 
             return jobs;
         }

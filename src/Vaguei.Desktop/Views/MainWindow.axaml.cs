@@ -104,8 +104,10 @@ public partial class MainWindow : Window
         SidebarSplitView.DisplayMode = isCompact
             ? SplitViewDisplayMode.Overlay
             : SplitViewDisplayMode.Inline;
-        SidebarSplitView.OpenPaneLength = isCompact ? 350 : 420;
+        SidebarSplitView.OpenPaneLength = 250;
         CompactSidebarButton.IsVisible = isCompact;
+        JobSearchField.Width = isCompact ? 260 : 420;
+        PublicationSelector.Width = isCompact ? 160 : 190;
 
         if (_isCompactLayout != isCompact)
         {

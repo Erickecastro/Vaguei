@@ -1,422 +1,98 @@
-<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="using:Vaguei.Desktop.ViewModels"
-        x:Class="Vaguei.Desktop.Views.MainWindow"
-        x:DataType="vm:MainViewModel"
-        mc:Ignorable="d"
-        d:DesignWidth="1536"
-        d:DesignHeight="1024"
-        Width="1280"
-        Height="820"
-        MinWidth="680"
-        MinHeight="600"
-        CanResize="True"
-        Background="{DynamicResource PageBackgroundBrush}"
-        Foreground="{DynamicResource PrimaryTextBrush}"
-        Title="Vaguei">
-
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:Vaguei.Desktop.ViewModels" x:Class="Vaguei.Desktop.Views.MainWindow" x:DataType="vm:MainViewModel"
+        mc:Ignorable="d" d:DesignWidth="1440" d:DesignHeight="900" Width="1280" Height="820" MinWidth="680" MinHeight="600"
+        CanResize="True" Title="Vaguei" Background="{DynamicResource PageBackgroundBrush}" Foreground="{DynamicResource PrimaryTextBrush}">
   <Window.Styles>
-    <Style Selector="TextBlock.title">
-      <Setter Property="FontSize" Value="24" />
-      <Setter Property="FontWeight" Value="Bold" />
-      <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
-    </Style>
-    <Style Selector="TextBlock.subtitle">
-      <Setter Property="FontSize" Value="15" />
-      <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
-    </Style>
-    <Style Selector="Border.card">
-      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CornerRadius" Value="16" />
-    </Style>
-    <Style Selector="Border.pill">
-      <Setter Property="Background" Value="{DynamicResource SoftSurfaceBrush}" />
-      <Setter Property="CornerRadius" Value="14" />
-      <Setter Property="Padding" Value="12,6" />
-    </Style>
-    <Style Selector="Button.primary">
-      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
-      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
-      <Setter Property="HorizontalContentAlignment" Value="Center" />
-      <Setter Property="FontWeight" Value="SemiBold" />
-      <Setter Property="CornerRadius" Value="10" />
-      <Setter Property="Padding" Value="16,12" />
-    </Style>
-    <Style Selector="Button.primary:pointerover">
-      <Setter Property="Background" Value="{DynamicResource AccentHoverBrush}" />
-    </Style>
-    <Style Selector="Button.primary:disabled">
-      <Setter Property="Opacity" Value="0.48" />
-    </Style>
-    <Style Selector="Button.icon">
-      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
-      <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CornerRadius" Value="12" />
-      <Setter Property="Width" Value="54" />
-      <Setter Property="Height" Value="54" />
-    </Style>
-    <Style Selector="Button.job-link">
-      <Setter Property="Width" Value="96" />
-      <Setter Property="Height" Value="44" />
-      <Setter Property="Padding" Value="0" />
-      <Setter Property="CornerRadius" Value="12" />
-      <Setter Property="Background" Value="{DynamicResource SoftSurfaceBrush}" />
-      <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-    </Style>
-    <Style Selector="Button.job-link:pointerover">
-      <Setter Property="Background" Value="{DynamicResource AccentSoftBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
-    </Style>
-    <Style Selector="Button.resume-remove">
-      <Setter Property="Width" Value="32" />
-      <Setter Property="Height" Value="32" />
-      <Setter Property="Padding" Value="8" />
-      <Setter Property="CornerRadius" Value="16" />
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
-    </Style>
-    <Style Selector="Button.search-action.attention">
-      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
-      <Setter Property="BorderThickness" Value="3" />
-      <Style.Animations>
-        <Animation Duration="0:0:0.72"
-                   IterationCount="INFINITE"
-                   PlaybackDirection="Alternate">
-          <KeyFrame Cue="0%">
-            <Setter Property="Opacity" Value="1" />
-          </KeyFrame>
-          <KeyFrame Cue="100%">
-            <Setter Property="Opacity" Value="0.52" />
-            <Setter Property="Background" Value="{DynamicResource AccentHoverBrush}" />
-          </KeyFrame>
-        </Animation>
-      </Style.Animations>
-    </Style>
-    <Style Selector="ComboBox.scope-selector">
-      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
-      <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CornerRadius" Value="12" />
-    </Style>
-    <Style Selector="TextBox.profile-input">
-      <Setter Property="MinHeight" Value="42" />
-      <Setter Property="Padding" Value="12,8" />
-      <Setter Property="CornerRadius" Value="9" />
-      <Setter Property="Background" Value="{DynamicResource SoftSurfaceBrush}" />
-      <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}" />
-    </Style>
-    <Style Selector="TextBox.profile-input:focus">
-      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
-      <Setter Property="BorderThickness" Value="2" />
-    </Style>
-    <Style Selector="ComboBoxItem">
-      <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
-    </Style>
+    <Style Selector="TextBlock.hero"><Setter Property="FontSize" Value="34"/><Setter Property="FontWeight" Value="Bold"/><Setter Property="LineHeight" Value="39"/></Style>
+    <Style Selector="TextBlock.title"><Setter Property="FontSize" Value="22"/><Setter Property="FontWeight" Value="Bold"/></Style>
+    <Style Selector="TextBlock.subtitle"><Setter Property="FontSize" Value="14"/><Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/></Style>
+    <Style Selector="Border.card"><Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}"/><Setter Property="BorderThickness" Value="1"/><Setter Property="CornerRadius" Value="14"/></Style>
+    <Style Selector="Border.pill"><Setter Property="Background" Value="{DynamicResource SoftSurfaceBrush}"/><Setter Property="CornerRadius" Value="12"/><Setter Property="Padding" Value="10,5"/></Style>
+    <Style Selector="Button.primary"><Setter Property="Background" Value="{DynamicResource AccentBrush}"/><Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/><Setter Property="HorizontalContentAlignment" Value="Center"/><Setter Property="VerticalContentAlignment" Value="Center"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="CornerRadius" Value="10"/><Setter Property="Padding" Value="18,11"/></Style>
+    <Style Selector="Button.primary:pointerover"><Setter Property="Background" Value="{DynamicResource AccentHoverBrush}"/></Style>
+    <Style Selector="Button.primary:disabled"><Setter Property="Opacity" Value="0.46"/></Style>
+    <Style Selector="Button.icon"><Setter Property="Width" Value="52"/><Setter Property="Height" Value="52"/><Setter Property="CornerRadius" Value="11"/><Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/><Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}"/><Setter Property="BorderThickness" Value="1"/></Style>
+    <Style Selector="Button.remove"><Setter Property="Width" Value="30"/><Setter Property="Height" Value="30"/><Setter Property="Padding" Value="7"/><Setter Property="CornerRadius" Value="15"/><Setter Property="Background" Value="Transparent"/></Style>
+    <Style Selector="Button.open"><Setter Property="Width" Value="92"/><Setter Property="Height" Value="40"/><Setter Property="Padding" Value="0"/><Setter Property="CornerRadius" Value="10"/><Setter Property="Background" Value="{DynamicResource SoftSurfaceBrush}"/><Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}"/><Setter Property="BorderThickness" Value="1"/></Style>
+    <Style Selector="Button.open:pointerover"><Setter Property="Background" Value="{DynamicResource AccentSoftBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/></Style>
+    <Style Selector="Button.search.attention"><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/><Setter Property="BorderThickness" Value="3"/><Style.Animations><Animation Duration="0:0:0.72" IterationCount="INFINITE" PlaybackDirection="Alternate"><KeyFrame Cue="0%"><Setter Property="Opacity" Value="1"/></KeyFrame><KeyFrame Cue="100%"><Setter Property="Opacity" Value="0.52"/><Setter Property="Background" Value="{DynamicResource AccentHoverBrush}"/></KeyFrame></Animation></Style.Animations></Style>
+    <Style Selector="ComboBox.selector"><Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/><Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}"/><Setter Property="BorderThickness" Value="1"/><Setter Property="CornerRadius" Value="10"/></Style>
+    <Style Selector="TextBox.searchbox"><Setter Property="MinHeight" Value="48"/><Setter Property="Padding" Value="38,8,12,8"/><Setter Property="CornerRadius" Value="10"/><Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/><Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}"/></Style>
+    <Style Selector="TextBox.searchbox:focus"><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/><Setter Property="BorderThickness" Value="2"/></Style>
+    <Style Selector="ComboBoxItem"><Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/></Style>
   </Window.Styles>
 
-  <Grid RowDefinitions="88,*">
-    <Border Background="{DynamicResource SurfaceBrush}"
-            BorderBrush="{DynamicResource OutlineBrush}"
-            BorderThickness="0,0,0,1"
-            Padding="34,0">
-      <Grid ColumnDefinitions="72,*,Auto,14,Auto"
-            VerticalAlignment="Center">
-        <Grid Width="68" Height="68">
-          <Image x:Name="DarkThemeLogo" Width="68" Height="68"
-                 Source="/Assets/logo-dark.png" Stretch="Uniform" />
-          <Image x:Name="LightThemeLogo" Width="68" Height="68"
-                 Source="/Assets/logo-light.png" Stretch="Uniform" />
-        </Grid>
-        <Grid Grid.Column="2" Width="240" Height="54">
-          <ComboBox x:Name="ScopeSelector" Classes="scope-selector"
-                    Width="240" Height="54" Padding="42,0,12,0"
-                    FontSize="16" FontWeight="SemiBold"
-                    ItemsSource="{Binding SearchScopes}"
-                    SelectedIndex="{Binding SearchScopeIndex}"
-                    HorizontalContentAlignment="Stretch" />
-          <PathIcon x:Name="ScopeLocationIcon" Width="23" Height="23"
-                    Margin="14,0,0,0" HorizontalAlignment="Left"
-                    VerticalAlignment="Center" IsHitTestVisible="False"
-                    Foreground="{DynamicResource PrimaryTextBrush}"
-                    Data="M12,2 C8.13,2 5,5.13 5,9 C5,14.25 12,22 12,22 C12,22 19,14.25 19,9 C19,5.13 15.87,2 12,2 Z M12,6.5 A2.5,2.5 0 1 1 12,11.5 A2.5,2.5 0 1 1 12,6.5 Z" />
-        </Grid>
-        <Button Grid.Column="4" Classes="icon" Click="OnThemeToggleClick"
-                ToolTip.Tip="Alternar tema">
-          <PathIcon Width="27" Height="27"
-                    Data="M12,2 A10,10 0 1 0 22,12 C22,6.48 17.52,2 12,2 Z M12,4 L12,20 A8,8 0 0 1 12,4 Z" />
-        </Button>
-      </Grid>
-    </Border>
-
-    <SplitView x:Name="SidebarSplitView" Grid.Row="1"
-               DisplayMode="Inline" IsPaneOpen="True"
-               OpenPaneLength="420" CompactPaneLength="0"
-               UseLightDismissOverlayMode="True">
-      <SplitView.Pane>
-        <ScrollViewer VerticalScrollBarVisibility="Auto"
-                      HorizontalScrollBarVisibility="Disabled">
-          <Border x:Name="SidebarPane"
-                  Background="{DynamicResource PageBackgroundBrush}"
-                  BorderBrush="{DynamicResource OutlineBrush}"
-                  BorderThickness="0,0,1,0" Padding="34,20">
-          <Border.Transitions>
-            <Transitions>
-              <DoubleTransition Property="Opacity" Duration="0:0:0.22" />
-            </Transitions>
-          </Border.Transitions>
-          <StackPanel Spacing="14">
-            <Border Classes="card" Padding="0"
-                    DragDrop.AllowDrop="True"
-                    DragDrop.DragOver="OnDragOver"
-                    DragDrop.Drop="OnDrop">
-              <StackPanel>
-                <StackPanel Margin="22,18,22,14" Spacing="9">
-                  <Border Width="58" Height="58" CornerRadius="29"
-                          HorizontalAlignment="Center"
-                          Background="{DynamicResource AccentBrush}">
-                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-                               FontSize="28" Foreground="{DynamicResource AccentTextBrush}"
-                               Text="↥" />
-                  </Border>
-                  <TextBlock HorizontalAlignment="Center" FontSize="18"
-                             FontWeight="Bold" Text="Solte seu currículo aqui" />
-                  <TextBlock Classes="subtitle" HorizontalAlignment="Center"
-                             Text="ODT, DOCX, PDF ou TXT" />
-                  <Button Classes="primary" Margin="0,3,0,0" Padding="14,9"
-                          Width="200" HorizontalAlignment="Center"
-                          Click="OnChooseFileClick" Content="Escolher currículo" />
-                </StackPanel>
-                <Border BorderBrush="{DynamicResource OutlineBrush}"
-                        BorderThickness="0,1,0,0" Padding="20,11">
-                  <Grid ColumnDefinitions="Auto,*,Auto">
-                    <Path Width="18" Height="18" VerticalAlignment="Center"
-                          Stretch="Uniform" Fill="Transparent"
-                          Stroke="{DynamicResource PrimaryTextBrush}"
-                          StrokeThickness="2.2"
-                          Data="M10,3 A7,7 0 1 0 10,17 A7,7 0 1 0 10,3 M15,15 L21,21" />
-                    <TextBlock Grid.Column="1" Margin="10,0" VerticalAlignment="Center"
-                               TextTrimming="CharacterEllipsis"
-                               Text="{Binding SelectedFileName}" />
-                    <Button Grid.Column="2" Classes="resume-remove"
-                            IsVisible="{Binding HasProfile}"
-                            Command="{Binding RemoveResumeCommand}"
-                            ToolTip.Tip="Remover currículo">
-                      <Path Width="16" Height="16" Stretch="Uniform"
-                            Fill="Transparent"
-                            Stroke="{DynamicResource PrimaryTextBrush}"
-                            StrokeThickness="2.2"
-                            Data="M5,5 L19,19 M19,5 L5,19" />
-                    </Button>
-                  </Grid>
-                </Border>
-              </StackPanel>
-            </Border>
-
-            <Border Classes="card" Padding="17" IsVisible="{Binding HasProfile}">
-              <StackPanel Spacing="8">
-                <Grid ColumnDefinitions="*,Auto">
-                  <TextBlock FontSize="18" FontWeight="Bold" Text="Perfil identificado" />
-                  <Border Grid.Column="1" Width="36" Height="36" CornerRadius="18"
-                          Background="{DynamicResource SoftSurfaceBrush}">
-                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-                               FontSize="18" Text="●" />
-                  </Border>
-                </Grid>
-                <TextBlock FontSize="17" FontWeight="Bold" Text="{Binding CandidateName}" />
-                <TextBlock Classes="subtitle" Text="{Binding ProfessionalTitle}" />
-                <TextBlock Margin="0,5,0,0" FontSize="12" FontWeight="SemiBold"
-                           Foreground="{DynamicResource SecondaryTextBrush}"
-                           Text="CARGO DE INTERESSE" />
-                <TextBox Classes="profile-input"
-                         Text="{Binding DesiredRole}"
-                         PlaceholderText="Ex.: Analista financeiro" />
-                <ItemsControl ItemsSource="{Binding ProfileSkills}">
-                  <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
-                  </ItemsControl.ItemsPanel>
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                      <Border Classes="pill" Margin="0,0,6,6" Padding="10,4">
-                        <TextBlock FontSize="13" Text="{Binding}" />
-                      </Border>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-                <Border Classes="pill" HorizontalAlignment="Left">
-                  <TextBlock FontSize="13"
-                             Text="{Binding AdditionalSkillCount, StringFormat='+ {0} competências'}" />
-                </Border>
-              </StackPanel>
-            </Border>
-
-            <Border Classes="card" Padding="17">
-              <StackPanel Spacing="8">
-                <Grid ColumnDefinitions="*,Auto">
-                  <TextBlock FontSize="18" FontWeight="Bold" Text="Status" />
-                  <Border Grid.Column="1" Width="36" Height="36" CornerRadius="9"
-                          Background="{DynamicResource SoftSurfaceBrush}">
-                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="↗" />
-                  </Border>
-                </Grid>
-                <TextBlock FontSize="28" FontWeight="Bold" Text="{Binding Jobs.Count}" />
-                <TextBlock Classes="subtitle" TextWrapping="Wrap"
-                           Text="{Binding StatusMessage}" />
-                <ProgressBar Height="4" IsIndeterminate="True"
-                             IsVisible="{Binding IsBusy}" />
-                <TextBlock Classes="subtitle" TextWrapping="Wrap"
-                           Text="{Binding SourceWarnings}" />
-                <Button Classes="primary" Margin="0,3,0,0" Padding="14,9"
-                        Command="{Binding RefreshJobsCommand}"
-                        Content="Buscar novas vagas" />
-              </StackPanel>
-            </Border>
-          </StackPanel>
-          </Border>
-        </ScrollViewer>
-      </SplitView.Pane>
-
-      <Grid Margin="32,28" RowDefinitions="Auto,Auto,*">
-        <Button x:Name="CompactSidebarButton" Grid.Row="0"
-                IsVisible="False" HorizontalAlignment="Left"
-                Margin="0,0,0,14" Padding="14,9"
-                VerticalContentAlignment="Center"
-                HorizontalContentAlignment="Center"
-                Background="{DynamicResource AccentSoftBrush}"
-                Foreground="{DynamicResource AccentBrush}"
-                BorderBrush="{DynamicResource OutlineBrush}"
-                BorderThickness="1" CornerRadius="10"
-                Click="OnCompactSidebarClick">
+  <SplitView x:Name="SidebarSplitView" DisplayMode="Inline" IsPaneOpen="True" OpenPaneLength="250" CompactPaneLength="0" UseLightDismissOverlayMode="True">
+    <SplitView.Pane>
+      <Border x:Name="SidebarPane" Width="250" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource OutlineBrush}" BorderThickness="0,0,1,0" Padding="20,18">
+        <Grid RowDefinitions="Auto,Auto,*,Auto">
           <StackPanel Orientation="Horizontal" Spacing="8">
-            <Path Width="20" Height="16" VerticalAlignment="Center"
-                  Stretch="Uniform" Fill="Transparent"
-                  Stroke="{DynamicResource AccentBrush}"
-                  StrokeThickness="2"
-                  Data="M2,3 L18,3 M2,8 L18,8 M2,13 L18,13" />
-            <TextBlock VerticalAlignment="Center" FontWeight="SemiBold"
-                       Text="Perfil e currículo" />
+            <Grid Width="42" Height="42"><Image x:Name="DarkThemeLogo" Width="42" Height="42" Source="/Assets/logo-dark.png" Stretch="Uniform"/><Image x:Name="LightThemeLogo" Width="42" Height="42" Source="/Assets/logo-light.png" Stretch="Uniform"/></Grid>
+            <TextBlock VerticalAlignment="Center" FontSize="19" FontWeight="Bold" Text="Vaguei"/>
           </StackPanel>
-        </Button>
-
-        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,10,Auto"
-              RowDefinitions="Auto,Auto" Margin="0,0,0,18">
-          <StackPanel Grid.RowSpan="2">
-            <TextBlock Classes="title" Text="Oportunidades encontradas" />
-            <TextBlock Classes="subtitle"
-                       Text="Ordenadas por compatibilidade e recência" />
-          </StackPanel>
-          <Border Grid.Column="1" VerticalAlignment="Center" Padding="16,7"
-                  CornerRadius="18" Background="{DynamicResource AccentSoftBrush}">
-            <TextBlock Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold"
-                       Text="{Binding Jobs.Count, StringFormat='{}{0} vagas'}" />
+          <Border Grid.Row="1" Classes="card" Margin="0,22,0,0" Padding="12"
+                  DragDrop.AllowDrop="True" DragDrop.DragOver="OnDragOver" DragDrop.Drop="OnDrop">
+            <StackPanel Width="184" HorizontalAlignment="Center" Spacing="7">
+              <Border Width="42" Height="42" CornerRadius="10" HorizontalAlignment="Center"
+                      Background="{DynamicResource SoftSurfaceBrush}" BorderBrush="{DynamicResource OutlineBrush}" BorderThickness="1">
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" Text="↥"/>
+              </Border>
+              <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Text="Anexar currículo"/>
+              <TextBlock Classes="subtitle" HorizontalAlignment="Center" FontSize="11" Text="PDF, DOCX, ODT ou TXT"/>
+              <Button Classes="primary" Width="178" Padding="10,8" Click="OnChooseFileClick" Content="Escolher currículo"/>
+              <Border Padding="7,4" CornerRadius="7" Background="{DynamicResource SoftSurfaceBrush}">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                  <Path Width="13" Height="13" Stretch="Uniform" Fill="Transparent"
+                        Stroke="{DynamicResource PrimaryTextBrush}" StrokeThickness="2"
+                        Data="M6,2 A4,4 0 1 0 6,10 A4,4 0 1 0 6,2 M9,9 L13,13"/>
+                  <TextBlock Grid.Column="1" Margin="6,0" FontSize="11" VerticalAlignment="Center"
+                             TextWrapping="NoWrap" Text="{Binding SelectedFileName}"/>
+                  <Button Grid.Column="2" Classes="remove" Width="25" Height="25" Padding="6"
+                          IsVisible="{Binding HasProfile}" Command="{Binding RemoveResumeCommand}">
+                    <Path Width="11" Height="11" Stretch="Uniform" Fill="Transparent"
+                          Stroke="{DynamicResource PrimaryTextBrush}" StrokeThickness="2"
+                          Data="M5,5 L19,19 M19,5 L5,19"/>
+                  </Button>
+                </Grid>
+              </Border>
+            </StackPanel>
           </Border>
-          <Button Grid.Column="3" Classes="primary search-action"
-                  Classes.attention="{Binding IsSearchAttentionActive}"
-                  VerticalAlignment="Center"
-                  Padding="18,10" Command="{Binding RefreshJobsCommand}"
-                  Content="Pesquisar" />
-          <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3"
-                    Width="180" Height="38" Margin="0,8,0,0"
-                    HorizontalAlignment="Right"
-                    ItemsSource="{Binding PublicationWindows}"
-                    SelectedIndex="{Binding PublicationWindowIndex}"
-                    ToolTip.Tip="Período de publicação das vagas" />
-        </Grid>
-
-        <ScrollViewer Grid.Row="2">
-          <StackPanel>
-            <Border Classes="card" Padding="54,44" IsVisible="{Binding IsBusy}">
-              <StackPanel HorizontalAlignment="Center" Spacing="14">
-                <TextBlock HorizontalAlignment="Center" FontSize="19"
-                           FontWeight="Bold" Text="Procurando oportunidades..." />
-                <TextBlock Classes="subtitle" HorizontalAlignment="Center"
-                           TextAlignment="Center" Text="Isso pode levar alguns instantes." />
-                <ProgressBar Width="260" Height="6" IsIndeterminate="True" />
-              </StackPanel>
-            </Border>
-
-            <Border Classes="card" Padding="30" IsVisible="{Binding ShowEmptyState}">
-              <StackPanel HorizontalAlignment="Center" Spacing="8">
-                <TextBlock HorizontalAlignment="Center" FontSize="34" Text="⌕" />
-                <TextBlock FontSize="18" FontWeight="Bold"
-                           Text="Suas vagas aparecerão aqui" />
-                <TextBlock Classes="subtitle" TextAlignment="Center"
-                           Text="Importe um currículo ou busque novamente para atualizar os resultados." />
-              </StackPanel>
-            </Border>
-
-            <ItemsControl ItemsSource="{Binding Jobs}">
-              <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="vm:JobResultItemViewModel">
-                  <Border Classes="card" Padding="22" Margin="0,0,0,12">
-                    <Grid ColumnDefinitions="*,110" RowDefinitions="Auto,Auto,Auto,Auto">
-                      <StackPanel Spacing="4">
-                        <TextBlock FontSize="20" FontWeight="Bold" TextWrapping="Wrap"
-                                   Text="{Binding Title}" />
-                        <TextBlock Classes="subtitle" Text="{Binding Company}" />
-                        <TextBlock Classes="subtitle" Text="{Binding Location}" />
-                      </StackPanel>
-                      <StackPanel Grid.Column="1" HorizontalAlignment="Center" Spacing="5">
-                        <Border Width="64" Height="64" CornerRadius="32"
-                                Background="{DynamicResource AccentBrush}">
-                          <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-                                     FontSize="19" Foreground="{DynamicResource AccentTextBrush}"
-                                     Text="{Binding Score}" />
-                        </Border>
-                        <TextBlock FontSize="12" Text="Compatibilidade" />
-                      </StackPanel>
-                      <TextBlock Grid.Row="1" Grid.ColumnSpan="2"
-                                 Margin="0,12,0,0" TextWrapping="Wrap"
-                                 Text="{Binding Reasons}" />
-                      <ItemsControl Grid.Row="2" Grid.ColumnSpan="2"
-                                    Margin="0,12,0,0" ItemsSource="{Binding Skills}">
-                        <ItemsControl.ItemsPanel>
-                          <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                          <DataTemplate>
-                            <Border Classes="pill" BorderBrush="{DynamicResource OutlineBrush}"
-                                    BorderThickness="1" Background="Transparent"
-                                    Margin="0,0,7,7">
-                              <TextBlock FontSize="12" Text="{Binding}" />
-                            </Border>
-                          </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                      </ItemsControl>
-                      <Grid Grid.Row="3" Grid.ColumnSpan="2"
-                            Margin="0,10,0,0" ColumnDefinitions="Auto,Auto,*,Auto">
-                        <TextBlock Classes="subtitle" Text="{Binding Source}" />
-                        <TextBlock Grid.Column="1" Classes="subtitle" Margin="10,0" Text="•" />
-                        <TextBlock Grid.Column="2" Classes="subtitle" Text="{Binding Published}" />
-                        <Button Grid.Column="3" Classes="job-link" Tag="{Binding Url}"
-                                Click="OnOpenJobClick"
-                                ToolTip.Tip="Abrir vaga no site de origem">
-                          <StackPanel Orientation="Horizontal" Spacing="8"
-                                      HorizontalAlignment="Center">
-                            <TextBlock VerticalAlignment="Center" FontWeight="SemiBold"
-                                       Text="Abrir" />
-                            <PathIcon Width="20" Height="20"
-                                      Data="M7,4 L15,12 L7,20" />
-                          </StackPanel>
-                        </Button>
-                      </Grid>
-                    </Grid>
-                  </Border>
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
+          <StackPanel Grid.Row="2" Width="210" VerticalAlignment="Top" Margin="0,18,0,10" Spacing="8" IsVisible="{Binding HasProfile}">
+            <TextBlock FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" Text="PERFIL IDENTIFICADO"/>
+            <TextBlock FontWeight="Bold" Text="{Binding CandidateName}" TextTrimming="CharacterEllipsis"/><TextBlock Classes="subtitle" Text="{Binding ProfessionalTitle}" TextTrimming="CharacterEllipsis"/>
+            <ItemsControl ItemsSource="{Binding ProfileSkills}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate><Border Classes="pill" Padding="8,3" Margin="0,0,5,5"><TextBlock FontSize="11" Text="{Binding}"/></Border></DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+            <TextBlock Classes="subtitle" FontSize="11" FontStyle="Italic" IsVisible="{Binding HasAdditionalSkills}" Text="{Binding AdditionalSkillCount, StringFormat='e mais {0} competências'}"/>
           </StackPanel>
-        </ScrollViewer>
+          <Border Grid.Row="3" Classes="card" Padding="13"><StackPanel Spacing="6"><Grid ColumnDefinitions="*,Auto"><TextBlock FontWeight="Bold" Text="Status"/><Border Grid.Column="1" Classes="pill" Padding="8,3"><TextBlock FontSize="12" Text="{Binding Jobs.Count, StringFormat='{}{0} vagas'}"/></Border></Grid><TextBlock Classes="subtitle" FontSize="12" TextWrapping="Wrap" MaxHeight="52" TextTrimming="CharacterEllipsis" Text="{Binding StatusMessage}"/><ProgressBar Height="3" IsIndeterminate="True" IsVisible="{Binding IsBusy}"/><TextBlock Classes="subtitle" FontSize="11" TextWrapping="Wrap" MaxHeight="34" TextTrimming="CharacterEllipsis" Text="{Binding SourceWarnings}"/></StackPanel></Border>
+        </Grid>
+      </Border>
+    </SplitView.Pane>
+
+    <Grid RowDefinitions="82,*">
+      <Border Background="{DynamicResource PageBackgroundBrush}" Padding="36,14,30,10">
+        <Grid ColumnDefinitions="Auto,*,Auto,12,Auto">
+          <Button x:Name="CompactSidebarButton" IsVisible="False" Padding="13,9" VerticalAlignment="Center" CornerRadius="10" Background="{DynamicResource AccentSoftBrush}" Foreground="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource OutlineBrush}" BorderThickness="1" Click="OnCompactSidebarClick"><StackPanel Orientation="Horizontal" Spacing="8"><Path Width="20" Height="16" VerticalAlignment="Center" Stretch="Uniform" Fill="Transparent" Stroke="{DynamicResource AccentBrush}" StrokeThickness="2" Data="M2,3 L18,3 M2,8 L18,8 M2,13 L18,13"/><TextBlock VerticalAlignment="Center" FontWeight="SemiBold" Text="Perfil e currículo"/></StackPanel></Button>
+          <Grid Grid.Column="2" Width="230" Height="52"><ComboBox x:Name="ScopeSelector" Classes="selector" Width="230" Height="52" Padding="40,0,12,0" FontWeight="SemiBold" ItemsSource="{Binding SearchScopes}" SelectedIndex="{Binding SearchScopeIndex}"/><PathIcon x:Name="ScopeLocationIcon" Width="20" Height="20" Margin="13,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" IsHitTestVisible="False" Foreground="{DynamicResource PrimaryTextBrush}" Data="M12,2 C8.13,2 5,5.13 5,9 C5,14.25 12,22 12,22 C12,22 19,14.25 19,9 C19,5.13 15.87,2 12,2 Z M12,6.5 A2.5,2.5 0 1 1 12,11.5 A2.5,2.5 0 1 1 12,6.5 Z"/></Grid>
+          <Button Grid.Column="4" Classes="icon" Click="OnThemeToggleClick" ToolTip.Tip="Alternar tema"><PathIcon Width="25" Height="25" Data="M12,2 A10,10 0 1 0 22,12 C22,6.48 17.52,2 12,2 Z M12,4 L12,20 A8,8 0 0 1 12,4 Z"/></Button>
+        </Grid>
+      </Border>
+
+      <Grid Grid.Row="1" Margin="34,8,30,28" RowDefinitions="64,*">
+        <Grid x:Name="SearchControlsGrid" Grid.Row="0" ColumnDefinitions="Auto,10,Auto,10,132,*" Margin="0,8">
+          <Grid x:Name="JobSearchField" Width="420" Height="48"><TextBox Classes="searchbox" Height="48" VerticalContentAlignment="Center" Text="{Binding DesiredRole}" PlaceholderText="Buscar vagas (cargo, tecnologia, empresa...)"/><Path Width="17" Height="17" Margin="13,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="Uniform" Fill="Transparent" IsHitTestVisible="False" Stroke="{DynamicResource PrimaryTextBrush}" StrokeThickness="2" Data="M8,2 A6,6 0 1 0 8,14 A6,6 0 1 0 8,2 M13,13 L18,18"/></Grid>
+          <ComboBox x:Name="PublicationSelector" Grid.Column="2" Classes="selector" Width="190" Height="48" ItemsSource="{Binding PublicationWindows}" SelectedIndex="{Binding PublicationWindowIndex}" ToolTip.Tip="Período de publicação das vagas"/>
+          <Button Grid.Column="4" Classes="primary search" Classes.attention="{Binding IsSearchAttentionActive}" Command="{Binding RefreshJobsCommand}" Content="Pesquisar"/>
+        </Grid>
+        <Grid Grid.Row="1" Margin="0,14,0,0" RowDefinitions="Auto,*">
+          <Grid Margin="2,0,2,10" ColumnDefinitions="*,Auto"><StackPanel><TextBlock Classes="title" Text="Oportunidades encontradas"/><TextBlock Classes="subtitle" Text="Ordenadas por compatibilidade e recência"/></StackPanel><Border Grid.Column="1" VerticalAlignment="Center" Padding="13,6" CornerRadius="15" Background="{DynamicResource AccentSoftBrush}"><TextBlock Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold" Text="{Binding Jobs.Count, StringFormat='{}{0} vagas'}"/></Border></Grid>
+          <ScrollViewer Grid.Row="1"><StackPanel>
+            <Border Classes="card" Padding="46,34" IsVisible="{Binding IsBusy}"><StackPanel HorizontalAlignment="Center" Spacing="12"><TextBlock FontSize="18" FontWeight="Bold" Text="Procurando oportunidades..."/><TextBlock Classes="subtitle" Text="Isso pode levar alguns instantes."/><ProgressBar Width="250" Height="5" IsIndeterminate="True"/></StackPanel></Border>
+            <Border Classes="card" Padding="44,36" IsVisible="{Binding ShowEmptyState}"><StackPanel HorizontalAlignment="Center" Spacing="8"><Path Width="34" Height="34" Stretch="Uniform" Fill="Transparent" Stroke="{DynamicResource PrimaryTextBrush}" StrokeThickness="2" Data="M14,2 A12,12 0 1 0 14,26 A12,12 0 1 0 14,2 M23,23 L34,34"/><TextBlock FontSize="17" FontWeight="Bold" Text="Suas vagas aparecerão aqui"/><TextBlock Classes="subtitle" TextAlignment="Center" Text="Envie seu currículo e clique em pesquisar para encontrar oportunidades compatíveis com seu perfil."/></StackPanel></Border>
+            <ItemsControl ItemsSource="{Binding Jobs}"><ItemsControl.ItemTemplate><DataTemplate x:DataType="vm:JobResultItemViewModel"><Border Classes="card" Padding="20" Margin="0,0,0,10"><Grid ColumnDefinitions="*,100" RowDefinitions="Auto,Auto,Auto,Auto"><StackPanel Spacing="3"><TextBlock FontSize="19" FontWeight="Bold" TextWrapping="Wrap" Text="{Binding Title}"/><TextBlock Classes="subtitle" Text="{Binding Company}"/><TextBlock Classes="subtitle" Text="{Binding Location}"/></StackPanel><StackPanel Grid.Column="1" HorizontalAlignment="Center" Spacing="4"><Border Width="58" Height="58" CornerRadius="29" Background="{DynamicResource AccentBrush}"><TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="17" Foreground="{DynamicResource AccentTextBrush}" Text="{Binding Score}"/></Border><TextBlock FontSize="11" Text="Compatibilidade"/></StackPanel><TextBlock Grid.Row="1" Grid.ColumnSpan="2" Margin="0,10,0,0" TextWrapping="Wrap" Text="{Binding Reasons}"/><ItemsControl Grid.Row="2" Grid.ColumnSpan="2" Margin="0,10,0,0" ItemsSource="{Binding Skills}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate><Border Classes="pill" Margin="0,0,6,6"><TextBlock FontSize="11" Text="{Binding}"/></Border></DataTemplate></ItemsControl.ItemTemplate></ItemsControl><Grid Grid.Row="3" Grid.ColumnSpan="2" Margin="0,8,0,0" ColumnDefinitions="Auto,Auto,*,Auto"><TextBlock Classes="subtitle" Text="{Binding Source}"/><TextBlock Grid.Column="1" Classes="subtitle" Margin="9,0" Text="•"/><TextBlock Grid.Column="2" Classes="subtitle" Text="{Binding Published}"/><Button Grid.Column="3" Classes="open" Tag="{Binding Url}" Click="OnOpenJobClick"><StackPanel Orientation="Horizontal" Spacing="7" HorizontalAlignment="Center"><TextBlock FontWeight="SemiBold" Text="Abrir"/><PathIcon Width="17" Height="17" Data="M7,4 L15,12 L7,20"/></StackPanel></Button></Grid></Grid></Border></DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+          </StackPanel></ScrollViewer>
+        </Grid>
       </Grid>
-    </SplitView>
-  </Grid>
+    </Grid>
+  </SplitView>
 </Window>
