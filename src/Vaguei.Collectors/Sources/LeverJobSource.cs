@@ -14,7 +14,8 @@ public sealed class LeverJobSource : IJobSource
         {
             ["swile"] = "Swile",
             ["lalamove"] = "Lalamove",
-            ["tryjeeves"] = "Jeeves"
+            ["tryjeeves"] = "Jeeves",
+            ["loadsmart"] = "Loadsmart"
         };
 
     private readonly HttpClient _httpClient;

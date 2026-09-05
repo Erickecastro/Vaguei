@@ -13,10 +13,8 @@ namespace Vaguei.Desktop.Views;
 
 public partial class MainWindow : Window
 {
-    private const double CompactLayoutThreshold = 1080;
-
+    private const double NarrowLayoutThreshold = 1080;
     private bool? _isCompactLayout;
-    private bool _isSidebarAnimating;
 
     private static readonly FilePickerFileType ResumeFileType = new("Currículos")
     {
@@ -82,43 +80,6 @@ public partial class MainWindow : Window
         Opacity = 1;
     }
 
-    private async void OnSidebarToggleClick(
-        object? sender,
-        RoutedEventArgs eventArgs)
-    {
-        if (_isSidebarAnimating)
-        {
-            return;
-        }
-
-        _isSidebarAnimating = true;
-
-        try
-        {
-            if (SidebarSplitView.IsPaneOpen)
-            {
-                SidebarPane.Opacity = 0;
-                await Task.Delay(180);
-                SidebarSplitView.IsPaneOpen = false;
-                SidebarPane.Opacity = 1;
-            }
-            else
-            {
-                SidebarPane.Opacity = 0;
-                SidebarSplitView.IsPaneOpen = true;
-                await Task.Delay(30);
-                SidebarPane.Opacity = 1;
-                await Task.Delay(220);
-            }
-
-            UpdateSidebarToggleIcon();
-        }
-        finally
-        {
-            _isSidebarAnimating = false;
-        }
-    }
-
     private void OnWindowOpened(
         object? sender,
         EventArgs eventArgs)
@@ -139,28 +100,27 @@ public partial class MainWindow : Window
     private void UpdateAdaptiveLayout(
         double width)
     {
-        var isCompact = width < CompactLayoutThreshold;
-
-        if (_isCompactLayout == isCompact)
-        {
-            return;
-        }
-
-        _isCompactLayout = isCompact;
+        var isCompact = width < NarrowLayoutThreshold;
         SidebarSplitView.DisplayMode = isCompact
             ? SplitViewDisplayMode.Overlay
             : SplitViewDisplayMode.Inline;
-        SidebarSplitView.IsPaneOpen = !isCompact;
+        SidebarSplitView.OpenPaneLength = isCompact ? 350 : 420;
+        CompactSidebarButton.IsVisible = isCompact;
+
+        if (_isCompactLayout != isCompact)
+        {
+            SidebarSplitView.IsPaneOpen = !isCompact;
+            _isCompactLayout = isCompact;
+        }
+
         SidebarPane.Opacity = 1;
-        UpdateSidebarToggleIcon();
     }
 
-    private void UpdateSidebarToggleIcon()
+    private void OnCompactSidebarClick(
+        object? sender,
+        RoutedEventArgs eventArgs)
     {
-        SidebarToggleIcon.Data = Geometry.Parse(
-            SidebarSplitView.IsPaneOpen
-                ? "M15,4 L7,12 L15,20"
-                : "M9,4 L17,12 L9,20");
+        SidebarSplitView.IsPaneOpen = true;
     }
 
     private void UpdateThemeVisuals(

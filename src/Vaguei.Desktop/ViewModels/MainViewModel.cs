@@ -33,6 +33,9 @@ public partial class MainViewModel : ViewModelBase
     private string _professionalTitle = string.Empty;
 
     [ObservableProperty]
+    private string _desiredRole = string.Empty;
+
+    [ObservableProperty]
     private int _additionalSkillCount;
 
     [ObservableProperty]
@@ -136,6 +139,7 @@ public partial class MainViewModel : ViewModelBase
             _currentProfile = profile;
             CandidateName = profile.Name;
             ProfessionalTitle = profile.ProfessionalTitle;
+            DesiredRole = profile.ProfessionalTitle;
             PopulateProfileSkills(profile);
             ProfileSummary = CreateProfileSummary(profile);
             HasProfile = true;
@@ -208,6 +212,7 @@ public partial class MainViewModel : ViewModelBase
         SelectedFileName = "Nenhum currículo selecionado";
         CandidateName = string.Empty;
         ProfessionalTitle = string.Empty;
+        DesiredRole = string.Empty;
         ProfileSummary = string.Empty;
         AdditionalSkillCount = 0;
         ProfileSkills.Clear();
@@ -240,6 +245,11 @@ public partial class MainViewModel : ViewModelBase
             IncludeInternational = IncludeInternational,
             PublicationWindow = GetPublicationWindow()
         };
+
+        if (!string.IsNullOrWhiteSpace(DesiredRole))
+        {
+            preferences.DesiredRoles.Add(DesiredRole.Trim());
+        }
 
         var result = await Task.Run(
             async () => await _searchOrchestrator.SearchAsync(

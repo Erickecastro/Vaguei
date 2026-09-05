@@ -18,7 +18,9 @@ public sealed class GreenhouseJobSource : IJobSource
             ["qualtrics"] = "Qualtrics",
             ["gitlab"] = "GitLab",
             ["ebanx"] = "EBANX",
-            ["monks"] = "Monks"
+            ["monks"] = "Monks",
+            ["quintoandar"] = "QuintoAndar",
+            ["gympass"] = "Wellhub"
         };
 
     private readonly HttpClient _httpClient;

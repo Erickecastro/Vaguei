@@ -31,7 +31,7 @@
       <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}" />
       <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CornerRadius" Value="14" />
+      <Setter Property="CornerRadius" Value="16" />
     </Style>
     <Style Selector="Border.pill">
       <Setter Property="Background" Value="{DynamicResource SoftSurfaceBrush}" />
@@ -39,12 +39,18 @@
       <Setter Property="Padding" Value="12,6" />
     </Style>
     <Style Selector="Button.primary">
-      <Setter Property="Background" Value="{DynamicResource InverseSurfaceBrush}" />
-      <Setter Property="Foreground" Value="{DynamicResource InverseTextBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
       <Setter Property="HorizontalContentAlignment" Value="Center" />
       <Setter Property="FontWeight" Value="SemiBold" />
-      <Setter Property="CornerRadius" Value="7" />
+      <Setter Property="CornerRadius" Value="10" />
       <Setter Property="Padding" Value="16,12" />
+    </Style>
+    <Style Selector="Button.primary:pointerover">
+      <Setter Property="Background" Value="{DynamicResource AccentHoverBrush}" />
+    </Style>
+    <Style Selector="Button.primary:disabled">
+      <Setter Property="Opacity" Value="0.48" />
     </Style>
     <Style Selector="Button.icon">
       <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
@@ -65,26 +71,31 @@
       <Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}" />
       <Setter Property="BorderThickness" Value="1" />
     </Style>
+    <Style Selector="Button.job-link:pointerover">
+      <Setter Property="Background" Value="{DynamicResource AccentSoftBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    </Style>
     <Style Selector="Button.resume-remove">
-      <Setter Property="Width" Value="38" />
-      <Setter Property="Height" Value="38" />
-      <Setter Property="Padding" Value="9" />
-      <Setter Property="CornerRadius" Value="19" />
+      <Setter Property="Width" Value="32" />
+      <Setter Property="Height" Value="32" />
+      <Setter Property="Padding" Value="8" />
+      <Setter Property="CornerRadius" Value="16" />
       <Setter Property="Background" Value="Transparent" />
       <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
     </Style>
     <Style Selector="Button.search-action.attention">
-      <Setter Property="BorderBrush" Value="{DynamicResource PrimaryTextBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
       <Setter Property="BorderThickness" Value="3" />
       <Style.Animations>
-        <Animation Duration="0:0:0.85"
+        <Animation Duration="0:0:0.72"
                    IterationCount="INFINITE"
                    PlaybackDirection="Alternate">
           <KeyFrame Cue="0%">
             <Setter Property="Opacity" Value="1" />
           </KeyFrame>
           <KeyFrame Cue="100%">
-            <Setter Property="Opacity" Value="0.58" />
+            <Setter Property="Opacity" Value="0.52" />
+            <Setter Property="Background" Value="{DynamicResource AccentHoverBrush}" />
           </KeyFrame>
         </Animation>
       </Style.Animations>
@@ -94,12 +105,24 @@
       <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}" />
     </Style>
+    <Style Selector="TextBox.profile-input">
+      <Setter Property="MinHeight" Value="42" />
+      <Setter Property="Padding" Value="12,8" />
+      <Setter Property="CornerRadius" Value="9" />
+      <Setter Property="Background" Value="{DynamicResource SoftSurfaceBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}" />
+    </Style>
+    <Style Selector="TextBox.profile-input:focus">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="BorderThickness" Value="2" />
+    </Style>
     <Style Selector="ComboBoxItem">
       <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
     </Style>
   </Window.Styles>
 
-  <Grid RowDefinitions="80,*">
+  <Grid RowDefinitions="88,*">
     <Border Background="{DynamicResource SurfaceBrush}"
             BorderBrush="{DynamicResource OutlineBrush}"
             BorderThickness="0,0,0,1"
@@ -112,12 +135,6 @@
           <Image x:Name="LightThemeLogo" Width="68" Height="68"
                  Source="/Assets/logo-light.png" Stretch="Uniform" />
         </Grid>
-        <Button Grid.Column="1" Classes="icon" Margin="14,0,0,0"
-                HorizontalAlignment="Left" Click="OnSidebarToggleClick"
-                ToolTip.Tip="Mostrar ou recolher painel lateral">
-          <PathIcon x:Name="SidebarToggleIcon" Width="27" Height="27"
-                    Data="M15,4 L7,12 L15,20" />
-        </Button>
         <Grid Grid.Column="2" Width="240" Height="54">
           <ComboBox x:Name="ScopeSelector" Classes="scope-selector"
                     Width="240" Height="54" Padding="42,0,12,0"
@@ -164,9 +181,9 @@
                 <StackPanel Margin="22,18,22,14" Spacing="9">
                   <Border Width="58" Height="58" CornerRadius="29"
                           HorizontalAlignment="Center"
-                          Background="{DynamicResource InverseSurfaceBrush}">
+                          Background="{DynamicResource AccentBrush}">
                     <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-                               FontSize="28" Foreground="{DynamicResource InverseTextBrush}"
+                               FontSize="28" Foreground="{DynamicResource AccentTextBrush}"
                                Text="↥" />
                   </Border>
                   <TextBlock HorizontalAlignment="Center" FontSize="18"
@@ -180,9 +197,11 @@
                 <Border BorderBrush="{DynamicResource OutlineBrush}"
                         BorderThickness="0,1,0,0" Padding="20,11">
                   <Grid ColumnDefinitions="Auto,*,Auto">
-                    <PathIcon Width="23" Height="23" VerticalAlignment="Center"
-                              Foreground="{DynamicResource PrimaryTextBrush}"
-                              Data="M10,3 A7,7 0 1 0 10,17 A7,7 0 1 0 10,3 Z M15,15 L21,21" />
+                    <Path Width="18" Height="18" VerticalAlignment="Center"
+                          Stretch="Uniform" Fill="Transparent"
+                          Stroke="{DynamicResource PrimaryTextBrush}"
+                          StrokeThickness="2.2"
+                          Data="M10,3 A7,7 0 1 0 10,17 A7,7 0 1 0 10,3 M15,15 L21,21" />
                     <TextBlock Grid.Column="1" Margin="10,0" VerticalAlignment="Center"
                                TextTrimming="CharacterEllipsis"
                                Text="{Binding SelectedFileName}" />
@@ -190,8 +209,11 @@
                             IsVisible="{Binding HasProfile}"
                             Command="{Binding RemoveResumeCommand}"
                             ToolTip.Tip="Remover currículo">
-                      <PathIcon Width="20" Height="20"
-                                Data="M5,5 L19,19 M19,5 L5,19" />
+                      <Path Width="16" Height="16" Stretch="Uniform"
+                            Fill="Transparent"
+                            Stroke="{DynamicResource PrimaryTextBrush}"
+                            StrokeThickness="2.2"
+                            Data="M5,5 L19,19 M19,5 L5,19" />
                     </Button>
                   </Grid>
                 </Border>
@@ -210,6 +232,12 @@
                 </Grid>
                 <TextBlock FontSize="17" FontWeight="Bold" Text="{Binding CandidateName}" />
                 <TextBlock Classes="subtitle" Text="{Binding ProfessionalTitle}" />
+                <TextBlock Margin="0,5,0,0" FontSize="12" FontWeight="SemiBold"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           Text="CARGO DE INTERESSE" />
+                <TextBox Classes="profile-input"
+                         Text="{Binding DesiredRole}"
+                         PlaceholderText="Ex.: Analista financeiro" />
                 <ItemsControl ItemsSource="{Binding ProfileSkills}">
                   <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
@@ -255,8 +283,22 @@
         </ScrollViewer>
       </SplitView.Pane>
 
-      <Grid Margin="32,28" RowDefinitions="Auto,*">
-        <Grid ColumnDefinitions="*,Auto,10,Auto"
+      <Grid Margin="32,28" RowDefinitions="Auto,Auto,*">
+        <Button x:Name="CompactSidebarButton" Grid.Row="0"
+                IsVisible="False" HorizontalAlignment="Left"
+                Margin="0,0,0,14" Padding="14,9"
+                Background="{DynamicResource AccentSoftBrush}"
+                Foreground="{DynamicResource AccentBrush}"
+                BorderBrush="{DynamicResource OutlineBrush}"
+                BorderThickness="1" CornerRadius="10"
+                Click="OnCompactSidebarClick">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock FontSize="18" VerticalAlignment="Center" Text="☰" />
+            <TextBlock FontWeight="SemiBold" Text="Perfil e currículo" />
+          </StackPanel>
+        </Button>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,10,Auto"
               RowDefinitions="Auto,Auto" Margin="0,0,0,18">
           <StackPanel Grid.RowSpan="2">
             <TextBlock Classes="title" Text="Oportunidades encontradas" />
@@ -264,8 +306,8 @@
                        Text="Ordenadas por compatibilidade e recência" />
           </StackPanel>
           <Border Grid.Column="1" VerticalAlignment="Center" Padding="16,7"
-                  CornerRadius="18" Background="{DynamicResource InverseSurfaceBrush}">
-            <TextBlock Foreground="{DynamicResource InverseTextBrush}"
+                  CornerRadius="18" Background="{DynamicResource AccentSoftBrush}">
+            <TextBlock Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold"
                        Text="{Binding Jobs.Count, StringFormat='{}{0} vagas'}" />
           </Border>
           <Button Grid.Column="3" Classes="primary search-action"
@@ -281,7 +323,7 @@
                     ToolTip.Tip="Período de publicação das vagas" />
         </Grid>
 
-        <ScrollViewer Grid.Row="1">
+        <ScrollViewer Grid.Row="2">
           <StackPanel>
             <Border Classes="card" Padding="54,44" IsVisible="{Binding IsBusy}">
               <StackPanel HorizontalAlignment="Center" Spacing="14">
@@ -316,9 +358,9 @@
                       </StackPanel>
                       <StackPanel Grid.Column="1" HorizontalAlignment="Center" Spacing="5">
                         <Border Width="64" Height="64" CornerRadius="32"
-                                Background="{DynamicResource InverseSurfaceBrush}">
+                                Background="{DynamicResource AccentBrush}">
                           <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-                                     FontSize="19" Foreground="{DynamicResource InverseTextBrush}"
+                                     FontSize="19" Foreground="{DynamicResource AccentTextBrush}"
                                      Text="{Binding Score}" />
                         </Border>
                         <TextBlock FontSize="12" Text="Compatibilidade" />

@@ -165,6 +165,29 @@ public sealed class MainViewModelTests
     }
 
     [Fact]
+    public async Task RefreshJobsCommand_UsesEditedDesiredRole()
+    {
+        var filePath = CreateTemporaryResume();
+
+        try
+        {
+            var source = new StubJobSource();
+            var viewModel = CreateViewModel(source);
+            await viewModel.ProcessResumeAsync(filePath);
+
+            viewModel.DesiredRole = "Especialista financeiro";
+            await viewModel.RefreshJobsCommand.ExecuteAsync(null);
+
+            Assert.NotNull(source.LastQuery);
+            Assert.Contains("Especialista financeiro", source.LastQuery.Keywords);
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
+    }
+
+    [Fact]
     public async Task RefreshJobsCommand_IsDisabledWhileSearchIsRunning()
     {
         var filePath = CreateTemporaryResume();
@@ -216,6 +239,7 @@ public sealed class MainViewModelTests
             Assert.False(viewModel.IsSearchAttentionActive);
             Assert.Empty(viewModel.Jobs);
             Assert.Empty(viewModel.ProfileSkills);
+            Assert.Empty(viewModel.DesiredRole);
             Assert.Equal("Nenhum currículo selecionado", viewModel.SelectedFileName);
             Assert.False(viewModel.RefreshJobsCommand.CanExecute(null));
         }

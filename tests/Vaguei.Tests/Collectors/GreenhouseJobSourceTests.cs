@@ -67,6 +67,32 @@ public sealed class GreenhouseJobSourceTests
         Assert.Equal("Pessoa Desenvolvedora", job.Title);
     }
 
+    [Fact]
+    public async Task SearchAsync_MatchesARelevantTermFromDesiredRole()
+    {
+        const string json =
+            """
+            {
+              "jobs": [{
+                "title": "Senior .NET Engineer",
+                "content": "Desenvolvimento de aplicações.",
+                "location": { "name": "Brazil" }
+              }]
+            }
+            """;
+
+        var source = new GreenhouseJobSource(
+            CreateHttpClient(json),
+            new Dictionary<string, string> { ["example"] = "Empresa" });
+
+        var jobs = await source.SearchAsync(new JobSearchQuery
+        {
+            Keywords = ["Desenvolvedor .NET"]
+        });
+
+        Assert.Single(jobs);
+    }
+
     private static HttpClient CreateHttpClient(string json) =>
         new(new FakeHandler(json));
 

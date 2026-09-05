@@ -103,8 +103,7 @@ internal static partial class JobSourceMapping
     {
         if (query.Keywords.Count > 0 &&
             !query.Keywords.Any(keyword =>
-                job.Title.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
-                job.Description.Contains(keyword, StringComparison.OrdinalIgnoreCase)))
+                ContainsSearchTerm(job.Title, job.Description, keyword)))
         {
             return false;
         }
@@ -126,11 +125,36 @@ internal static partial class JobSourceMapping
         return true;
     }
 
+    private static bool ContainsSearchTerm(
+        string title,
+        string description,
+        string keyword)
+    {
+        if (title.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
+            description.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        var meaningfulTerms = SearchTermPattern()
+            .Matches(keyword)
+            .Select(match => match.Value)
+            .Where(term => term.Length >= 3)
+            .ToArray();
+
+        return meaningfulTerms.Any(term =>
+            title.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+            description.Contains(term, StringComparison.OrdinalIgnoreCase));
+    }
+
     [GeneratedRegex("<[^>]+>")]
     private static partial Regex MarkupPattern();
 
     [GeneratedRegex(@"\s+")]
     private static partial Regex WhiteSpacePattern();
+
+    [GeneratedRegex(@"[\p{L}\p{N}+#.]+")]
+    private static partial Regex SearchTermPattern();
 
     [GeneratedRegex(
         @"(?:^|[\s,;/()\-])(brasil|brazil|s[aã]o paulo|rio de janeiro|belo horizonte|curitiba|porto alegre|bras[ií]lia|recife|salvador|campinas|florian[oó]polis|manaus|fortaleza|goi[aâ]nia|vit[oó]ria|barueri|osasco|amazonas|bahia|cear[aá]|esp[ií]rito santo|goi[aá]s|maranh[aã]o|paran[aá]|pernambuco|santa catarina|rio grande do sul)(?:$|[\s,;/()\-])",

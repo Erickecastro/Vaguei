@@ -6,24 +6,34 @@
     <ResourceDictionary>
       <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Light">
-          <SolidColorBrush x:Key="PageBackgroundBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="PageBackgroundBrush" Color="#F6F7FB" />
           <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF" />
-          <SolidColorBrush x:Key="SoftSurfaceBrush" Color="#F4F4F4" />
-          <SolidColorBrush x:Key="PrimaryTextBrush" Color="#000000" />
-          <SolidColorBrush x:Key="SecondaryTextBrush" Color="#4A4A4A" />
-          <SolidColorBrush x:Key="OutlineBrush" Color="#DEDEDE" />
-          <SolidColorBrush x:Key="InverseSurfaceBrush" Color="#000000" />
+          <SolidColorBrush x:Key="SoftSurfaceBrush" Color="#F0F2F7" />
+          <SolidColorBrush x:Key="PrimaryTextBrush" Color="#1A1D26" />
+          <SolidColorBrush x:Key="SecondaryTextBrush" Color="#626879" />
+          <SolidColorBrush x:Key="OutlineBrush" Color="#DDE1EA" />
+          <SolidColorBrush x:Key="InverseSurfaceBrush" Color="#252936" />
           <SolidColorBrush x:Key="InverseTextBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="AccentBrush" Color="#5856D6" />
+          <SolidColorBrush x:Key="AccentHoverBrush" Color="#4745C4" />
+          <SolidColorBrush x:Key="AccentSoftBrush" Color="#ECEBFF" />
+          <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="SuccessBrush" Color="#1F8A70" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
-          <SolidColorBrush x:Key="PageBackgroundBrush" Color="#000000" />
-          <SolidColorBrush x:Key="SurfaceBrush" Color="#090909" />
-          <SolidColorBrush x:Key="SoftSurfaceBrush" Color="#171717" />
-          <SolidColorBrush x:Key="PrimaryTextBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="PageBackgroundBrush" Color="#121212" />
+          <SolidColorBrush x:Key="SurfaceBrush" Color="#1B1B1B" />
+          <SolidColorBrush x:Key="SoftSurfaceBrush" Color="#252525" />
+          <SolidColorBrush x:Key="PrimaryTextBrush" Color="#F2F2F2" />
           <SolidColorBrush x:Key="SecondaryTextBrush" Color="#B5B5B5" />
-          <SolidColorBrush x:Key="OutlineBrush" Color="#303030" />
-          <SolidColorBrush x:Key="InverseSurfaceBrush" Color="#FFFFFF" />
-          <SolidColorBrush x:Key="InverseTextBrush" Color="#000000" />
+          <SolidColorBrush x:Key="OutlineBrush" Color="#383838" />
+          <SolidColorBrush x:Key="InverseSurfaceBrush" Color="#EBEBEB" />
+          <SolidColorBrush x:Key="InverseTextBrush" Color="#171717" />
+          <SolidColorBrush x:Key="AccentBrush" Color="#8583F4" />
+          <SolidColorBrush x:Key="AccentHoverBrush" Color="#9997FF" />
+          <SolidColorBrush x:Key="AccentSoftBrush" Color="#302F50" />
+          <SolidColorBrush x:Key="AccentTextBrush" Color="#161616" />
+          <SolidColorBrush x:Key="SuccessBrush" Color="#5BC8A9" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
     </ResourceDictionary>
