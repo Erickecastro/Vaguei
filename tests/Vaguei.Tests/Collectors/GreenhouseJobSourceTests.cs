@@ -93,6 +93,54 @@ public sealed class GreenhouseJobSourceTests
         Assert.Single(jobs);
     }
 
+    [Fact]
+    public async Task SearchAsync_MatchesCompanyName()
+    {
+        const string json =
+            """
+            { "jobs": [{
+              "title": "Assistente administrativo",
+              "content": "Rotinas administrativas.",
+              "location": { "name": "Manaus, Brazil" }
+            }] }
+            """;
+
+        var source = new GreenhouseJobSource(
+            CreateHttpClient(json),
+            new Dictionary<string, string> { ["sidia"] = "Sidia" });
+
+        var jobs = await source.SearchAsync(new JobSearchQuery
+        {
+            Keywords = ["Sidia"]
+        });
+
+        Assert.Single(jobs);
+    }
+
+    [Fact]
+    public async Task SearchAsync_DoesNotMatchCompanyInsideAnotherWord()
+    {
+        const string json =
+            """
+            { "jobs": [{
+              "title": "Especialista de Legal Efficiency",
+              "content": "Support the company and its subsidiaries.",
+              "location": { "name": "São Paulo, Brazil" }
+            }] }
+            """;
+
+        var source = new GreenhouseJobSource(
+            CreateHttpClient(json),
+            new Dictionary<string, string> { ["quintoandar"] = "QuintoAndar" });
+
+        var jobs = await source.SearchAsync(new JobSearchQuery
+        {
+            Keywords = ["Sidia"]
+        });
+
+        Assert.Empty(jobs);
+    }
+
     private static HttpClient CreateHttpClient(string json) =>
         new(new FakeHandler(json));
 

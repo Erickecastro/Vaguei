@@ -164,6 +164,7 @@ try
             new ArbeitnowJobSource(httpClient),
             new AshbyJobSource(httpClient),
             new GreenhouseJobSource(httpClient),
+            new InHireJobSource(httpClient),
             new LeverJobSource(httpClient)
         ]);
 

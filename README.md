@@ -33,7 +33,7 @@ Software development is the initial validation domain because it reflects the fi
 * Job requirement classification
 * Job source orchestration and failure isolation
 * Duplicate job removal
-* Public Ashby, Greenhouse, and Lever job board integrations
+* Public Ashby, Greenhouse, InHire, and Lever job board integrations
 * Brazilian job location recognition
 * Cross-platform execution
 
@@ -56,7 +56,6 @@ Software development is the initial validation domain because it reflects the fi
 * Additional authorized job source integrations
 * Broader profession and skill taxonomies
 * REST APIs
-* Avalonia UI
 * Docker
 * Artificial Intelligence
 
@@ -116,7 +115,7 @@ Compatible Jobs
 
 The core currently targets .NET 10 and is kept independent from the user interface.
 
-The first graphical interface is planned with Avalonia for:
+The graphical interface uses Avalonia and currently targets:
 
 * Linux desktop
 * Windows desktop
@@ -133,9 +132,14 @@ dotnet run --project src/Vaguei.Desktop
 ```
 
 The current collector searches Arbeitnow and a curated catalog of public Ashby,
-Greenhouse, and Lever job boards. The catalog includes employers with Brazilian
-openings and can be extended without scraping protected job platforms. Search
-results always preserve the original application URL.
+Greenhouse, InHire, and Lever career pages. This includes the official public
+Sidia feed on InHire. The catalog can be extended without scraping protected job
+platforms, and results always preserve the original application URL.
+
+The window and Windows executable embed the Vaguei icon. Linux packages should
+also install the files under `packaging/linux`; see
+`packaging/linux/README.md` for the desktop-entry and icon locations required by
+GNOME and other freedesktop environments.
 
 For local diagnostics, the CLI accepts a resume path:
 

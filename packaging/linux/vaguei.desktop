@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Vaguei
+Comment=Encontre oportunidades compatíveis com o seu perfil
+Exec=vaguei
+Icon=vaguei
+Terminal=false
+Categories=Office;Network;
+StartupWMClass=vaguei

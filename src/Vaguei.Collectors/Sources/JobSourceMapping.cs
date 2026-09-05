@@ -103,7 +103,11 @@ internal static partial class JobSourceMapping
     {
         if (query.Keywords.Count > 0 &&
             !query.Keywords.Any(keyword =>
-                ContainsSearchTerm(job.Title, job.Description, keyword)))
+                ContainsSearchTerm(
+                    job.Title,
+                    job.Company,
+                    job.Description,
+                    keyword)))
         {
             return false;
         }
@@ -127,11 +131,13 @@ internal static partial class JobSourceMapping
 
     private static bool ContainsSearchTerm(
         string title,
+        string company,
         string description,
         string keyword)
     {
-        if (title.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
-            description.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+        var searchableText = $"{title}\n{company}\n{description}";
+
+        if (ContainsWholePhrase(searchableText, keyword))
         {
             return true;
         }
@@ -142,9 +148,29 @@ internal static partial class JobSourceMapping
             .Where(term => term.Length >= 3)
             .ToArray();
 
-        return meaningfulTerms.Any(term =>
-            title.Contains(term, StringComparison.OrdinalIgnoreCase) ||
-            description.Contains(term, StringComparison.OrdinalIgnoreCase));
+        var availableTerms = SearchTermPattern()
+            .Matches(searchableText)
+            .Select(match => match.Value)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        return meaningfulTerms.Any(availableTerms.Contains);
+    }
+
+    private static bool ContainsWholePhrase(string text, string phrase)
+    {
+        var trimmedPhrase = phrase.Trim();
+        if (trimmedPhrase.Length == 0)
+        {
+            return false;
+        }
+
+        var pattern =
+            $@"(?<![\p{{L}}\p{{N}}+#.]){Regex.Escape(trimmedPhrase)}(?![\p{{L}}\p{{N}}+#.])";
+
+        return Regex.IsMatch(
+            text,
+            pattern,
+            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
     }
 
     [GeneratedRegex("<[^>]+>")]

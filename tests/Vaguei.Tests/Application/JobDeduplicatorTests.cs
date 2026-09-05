@@ -50,6 +50,26 @@ public sealed class JobDeduplicatorTests
         Assert.Equal(2, result.Count);
     }
 
+    [Fact]
+    public void Deduplicate_RemovesCrossPostsWithMinorDescriptionDifferences()
+    {
+        var first = CreateJob(
+            "Analista Financeiro",
+            "Empresa Teste",
+            "Responsável por planejamento financeiro, orçamento, relatórios e análise mensal de resultados.",
+            "Fonte A");
+
+        var second = CreateJob(
+            "Analista Financeiro",
+            "Empresa Teste",
+            "Responsável por planejamento financeiro, orçamento, relatórios e análise mensal de resultados. Benefícios competitivos.",
+            "Fonte B");
+
+        var result = _deduplicator.Deduplicate([first, second]);
+
+        Assert.Single(result);
+    }
+
     private static JobPosting CreateJob(
         string title,
         string company,

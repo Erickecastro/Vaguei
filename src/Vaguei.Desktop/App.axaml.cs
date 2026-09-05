@@ -41,6 +41,7 @@ public partial class App : Avalonia.Application
                 new ArbeitnowJobSource(_httpClient),
                 new AshbyJobSource(_httpClient),
                 new GreenhouseJobSource(_httpClient),
+                new InHireJobSource(_httpClient),
                 new LeverJobSource(_httpClient)
             };
 

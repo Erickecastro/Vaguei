@@ -211,6 +211,36 @@ public sealed class MainViewModelTests
     }
 
     [Fact]
+    public async Task DirectSearch_EnablesSearchWithoutResume()
+    {
+        var source = new StubJobSource();
+        var viewModel = CreateViewModel(source);
+
+        viewModel.DesiredRole = ".NET";
+
+        Assert.True(viewModel.RefreshJobsCommand.CanExecute(null));
+
+        await viewModel.RefreshJobsCommand.ExecuteAsync(null);
+
+        Assert.NotNull(source.LastQuery);
+        Assert.Contains(".NET", source.LastQuery.Keywords);
+    }
+
+    [Fact]
+    public async Task DirectSearch_ExplainsWhenNoRelatedResultExists()
+    {
+        var viewModel = CreateViewModel(
+            new StubJobSource { ResultCount = 0 });
+        viewModel.DesiredRole = "termo inexistente";
+
+        await viewModel.RefreshJobsCommand.ExecuteAsync(null);
+
+        Assert.Contains(
+            "Nenhum resultado relacionado",
+            viewModel.StatusMessage);
+    }
+
+    [Fact]
     public async Task RefreshJobsCommand_IsDisabledWhileSearchIsRunning()
     {
         var filePath = CreateTemporaryResume();

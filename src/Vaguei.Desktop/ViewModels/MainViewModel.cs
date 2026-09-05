@@ -34,6 +34,7 @@ public partial class MainViewModel : ViewModelBase
     private string _professionalTitle = string.Empty;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RefreshJobsCommand))]
     private string _desiredRole = string.Empty;
 
     [ObservableProperty]
@@ -173,10 +174,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand(CanExecute = nameof(CanRefreshJobs))]
     private async Task RefreshJobsAsync()
     {
-        if (_currentProfile is null)
-        {
-            return;
-        }
+        var profile = _currentProfile ?? new CandidateProfile();
 
         IsSearchAttentionActive = false;
         IsBusy = true;
@@ -186,7 +184,7 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             await SearchJobsAsync(
-                _currentProfile,
+                profile,
                 CancellationToken.None);
         }
         catch (Exception exception)
@@ -201,8 +199,21 @@ public partial class MainViewModel : ViewModelBase
 
     private bool CanRefreshJobs()
     {
-        return _currentProfile is not null &&
+        return (_currentProfile is not null || IsValidDirectSearch(DesiredRole)) &&
                !IsBusy;
+    }
+
+    private static bool IsValidDirectSearch(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return false;
+        }
+
+        var normalized = value.Trim();
+
+        return normalized.Length is >= 2 and <= 80 &&
+               normalized.Any(char.IsLetterOrDigit);
     }
 
     [RelayCommand]
@@ -252,12 +263,15 @@ public partial class MainViewModel : ViewModelBase
             PublicationWindow = GetPublicationWindow()
         };
 
-        if (!string.IsNullOrWhiteSpace(DesiredRole) &&
-            !DesiredRole.Trim().Equals(
+        var directSearch = DesiredRole.Trim();
+
+        if (IsValidDirectSearch(directSearch) &&
+            (_currentProfile is null ||
+             !directSearch.Equals(
                 _detectedProfessionalTitle.Trim(),
-                StringComparison.OrdinalIgnoreCase))
+                StringComparison.OrdinalIgnoreCase)))
         {
-            preferences.DesiredRoles.Add(DesiredRole.Trim());
+            preferences.DesiredRoles.Add(directSearch);
         }
 
         var result = await Task.Run(
@@ -284,7 +298,9 @@ public partial class MainViewModel : ViewModelBase
                 $"{failure.Source}: {failure.Message}"));
 
         StatusMessage = Jobs.Count == 0
-            ? "Nenhuma vaga foi encontrada pelas fontes atuais com este filtro."
+            ? IsValidDirectSearch(directSearch)
+                ? $"Nenhum resultado relacionado a “{directSearch}”. Tente outro cargo, tecnologia ou empresa."
+                : "Nenhuma vaga foi encontrada pelas fontes atuais com este filtro."
             : $"{Jobs.Count} oportunidades encontradas e ordenadas por compatibilidade.";
     }
 

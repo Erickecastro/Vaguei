@@ -28,5 +28,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets/vaguei.ico</ApplicationIcon>
+    <AssemblyName>vaguei</AssemblyName>
   </PropertyGroup>
 </Project>

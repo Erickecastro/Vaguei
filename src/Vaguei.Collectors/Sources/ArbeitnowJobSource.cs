@@ -113,22 +113,9 @@ public sealed class ArbeitnowJobSource : IJobSource
         JobPosting job,
         JobSearchQuery query)
     {
-        if (query.Keywords.Count > 0)
+        if (!JobSourceMapping.MatchesQuery(job, query))
         {
-            var matchesKeyword =
-                query.Keywords.Any(
-                    keyword =>
-                        job.Title.Contains(
-                            keyword,
-                            StringComparison.OrdinalIgnoreCase) ||
-                        job.Description.Contains(
-                            keyword,
-                            StringComparison.OrdinalIgnoreCase));
-
-            if (!matchesKeyword)
-            {
-                return false;
-            }
+            return false;
         }
 
         if (query.WorkModels.Count > 0 &&
