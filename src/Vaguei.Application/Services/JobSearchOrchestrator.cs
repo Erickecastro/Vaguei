@@ -9,6 +9,7 @@ public sealed class JobSearchOrchestrator
 {
     private readonly IReadOnlyCollection<IJobSource> _sources;
     private readonly JobSearchQueryBuilder _queryBuilder;
+    private readonly JobGeographyFilter _geographyFilter;
     private readonly JobFreshnessFilter _freshnessFilter;
     private readonly JobDeduplicator _deduplicator;
     private readonly JobMatcher _matcher;
@@ -18,6 +19,7 @@ public sealed class JobSearchOrchestrator
         : this(
             sources,
             new JobSearchQueryBuilder(),
+            new JobGeographyFilter(),
             new JobFreshnessFilter(),
             new JobDeduplicator(),
             new JobMatcher())
@@ -27,18 +29,21 @@ public sealed class JobSearchOrchestrator
     public JobSearchOrchestrator(
         IEnumerable<IJobSource> sources,
         JobSearchQueryBuilder queryBuilder,
+        JobGeographyFilter geographyFilter,
         JobFreshnessFilter freshnessFilter,
         JobDeduplicator deduplicator,
         JobMatcher matcher)
     {
         ArgumentNullException.ThrowIfNull(sources);
         ArgumentNullException.ThrowIfNull(queryBuilder);
+        ArgumentNullException.ThrowIfNull(geographyFilter);
         ArgumentNullException.ThrowIfNull(freshnessFilter);
         ArgumentNullException.ThrowIfNull(deduplicator);
         ArgumentNullException.ThrowIfNull(matcher);
 
         _sources = sources.ToArray();
         _queryBuilder = queryBuilder;
+        _geographyFilter = geographyFilter;
         _freshnessFilter = freshnessFilter;
         _deduplicator = deduplicator;
         _matcher = matcher;
@@ -68,8 +73,12 @@ public sealed class JobSearchOrchestrator
             .SelectMany(result => result.Jobs)
             .ToArray();
 
-        var freshJobs = _freshnessFilter.Filter(
+        var geographicallyAllowedJobs = _geographyFilter.Filter(
             collectedJobs,
+            preferences);
+
+        var freshJobs = _freshnessFilter.Filter(
+            geographicallyAllowedJobs,
             preferences,
             referenceTime);
 

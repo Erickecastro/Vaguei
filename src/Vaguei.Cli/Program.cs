@@ -153,12 +153,18 @@ try
         new JobSearchPreferences();
 
     using var httpClient =
-        new HttpClient();
+        new HttpClient
+        {
+            Timeout = TimeSpan.FromSeconds(30)
+        };
 
     var orchestrator =
         new JobSearchOrchestrator(
         [
-            new ArbeitnowJobSource(httpClient)
+            new ArbeitnowJobSource(httpClient),
+            new AshbyJobSource(httpClient),
+            new GreenhouseJobSource(httpClient),
+            new LeverJobSource(httpClient)
         ]);
 
     var searchResult = await orchestrator.SearchAsync(

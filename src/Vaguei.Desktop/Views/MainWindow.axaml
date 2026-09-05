@@ -65,6 +65,30 @@
       <Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}" />
       <Setter Property="BorderThickness" Value="1" />
     </Style>
+    <Style Selector="Button.resume-remove">
+      <Setter Property="Width" Value="38" />
+      <Setter Property="Height" Value="38" />
+      <Setter Property="Padding" Value="9" />
+      <Setter Property="CornerRadius" Value="19" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+    </Style>
+    <Style Selector="Button.search-action.attention">
+      <Setter Property="BorderBrush" Value="{DynamicResource PrimaryTextBrush}" />
+      <Setter Property="BorderThickness" Value="3" />
+      <Style.Animations>
+        <Animation Duration="0:0:0.85"
+                   IterationCount="INFINITE"
+                   PlaybackDirection="Alternate">
+          <KeyFrame Cue="0%">
+            <Setter Property="Opacity" Value="1" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="Opacity" Value="0.58" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
     <Style Selector="ComboBox.scope-selector">
       <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
       <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
@@ -156,11 +180,19 @@
                 <Border BorderBrush="{DynamicResource OutlineBrush}"
                         BorderThickness="0,1,0,0" Padding="20,11">
                   <Grid ColumnDefinitions="Auto,*,Auto">
-                    <TextBlock VerticalAlignment="Center" FontSize="18" Text="⌕" />
+                    <PathIcon Width="23" Height="23" VerticalAlignment="Center"
+                              Foreground="{DynamicResource PrimaryTextBrush}"
+                              Data="M10,3 A7,7 0 1 0 10,17 A7,7 0 1 0 10,3 Z M15,15 L21,21" />
                     <TextBlock Grid.Column="1" Margin="10,0" VerticalAlignment="Center"
                                TextTrimming="CharacterEllipsis"
                                Text="{Binding SelectedFileName}" />
-                    <TextBlock Grid.Column="2" VerticalAlignment="Center" Text="×" />
+                    <Button Grid.Column="2" Classes="resume-remove"
+                            IsVisible="{Binding HasProfile}"
+                            Command="{Binding RemoveResumeCommand}"
+                            ToolTip.Tip="Remover currículo">
+                      <PathIcon Width="20" Height="20"
+                                Data="M5,5 L19,19 M19,5 L5,19" />
+                    </Button>
                   </Grid>
                 </Border>
               </StackPanel>
@@ -224,8 +256,9 @@
       </SplitView.Pane>
 
       <Grid Margin="32,28" RowDefinitions="Auto,*">
-        <Grid ColumnDefinitions="*,Auto,10,Auto" Margin="0,0,0,18">
-          <StackPanel>
+        <Grid ColumnDefinitions="*,Auto,10,Auto"
+              RowDefinitions="Auto,Auto" Margin="0,0,0,18">
+          <StackPanel Grid.RowSpan="2">
             <TextBlock Classes="title" Text="Oportunidades encontradas" />
             <TextBlock Classes="subtitle"
                        Text="Ordenadas por compatibilidade e recência" />
@@ -235,9 +268,17 @@
             <TextBlock Foreground="{DynamicResource InverseTextBrush}"
                        Text="{Binding Jobs.Count, StringFormat='{}{0} vagas'}" />
           </Border>
-          <Button Grid.Column="3" Classes="primary" VerticalAlignment="Center"
+          <Button Grid.Column="3" Classes="primary search-action"
+                  Classes.attention="{Binding IsSearchAttentionActive}"
+                  VerticalAlignment="Center"
                   Padding="18,10" Command="{Binding RefreshJobsCommand}"
                   Content="Pesquisar" />
+          <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3"
+                    Width="180" Height="38" Margin="0,8,0,0"
+                    HorizontalAlignment="Right"
+                    ItemsSource="{Binding PublicationWindows}"
+                    SelectedIndex="{Binding PublicationWindowIndex}"
+                    ToolTip.Tip="Período de publicação das vagas" />
         </Grid>
 
         <ScrollViewer Grid.Row="1">

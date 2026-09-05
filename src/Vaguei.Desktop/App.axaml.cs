@@ -13,7 +13,10 @@ namespace Vaguei.Desktop;
 
 public partial class App : Avalonia.Application
 {
-    private readonly HttpClient _httpClient = new();
+    private readonly HttpClient _httpClient = new()
+    {
+        Timeout = TimeSpan.FromSeconds(30)
+    };
 
     public override void Initialize()
     {
@@ -35,7 +38,10 @@ public partial class App : Avalonia.Application
 
             var sources = new IJobSource[]
             {
-                new ArbeitnowJobSource(_httpClient)
+                new ArbeitnowJobSource(_httpClient),
+                new AshbyJobSource(_httpClient),
+                new GreenhouseJobSource(_httpClient),
+                new LeverJobSource(_httpClient)
             };
 
             desktop.MainWindow = new MainWindow

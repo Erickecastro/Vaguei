@@ -18,11 +18,21 @@ public sealed class MainViewModelTests
         Assert.Equal(
             ["Somente Brasil", "Brasil + exterior"],
             viewModel.SearchScopes);
+        Assert.Equal(
+            [
+                "Últimas 24 horas",
+                "Últimos 3 dias",
+                "Últimos 7 dias",
+                "Últimos 30 dias",
+                "Últimos 3 meses"
+            ],
+            viewModel.PublicationWindows);
+        Assert.Equal(3, viewModel.PublicationWindowIndex);
         Assert.True(viewModel.ShowEmptyState);
     }
 
     [Fact]
-    public async Task ProcessResumeAsync_PopulatesProfileAndJobs()
+    public async Task ProcessResumeAsync_PopulatesProfileAndWaitsForSearch()
     {
         var filePath = CreateTemporaryResume();
 
@@ -34,10 +44,10 @@ public sealed class MainViewModelTests
             await viewModel.ProcessResumeAsync(filePath);
 
             Assert.True(viewModel.HasProfile);
-            Assert.True(
-                viewModel.HasResults,
-                viewModel.StatusMessage);
-            Assert.Single(viewModel.Jobs);
+            Assert.False(viewModel.HasResults);
+            Assert.Empty(viewModel.Jobs);
+            Assert.Equal(0, source.SearchCount);
+            Assert.True(viewModel.IsSearchAttentionActive);
             Assert.Contains(
                 "Pessoa Teste",
                 viewModel.ProfileSummary);
@@ -61,6 +71,7 @@ public sealed class MainViewModelTests
             viewModel.SearchScopeIndex = 1;
 
             await viewModel.ProcessResumeAsync(filePath);
+            await viewModel.RefreshJobsCommand.ExecuteAsync(null);
 
             Assert.NotNull(source.LastQuery);
             Assert.Empty(source.LastQuery.Locations);
@@ -103,6 +114,33 @@ public sealed class MainViewModelTests
     }
 
     [Fact]
+    public async Task ProcessResumeAsync_AppliesSelectedPublicationWindow()
+    {
+        var filePath = CreateTemporaryResume();
+
+        try
+        {
+            var source = new StubJobSource
+            {
+                PublishedAt = DateTimeOffset.UtcNow.AddDays(-2)
+            };
+
+            var viewModel = CreateViewModel(source);
+            viewModel.PublicationWindowIndex = 0;
+
+            await viewModel.ProcessResumeAsync(filePath);
+            await viewModel.RefreshJobsCommand.ExecuteAsync(null);
+
+            Assert.False(viewModel.HasResults);
+            Assert.Empty(viewModel.Jobs);
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
+    }
+
+    [Fact]
     public async Task RefreshJobsCommand_ReusesAnalyzedProfile()
     {
         var filePath = CreateTemporaryResume();
@@ -115,7 +153,8 @@ public sealed class MainViewModelTests
             await viewModel.ProcessResumeAsync(filePath);
             await viewModel.RefreshJobsCommand.ExecuteAsync(null);
 
-            Assert.Equal(2, source.SearchCount);
+            Assert.Equal(1, source.SearchCount);
+            Assert.False(viewModel.IsSearchAttentionActive);
             Assert.True(
                 viewModel.RefreshJobsCommand.CanExecute(null));
         }
@@ -152,6 +191,33 @@ public sealed class MainViewModelTests
             Assert.False(viewModel.IsBusy);
             Assert.True(
                 viewModel.RefreshJobsCommand.CanExecute(null));
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
+    }
+
+    [Fact]
+    public async Task RemoveResumeCommand_ClearsProfileAndResults()
+    {
+        var filePath = CreateTemporaryResume();
+
+        try
+        {
+            var viewModel = CreateViewModel(new StubJobSource());
+            await viewModel.ProcessResumeAsync(filePath);
+            await viewModel.RefreshJobsCommand.ExecuteAsync(null);
+
+            viewModel.RemoveResumeCommand.Execute(null);
+
+            Assert.False(viewModel.HasProfile);
+            Assert.False(viewModel.HasResults);
+            Assert.False(viewModel.IsSearchAttentionActive);
+            Assert.Empty(viewModel.Jobs);
+            Assert.Empty(viewModel.ProfileSkills);
+            Assert.Equal("Nenhum currículo selecionado", viewModel.SelectedFileName);
+            Assert.False(viewModel.RefreshJobsCommand.CanExecute(null));
         }
         finally
         {
@@ -220,6 +286,9 @@ public sealed class MainViewModelTests
 
         public int SearchCount { get; private set; }
 
+        public DateTimeOffset PublishedAt { get; init; } =
+            DateTimeOffset.UtcNow.AddMinutes(-1);
+
         public async Task<IEnumerable<JobPosting>> SearchAsync(
             JobSearchQuery query,
             CancellationToken cancellationToken = default)
@@ -241,7 +310,7 @@ public sealed class MainViewModelTests
                     Company = "Empresa Teste",
                     Description = "Consultas SQL.",
                     Source = Name,
-                    PublishedAt = DateTimeOffset.UtcNow.AddMinutes(-1),
+                    PublishedAt = PublishedAt,
                     Location = new JobLocation
                     {
                         RawLocation = "Brasil"

@@ -45,12 +45,18 @@ public partial class MainViewModel : ViewModelBase
     private int _searchScopeIndex;
 
     [ObservableProperty]
+    private int _publicationWindowIndex = 3;
+
+    [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(RefreshJobsCommand))]
     [NotifyPropertyChangedFor(nameof(ShowEmptyState))]
     private bool _isBusy;
 
     [ObservableProperty]
     private bool _hasProfile;
+
+    [ObservableProperty]
+    private bool _isSearchAttentionActive;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowEmptyState))]
@@ -76,6 +82,15 @@ public partial class MainViewModel : ViewModelBase
         "Brasil + exterior"
     ];
 
+    public IReadOnlyList<string> PublicationWindows { get; } =
+    [
+        "Últimas 24 horas",
+        "Últimos 3 dias",
+        "Últimos 7 dias",
+        "Últimos 30 dias",
+        "Últimos 3 meses"
+    ];
+
     public bool ShowEmptyState => !IsBusy && !HasResults;
 
     public async Task ProcessResumeAsync(
@@ -89,6 +104,10 @@ public partial class MainViewModel : ViewModelBase
 
         IsBusy = true;
         HasResults = false;
+        HasProfile = false;
+        IsSearchAttentionActive = false;
+        _currentProfile = null;
+        RefreshJobsCommand.NotifyCanExecuteChanged();
         SourceWarnings = string.Empty;
         Jobs.Clear();
         SelectedFileName = Path.GetFileName(filePath);
@@ -120,11 +139,10 @@ public partial class MainViewModel : ViewModelBase
             PopulateProfileSkills(profile);
             ProfileSummary = CreateProfileSummary(profile);
             HasProfile = true;
+            IsSearchAttentionActive = true;
             RefreshJobsCommand.NotifyCanExecuteChanged();
-
-            await SearchJobsAsync(
-                profile,
-                cancellationToken);
+            StatusMessage =
+                "Currículo analisado. Clique em Pesquisar para encontrar vagas.";
         }
         catch (OperationCanceledException)
             when (cancellationToken.IsCancellationRequested)
@@ -151,6 +169,7 @@ public partial class MainViewModel : ViewModelBase
             return;
         }
 
+        IsSearchAttentionActive = false;
         IsBusy = true;
         HasResults = false;
         Jobs.Clear();
@@ -177,6 +196,31 @@ public partial class MainViewModel : ViewModelBase
                !IsBusy;
     }
 
+    [RelayCommand]
+    private void RemoveResume()
+    {
+        if (IsBusy)
+        {
+            return;
+        }
+
+        _currentProfile = null;
+        SelectedFileName = "Nenhum currículo selecionado";
+        CandidateName = string.Empty;
+        ProfessionalTitle = string.Empty;
+        ProfileSummary = string.Empty;
+        AdditionalSkillCount = 0;
+        ProfileSkills.Clear();
+        Jobs.Clear();
+        SourceWarnings = string.Empty;
+        HasProfile = false;
+        HasResults = false;
+        IsSearchAttentionActive = false;
+        StatusMessage =
+            "Arraste seu currículo para começar ou escolha um arquivo.";
+        RefreshJobsCommand.NotifyCanExecuteChanged();
+    }
+
     partial void OnSearchScopeIndexChanged(
         int value)
     {
@@ -193,7 +237,8 @@ public partial class MainViewModel : ViewModelBase
         var preferences = new JobSearchPreferences
         {
             IncludeBrazil = true,
-            IncludeInternational = IncludeInternational
+            IncludeInternational = IncludeInternational,
+            PublicationWindow = GetPublicationWindow()
         };
 
         var result = await Task.Run(
@@ -222,6 +267,19 @@ public partial class MainViewModel : ViewModelBase
         StatusMessage = Jobs.Count == 0
             ? "Nenhuma vaga foi encontrada pelas fontes atuais com este filtro."
             : $"{Jobs.Count} oportunidades encontradas e ordenadas por compatibilidade.";
+    }
+
+    private JobPublicationWindow GetPublicationWindow()
+    {
+        return PublicationWindowIndex switch
+        {
+            0 => JobPublicationWindow.Last24Hours,
+            1 => JobPublicationWindow.Last3Days,
+            2 => JobPublicationWindow.Last7Days,
+            3 => JobPublicationWindow.Last30Days,
+            4 => JobPublicationWindow.Last3Months,
+            _ => JobPublicationWindow.Last30Days
+        };
     }
 
     private void PopulateProfileSkills(

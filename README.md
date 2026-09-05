@@ -33,6 +33,8 @@ Software development is the initial validation domain because it reflects the fi
 * Job requirement classification
 * Job source orchestration and failure isolation
 * Duplicate job removal
+* Public Ashby, Greenhouse, and Lever job board integrations
+* Brazilian job location recognition
 * Cross-platform execution
 
 # Tech Stack
@@ -51,7 +53,7 @@ Software development is the initial validation domain because it reflects the fi
 
 ### Planned
 
-* Multiple job source integrations
+* Additional authorized job source integrations
 * Broader profession and skill taxonomies
 * REST APIs
 * Avalonia UI
@@ -129,6 +131,11 @@ An initial Avalonia desktop interface is available in `src/Vaguei.Desktop`. Run 
 ```bash
 dotnet run --project src/Vaguei.Desktop
 ```
+
+The current collector searches Arbeitnow and a curated catalog of public Ashby,
+Greenhouse, and Lever job boards. The catalog includes employers with Brazilian
+openings and can be extended without scraping protected job platforms. Search
+results always preserve the original application URL.
 
 For local diagnostics, the CLI accepts a resume path:
 

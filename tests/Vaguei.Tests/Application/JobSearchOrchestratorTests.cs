@@ -123,6 +123,45 @@ public sealed class JobSearchOrchestratorTests
         Assert.Empty(result.Matches);
     }
 
+    [Fact]
+    public async Task SearchAsync_BrazilOnly_RejectsInternationalJobsCentrally()
+    {
+        var brazilianJob = CreateJob(
+            "Analista de Dados",
+            "SQL",
+            "Fonte");
+
+        var internationalJob = CreateJob(
+            "Data Analyst",
+            "SQL",
+            "Fonte");
+
+        internationalJob.Location.RawLocation =
+            "London, United Kingdom";
+
+        var orchestrator = new JobSearchOrchestrator(
+        [
+            new StubJobSource(
+                "Fonte",
+                [brazilianJob, internationalJob])
+        ]);
+
+        var result = await orchestrator.SearchAsync(
+            new CandidateProfile
+            {
+                ProfessionalTitle = "Analista de Dados",
+                Skills = ["SQL"]
+            },
+            new JobSearchPreferences(),
+            ReferenceTime);
+
+        var match = Assert.Single(result.Matches);
+
+        Assert.Equal(
+            "Brasil",
+            match.Job.Location.RawLocation);
+    }
+
     private static JobPosting CreateJob(
         string title,
         string description,
