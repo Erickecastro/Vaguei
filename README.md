@@ -41,7 +41,7 @@ Software development is the initial validation domain because it reflects the fi
 * Source failure warnings without interrupting successful providers
 * Dismissible connection warning with automatic timeout when every source is unreachable
 * Original job link for every result
-* In-app About area covering purpose, privacy, terms, and licenses
+* In-app About area covering purpose, privacy, terms, licenses, and source authorization status
 
 ### Resume processing
 
@@ -256,6 +256,7 @@ Project governance documents are versioned with the code:
 * [Terms of Use](docs/TERMS_OF_USE.md)
 * [Privacy](docs/PRIVACY.md)
 * [Integrations and Partnerships](docs/PARTNERSHIPS.md)
+* [Partnership Request Templates](docs/PARTNERSHIP_REQUEST_TEMPLATES.md)
 * [MIT License](LICENSE)
 
 These documents describe the current experimental application. They require legal review, an official contact channel, and an explicit acceptance/versioning mechanism before commercial distribution or remote personal-data processing.

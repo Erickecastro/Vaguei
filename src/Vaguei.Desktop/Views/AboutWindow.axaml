@@ -15,7 +15,7 @@
   <Border CornerRadius="12" ClipToBounds="True" Background="{DynamicResource PageBackgroundBrush}" BorderBrush="{DynamicResource OutlineBrush}" BorderThickness="1">
     <Grid RowDefinitions="40,*">
       <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource OutlineBrush}" BorderThickness="0,0,0,1">
-        <Grid ColumnDefinitions="*,Auto" PointerPressed="OnTitleBarPointerPressed">
+        <Grid x:Name="AboutTitleBar" ColumnDefinitions="*,Auto">
           <TextBlock Margin="16,0" VerticalAlignment="Center" FontWeight="SemiBold" Text="Sobre o Vaguei"/>
           <Button Grid.Column="1" Width="40" Height="40" Padding="0" Background="Transparent" BorderThickness="0" Click="OnCloseClick" ToolTip.Tip="Fechar">
             <Border Width="26" Height="26" CornerRadius="13" Background="{DynamicResource SoftSurfaceBrush}">
@@ -76,7 +76,18 @@
               <TextBlock Classes="body" Text="Copyright © 2026 Ericke Castro. O software pode ser usado, copiado, modificado e distribuído nos termos da licença MIT, mantendo o aviso de copyright e a licença. O software é fornecido sem garantias."/>
               <TextBlock Classes="section" Text="Conteúdo de terceiros"/>
               <TextBlock Classes="body" Text="A licença MIT do código não concede direitos sobre marcas, logotipos, descrições de vagas ou dados fornecidos por terceiros. Cada integração permanece sujeita aos termos e requisitos de atribuição de sua fonte."/>
-              <Border Classes="panel" Margin="0,16,0,0"><TextBlock Classes="body" Text="Documentos completos no repositório: LICENSE, docs/TERMS_OF_USE.md, docs/PRIVACY.md e docs/PARTNERSHIPS.md."/></Border>
+              <Border Classes="panel" Margin="0,16,0,0"><TextBlock Classes="body" Text="Documentos completos no repositório: LICENSE, docs/TERMS_OF_USE.md, docs/PRIVACY.md, docs/PARTNERSHIPS.md e docs/PARTNERSHIP_REQUEST_TEMPLATES.md."/></Border>
+            </StackPanel></ScrollViewer>
+          </TabItem>
+          <TabItem Header="Fontes">
+            <ScrollViewer Margin="4,16,4,4"><StackPanel>
+              <TextBlock Classes="section" Text="Integrações disponíveis"/>
+              <TextBlock Classes="body" Text="Arbeitnow, Ashby, Greenhouse, InHire, Jobicy, Lever, Remotive, SmartRecruiters e Workable utilizam endpoints públicos ou páginas de carreira permitidas. Jooble está implementada e é ativada somente com uma chave oficial."/>
+              <TextBlock Classes="section" Text="Parcerias em preparação"/>
+              <TextBlock Classes="body" Text="Gupy é a prioridade nacional e exige aprovação do Vaguei como job board parceiro. InfoJobs, Jobbol e Catho também dependem de autorização específica para distribuição de seus catálogos."/>
+              <TextBlock Classes="section" Text="Fonte restrita"/>
+              <TextBlock Classes="body" Text="O LinkedIn não oferece uma API pública para importar livremente seu catálogo. O Vaguei não coleta páginas protegidas e só fará uma integração após contrato e autorização explícita."/>
+              <Border Classes="panel" Margin="0,16,0,0"><TextBlock Classes="body" Text="Toda vaga mantém sua plataforma de origem e o link oficial. Uma fonte pode ser desativada independentemente se seus termos, autorização ou disponibilidade mudarem."/></Border>
             </StackPanel></ScrollViewer>
           </TabItem>
         </TabControl>

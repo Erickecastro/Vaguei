@@ -27,3 +27,13 @@ O Vaguei é um aplicativo de descoberta de oportunidades que normaliza vagas aut
 - InfoJobs, Jobbol e Catho: solicitar autorização específica para distribuição do catálogo.
 - LinkedIn: integrar somente após contrato e aprovação explícita; não coletar páginas automaticamente.
 
+## Matriz atual de acesso
+
+| Situação | Fontes |
+| --- | --- |
+| Endpoint público ou página de carreira permitida | Arbeitnow, Ashby, Greenhouse, InHire, Jobicy, Lever, Remotive, SmartRecruiters e Workable |
+| API oficial implementada, dependente de credencial | Jooble |
+| Parceria ou autorização a solicitar | Gupy, InfoJobs, Jobbol e Catho |
+| Sem coleta automatizada autorizada no momento | LinkedIn |
+
+Essa classificação deve ser revisada sempre que uma fonte alterar seus termos, documentação ou modelo de acesso.
