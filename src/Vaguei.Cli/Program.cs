@@ -1,5 +1,5 @@
 ﻿using Vaguei.Application.Services;
-using Vaguei.Collectors.Sources;
+using Vaguei.Collectors.Configuration;
 using Vaguei.Domain.Models;
 using Vaguei.ResumeParser.Parsers;
 using Vaguei.ResumeParser.Services;
@@ -158,17 +158,8 @@ try
             Timeout = TimeSpan.FromSeconds(30)
         };
 
-    var orchestrator =
-        new JobSearchOrchestrator(
-        [
-            new ArbeitnowJobSource(httpClient),
-            new AshbyJobSource(httpClient),
-            new GreenhouseJobSource(httpClient),
-            new InHireJobSource(httpClient),
-            new LeverJobSource(httpClient),
-            new SmartRecruitersJobSource(httpClient),
-            new WorkableJobSource(httpClient)
-        ]);
+    var orchestrator = new JobSearchOrchestrator(
+        JobSourceFactory.Create(httpClient));
 
     var searchResult = await orchestrator.SearchAsync(
         profile,

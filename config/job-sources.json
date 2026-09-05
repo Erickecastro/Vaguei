@@ -1,0 +1,43 @@
+{
+  "ashby": {
+    "reonic": "Reonic"
+  },
+  "greenhouse": {
+    "intersystems": "InterSystems",
+    "braze": "Braze",
+    "atolls": "Atolls",
+    "qualtrics": "Qualtrics",
+    "gitlab": "GitLab",
+    "ebanx": "EBANX",
+    "monks": "Monks",
+    "quintoandar": "QuintoAndar",
+    "gympass": "Wellhub"
+  },
+  "inhire": {
+    "sidia": "Sidia"
+  },
+  "lever": {
+    "swile": "Swile",
+    "lalamove": "Lalamove",
+    "tryjeeves": "Jeeves",
+    "loadsmart": "Loadsmart"
+  },
+  "smartRecruiters": {
+    "BoschGroup": "Bosch",
+    "SGS": "SGS",
+    "Experian": "Serasa Experian",
+    "PARSECOPERACOESLOGISTICASLTDA": "Parsec Operações Logísticas",
+    "keycommerce": "KeyCommerce",
+    "SeInspire": "Se Inspire",
+    "adimplere": "Adimplere",
+    "PimpMyCarroa": "Pimp My Carroça"
+  },
+  "workable": {
+    "monkey-1": "Monkey",
+    "popmenu": "Popmenu",
+    "devpro": "Dev.Pro",
+    "pairedrecruiting": "Paired",
+    "valsoft-corp": "Valsoft Corporation",
+    "whoosh-1": "Whoosh"
+  }
+}

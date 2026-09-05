@@ -8,6 +8,10 @@
 
   <ItemGroup>
     <AvaloniaResource Include="Assets/**" />
+    <Content Include="../../config/job-sources.json"
+             Link="job-sources.json"
+             CopyToOutputDirectory="PreserveNewest"
+             CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

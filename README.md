@@ -67,7 +67,7 @@ Vaguei currently reads anonymous, read-only job data from public endpoints or pu
 * SmartRecruiters
 * Workable
 
-The repository contains a curated employer catalog for sources that require a board, tenant, site, company, or account identifier. This includes the public Sidia page on InHire and a mix of Brazilian and international employers across the other providers.
+The repository contains a curated employer catalog for sources that require a board, tenant, site, company, or account identifier. This includes the public Sidia page on InHire and a mix of Brazilian and international employers across the other providers. The shared catalog lives in [`config/job-sources.json`](config/job-sources.json), is copied into Desktop and CLI builds, and falls back to validated built-in defaults when it is missing or malformed.
 
 The current integration does **not** scrape authenticated or protected pages. LinkedIn, Gupy, Catho, and similar platforms will only be integrated through an official API, an approved partnership, an employer-owned public feed, or another method explicitly permitted by their terms. Vaguei does not attempt to bypass authentication, anti-bot protection, rate limits, or access controls.
 
@@ -187,7 +187,7 @@ The score is intentionally explainable and deterministic. It is not a hiring pre
 
 # Current Limitations
 
-* Employer catalogs are currently maintained in code and do not discover every company automatically.
+* The configured employer catalog does not discover every company automatically.
 * Public APIs can change, rate-limit requests, omit publication dates, or become unavailable.
 * Search breadth is constrained by the configured public sources and employers.
 * The initial skill and role taxonomies are strongest for software development.
@@ -199,7 +199,6 @@ The score is intentionally explainable and deterministic. It is not a hiring pre
 
 ### Near term
 
-* Move employer catalogs from source code to validated configuration
 * Add bounded concurrency, timeouts, retries, caching, and per-source diagnostics
 * Expand authorized public career sources and Brazilian employer coverage
 * Broaden role and skill taxonomies beyond software development
