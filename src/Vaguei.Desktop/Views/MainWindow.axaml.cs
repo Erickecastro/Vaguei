@@ -36,6 +36,15 @@ public partial class MainWindow : Window
             }
         ];
 
+        AppContent.Transitions = [CreateOpacityTransition(420)];
+        StartupSplash.Transitions = [CreateOpacityTransition(420)];
+        StartupIdentity.Transitions = [CreateOpacityTransition(360)];
+        StartupLogoContainer.Transitions =
+        [
+            new DoubleTransition { Property = WidthProperty, Duration = TimeSpan.FromMilliseconds(520) },
+            new DoubleTransition { Property = HeightProperty, Duration = TimeSpan.FromMilliseconds(520) }
+        ];
+
         SizeChanged += OnWindowSizeChanged;
         PropertyChanged += OnWindowPropertyChanged;
         Opened += OnWindowOpened;
@@ -105,7 +114,7 @@ public partial class MainWindow : Window
         _isThemeTransitioning = false;
     }
 
-    private void OnWindowOpened(
+    private async void OnWindowOpened(
         object? sender,
         EventArgs eventArgs)
     {
@@ -113,7 +122,28 @@ public partial class MainWindow : Window
         UpdateThemeVisuals(
             Avalonia.Application.Current?.ActualThemeVariant ??
             ThemeVariant.Light);
+        await PlayStartupIntroAsync();
     }
+
+    private async Task PlayStartupIntroAsync()
+    {
+        await Task.Delay(160);
+        StartupIdentity.Opacity = 1;
+        StartupLogoContainer.Width = 76;
+        StartupLogoContainer.Height = 76;
+        await Task.Delay(900);
+        StartupSplash.Opacity = 0;
+        AppContent.Opacity = 1;
+        await Task.Delay(440);
+        StartupSplash.IsVisible = false;
+    }
+
+    private static DoubleTransition CreateOpacityTransition(int milliseconds) =>
+        new()
+        {
+            Property = OpacityProperty,
+            Duration = TimeSpan.FromMilliseconds(milliseconds)
+        };
 
     private void OnWindowSizeChanged(
         object? sender,
@@ -179,6 +209,8 @@ public partial class MainWindow : Window
         LightThemeLogo.IsVisible = !isDark;
         TitleDarkThemeLogo.IsVisible = isDark;
         TitleLightThemeLogo.IsVisible = !isDark;
+        StartupDarkThemeLogo.IsVisible = isDark;
+        StartupLightThemeLogo.IsVisible = !isDark;
         ScopeSelector.Foreground = foreground;
         ScopeLocationIcon.Foreground = foreground;
     }

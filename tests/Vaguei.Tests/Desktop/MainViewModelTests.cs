@@ -232,6 +232,7 @@ public sealed class MainViewModelTests
     {
         var viewModel = CreateViewModel(new StubJobSource());
         viewModel.WorkModelIndex = 1;
+        viewModel.PublicationWindowIndex = 4;
         viewModel.EmploymentTypeIndex = 2;
         viewModel.SeniorityIndex = 3;
         viewModel.LocationFilter = "Manaus";
@@ -239,9 +240,26 @@ public sealed class MainViewModelTests
         viewModel.ClearAdvancedFiltersCommand.Execute(null);
 
         Assert.Equal(0, viewModel.WorkModelIndex);
+        Assert.Equal(3, viewModel.PublicationWindowIndex);
         Assert.Equal(0, viewModel.EmploymentTypeIndex);
         Assert.Equal(0, viewModel.SeniorityIndex);
         Assert.Empty(viewModel.LocationFilter);
+    }
+
+    [Fact]
+    public async Task RefreshJobsCommand_SearchesAgainAfterPublicationWindowChanges()
+    {
+        var source = new StubJobSource();
+        var viewModel = CreateViewModel(source);
+        viewModel.DesiredRole = "Estágio";
+
+        await viewModel.RefreshJobsCommand.ExecuteAsync(null);
+        viewModel.PublicationWindowIndex = 4;
+        await viewModel.RefreshJobsCommand.ExecuteAsync(null);
+
+        Assert.Equal(2, source.SearchCount);
+        Assert.False(viewModel.IsBusy);
+        Assert.True(viewModel.RefreshJobsCommand.CanExecute(null));
     }
 
     [Fact]

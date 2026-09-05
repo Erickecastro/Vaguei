@@ -275,9 +275,6 @@ public partial class MainViewModel : ViewModelBase
 
         IsSearchAttentionActive = false;
         IsBusy = true;
-        HasResults = false;
-        Jobs.Clear();
-        _allJobs.Clear();
 
         try
         {
@@ -345,10 +342,13 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void ClearAdvancedFilters()
     {
+        PublicationWindowIndex = 3;
         WorkModelIndex = 0;
         EmploymentTypeIndex = 0;
         SeniorityIndex = 0;
         LocationFilter = string.Empty;
+        ShowOnlyFavorites = false;
+        ApplyVisibleJobFilter();
     }
 
     partial void OnSearchScopeIndexChanged(
