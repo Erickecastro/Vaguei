@@ -312,37 +312,22 @@ public partial class MainViewModel : ViewModelBase
 
         try
         {
-            var searchTask = SearchJobsAsync(
-                profile,
-                timeoutSource.Token);
-            var completedTask = await Task.WhenAny(
-                searchTask,
-                Task.Delay(_searchTimeout, timeoutSource.Token));
-
-            if (completedTask != searchTask)
-            {
-                timeoutSource.Cancel();
-                _ = ObserveAbandonedSearchAsync(searchTask);
-                StatusMessage = _connectionLostDuringSearch
-                    ? "Busca interrompida: conexão perdida."
-                    : "A busca demorou mais que o esperado. Tente novamente.";
-                ShowConnectionNotice();
-                return;
-            }
-
-            await searchTask;
+            await SearchJobsAsync(profile, timeoutSource.Token);
         }
         catch (OperationCanceledException)
             when (timeoutSource.IsCancellationRequested)
         {
             StatusMessage = _connectionLostDuringSearch
                 ? "Busca interrompida: conexão perdida."
-                : "A busca demorou mais que o esperado. Tente novamente.";
-            ShowConnectionNotice();
+                : "As fontes de vagas demoraram mais que o esperado. Tente novamente.";
+            if (_connectionLostDuringSearch)
+            {
+                ShowConnectionNotice();
+            }
         }
-        catch (Exception exception)
+        catch (Exception)
         {
-            StatusMessage = $"Não foi possível buscar novas vagas: {exception.Message}";
+            StatusMessage = "Não foi possível consultar as fontes de vagas agora. Tente novamente em instantes.";
         }
         finally
         {
@@ -368,18 +353,6 @@ public partial class MainViewModel : ViewModelBase
         }
 
         ShowConnectionNotice();
-    }
-
-    private static async Task ObserveAbandonedSearchAsync(Task searchTask)
-    {
-        try
-        {
-            await searchTask.ConfigureAwait(false);
-        }
-        catch
-        {
-            // A interface já informou o timeout; apenas observa a tarefa abandonada.
-        }
     }
 
     private bool CanRefreshJobs()
@@ -523,7 +496,10 @@ public partial class MainViewModel : ViewModelBase
                 .ConfigureAwait(false),
             cancellationToken);
 
-        cancellationToken.ThrowIfCancellationRequested();
+        if (cancellationToken.IsCancellationRequested && _connectionLostDuringSearch)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+        }
 
         Jobs.Clear();
         _allJobs.Clear();
@@ -542,7 +518,8 @@ public partial class MainViewModel : ViewModelBase
 
         HasResults = Jobs.Count > 0;
 
-        if (result.AllSourcesFailed)
+        var connectionUnavailable = _networkAvailable?.Invoke() == false;
+        if (result.AllSourcesFailed && connectionUnavailable)
         {
             ShowConnectionNotice();
         }
@@ -559,7 +536,9 @@ public partial class MainViewModel : ViewModelBase
         SourceCoverageSummary = CreateSourceCoverageSummary(
             result.SourceSummaries);
 
-        StatusMessage = _allJobs.Count == 0
+        StatusMessage = result.AllSourcesFailed && !connectionUnavailable
+            ? "As fontes de vagas estão temporariamente indisponíveis. Tente novamente em instantes."
+            : _allJobs.Count == 0
             ? IsValidDirectSearch(directSearch)
                 ? $"Nenhum resultado relacionado a “{directSearch}”. Tente outro cargo, tecnologia ou empresa."
                 : "Nenhuma vaga foi encontrada pelas fontes atuais com este filtro."

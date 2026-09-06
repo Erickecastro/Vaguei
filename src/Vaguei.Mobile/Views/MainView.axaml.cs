@@ -82,7 +82,7 @@ public partial class MainView : UserControl
 
         var file = (await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = "Escolha seu currículo",
+            Title = "Permitir acesso a um currículo",
             AllowMultiple = false,
             FileTypeFilter = [ResumeFiles]
         })).FirstOrDefault();

@@ -52,6 +52,8 @@ adb shell monkey -p com.erickecastro.vaguei -c android.intent.category.LAUNCHER 
 - Desligar a rede durante uma busca e confirmar cancelamento imediato com aviso compacto.
 - Girar o aparelho com rotação automática ativa e confirmar que o aplicativo permanece em retrato.
 - Conferir as abas Sobre, Privacidade, Termos, Licenças e Fontes.
+- Abrir o teclado nos campos e confirmar que a tela não é recalculada ou redimensionada por completo.
+- Confirmar que o seletor nativo concede acesso apenas ao currículo escolhido e não solicita fotos, vídeos ou armazenamento completo.
 - Abrir e fechar a área Sobre.
 - Rotacionar o aparelho durante a tela inicial e durante uma busca.
 

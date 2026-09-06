@@ -42,6 +42,9 @@ A extração de `Vaguei.UI` deve acontecer gradualmente. A tela desktop atual n�
 - Timeout geral de busca e política de rede mobile sem repetição demorada.
 - Cancelamento imediato ao perder a conexão e mensagens técnicas resumidas na tela pequena.
 - Orientação bloqueada em retrato e cinco abas institucionais equivalentes ao desktop.
+- Resultados virtualizados e teclado sem redimensionamento integral da árvore visual.
+- Consulta paralela das nove fontes independentes, com limites curtos por fonte e para a busca completa.
+- Acesso a currículo pelo Storage Access Framework: somente o documento escolhido é concedido ao aplicativo, sem permissão ampla para fotos, vídeos ou armazenamento.
 - Compatibilidade, justificativas e competências nos resultados.
 - Diagnóstico de fontes, carregamento e aviso de falta de conexão.
 - Tema claro/escuro persistente e área institucional Sobre.

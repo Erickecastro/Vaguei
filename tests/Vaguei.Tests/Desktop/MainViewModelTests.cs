@@ -332,19 +332,15 @@ public sealed class MainViewModelTests
     }
 
     [Fact]
-    public async Task DirectSearch_ShowsDismissibleNoticeWhenEverySourceFails()
+    public async Task DirectSearch_DoesNotBlameConnectionWhenEverySourceFails()
     {
         var viewModel = CreateViewModel(new StubJobSource { ShouldFail = true });
         viewModel.DesiredRole = "Analista";
 
         await viewModel.RefreshJobsCommand.ExecuteAsync(null);
 
-        Assert.True(viewModel.IsConnectionNoticeVisible);
-        Assert.Contains("conexão", viewModel.ConnectionNoticeMessage);
-
-        viewModel.DismissConnectionNoticeCommand.Execute(null);
-
         Assert.False(viewModel.IsConnectionNoticeVisible);
+        Assert.Contains("fontes de vagas", viewModel.StatusMessage);
     }
 
     [Fact]
@@ -395,7 +391,8 @@ public sealed class MainViewModelTests
 
         Assert.False(viewModel.IsBusy);
         Assert.True(viewModel.RefreshJobsCommand.CanExecute(null));
-        Assert.Contains("demorou mais", viewModel.StatusMessage);
+        Assert.Contains("demoraram mais", viewModel.StatusMessage);
+        Assert.False(viewModel.IsConnectionNoticeVisible);
         source.ReleaseSearch();
     }
 

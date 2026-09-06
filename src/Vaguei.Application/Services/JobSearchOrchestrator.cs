@@ -67,12 +67,31 @@ public sealed class JobSearchOrchestrator
             profile,
             preferences);
 
-        var sourceResults = await Task.WhenAll(
-            _sources.Select(source =>
+        var sourceTasks = _sources.Select(source =>
                 SearchSourceAsync(
                     source,
                     query,
-                    cancellationToken)));
+                    cancellationToken))
+            .ToArray();
+
+        SourceSearchResult[] sourceResults;
+        try
+        {
+            sourceResults = await Task.WhenAll(sourceTasks)
+                .WaitAsync(cancellationToken);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            sourceResults = sourceTasks
+                .Where(task => task.IsCompletedSuccessfully)
+                .Select(task => task.Result)
+                .ToArray();
+
+            if (sourceResults.Length == 0)
+            {
+                throw;
+            }
+        }
 
         var collectedJobs = sourceResults
             .SelectMany(result => result.Jobs)

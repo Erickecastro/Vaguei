@@ -15,7 +15,7 @@ public partial class App : Avalonia.Application
 {
     private readonly HttpClient _httpClient = new()
     {
-        Timeout = TimeSpan.FromSeconds(22)
+        Timeout = TimeSpan.FromSeconds(12)
     };
 
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
@@ -52,12 +52,12 @@ public partial class App : Avalonia.Application
             new ResumeAnalyzer(),
             new JobSearchOrchestrator(JobSourceFactory.Create(
                 _httpClient,
-                sourceTimeout: TimeSpan.FromSeconds(20),
+                sourceTimeout: TimeSpan.FromSeconds(10),
                 retryCount: 0,
                 maximumConcurrentSources: 5)),
             new JsonFavoriteJobStore(),
             new JsonJobSearchSettingsStore(),
-            searchTimeout: TimeSpan.FromSeconds(30),
+            searchTimeout: TimeSpan.FromSeconds(16),
             networkAvailable: System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable,
             showDetailedSourceWarnings: false)
     };

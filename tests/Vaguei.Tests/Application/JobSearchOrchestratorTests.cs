@@ -117,6 +117,29 @@ public sealed class JobSearchOrchestratorTests
     }
 
     [Fact]
+    public async Task SearchAsync_PreservesCompletedResultsWhenDeadlineExpires()
+    {
+        var orchestrator = new JobSearchOrchestrator(
+        [
+            new StubJobSource(
+                "Fonte rápida",
+                [CreateJob("Analista", "Excel", "Fonte rápida")]),
+            new HangingJobSource("Fonte lenta")
+        ]);
+        using var cancellation = new CancellationTokenSource(
+            TimeSpan.FromMilliseconds(50));
+
+        var result = await orchestrator.SearchAsync(
+            new CandidateProfile { ProfessionalTitle = "Analista" },
+            new JobSearchPreferences(),
+            ReferenceTime,
+            cancellation.Token);
+
+        var match = Assert.Single(result.Matches);
+        Assert.Equal("Fonte rápida", match.Job.Source);
+    }
+
+    [Fact]
     public async Task SearchAsync_AppliesFreshnessCentrally()
     {
         var oldJob = CreateJob(
@@ -229,6 +252,19 @@ public sealed class JobSearchOrchestratorTests
         {
             throw new HttpRequestException(
                 "Falha simulada.");
+        }
+    }
+
+    private sealed class HangingJobSource(string name) : IJobSource
+    {
+        public string Name => name;
+
+        public async Task<IEnumerable<JobPosting>> SearchAsync(
+            JobSearchQuery query,
+            CancellationToken cancellationToken = default)
+        {
+            await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+            return [];
         }
     }
 }
