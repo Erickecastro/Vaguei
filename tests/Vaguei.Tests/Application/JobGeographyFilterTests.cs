@@ -37,24 +37,27 @@ public sealed class JobGeographyFilterTests
     }
 
     [Fact]
-    public void IsAllowed_BrazilAndInternational_AcceptsEveryLocation()
+    public void IsAllowed_InternationalOnly_RejectsBrazilAndUnknownLocations()
     {
         var preferences = new JobSearchPreferences
         {
-            IncludeBrazil = true,
+            IncludeBrazil = false,
             IncludeInternational = true
         };
 
         var filter = new JobGeographyFilter();
 
-        Assert.True(filter.IsAllowed(
+        Assert.False(filter.IsAllowed(
             CreateJob("São Paulo, Brasil"),
             preferences));
         Assert.True(filter.IsAllowed(
             CreateJob("Berlin, Germany"),
             preferences));
-        Assert.True(filter.IsAllowed(
+        Assert.False(filter.IsAllowed(
             CreateJob(null),
+            preferences));
+        Assert.False(filter.IsAllowed(
+            CreateJob("Remote"),
             preferences));
     }
 

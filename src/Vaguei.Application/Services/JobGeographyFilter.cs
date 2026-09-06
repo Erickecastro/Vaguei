@@ -46,7 +46,8 @@ public sealed partial class JobGeographyFilter
         }
 
         return preferences.IncludeInternational &&
-               !isBrazilian;
+               !isBrazilian &&
+               HasKnownInternationalLocation(job.Location);
     }
 
     private static bool MatchesExplicitLocations(
@@ -124,6 +125,31 @@ public sealed partial class JobGeographyFilter
                (BrazilLocationPattern().IsMatch(location.RawLocation) ||
                 BrazilianCityPattern().IsMatch(location.RawLocation) ||
                 BrazilStateCodePattern().IsMatch(location.RawLocation));
+    }
+
+    private static bool HasKnownInternationalLocation(JobLocation location)
+    {
+        if (!string.IsNullOrWhiteSpace(location.CountryCode))
+        {
+            return !location.CountryCode.Equals("BR", StringComparison.OrdinalIgnoreCase);
+        }
+
+        if (!string.IsNullOrWhiteSpace(location.Country))
+        {
+            return !IsBrazilName(location.Country);
+        }
+
+        var rawLocation = Normalize(location.RawLocation);
+        if (string.IsNullOrWhiteSpace(rawLocation)) return false;
+
+        string[] unspecifiedLocations =
+        [
+            "remote", "remoto", "worldwide", "global", "anywhere",
+            "multiple locations", "various locations"
+        ];
+
+        return !unspecifiedLocations.Any(value =>
+            rawLocation.Equals(value, StringComparison.Ordinal));
     }
 
     private static bool IsBrazilName(

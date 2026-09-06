@@ -60,7 +60,7 @@
   <SplitView Grid.Row="1" x:Name="SidebarSplitView" DisplayMode="Inline" IsPaneOpen="True" OpenPaneLength="250" CompactPaneLength="0" UseLightDismissOverlayMode="True">
     <SplitView.Pane>
       <Border x:Name="SidebarPane" Width="250" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource OutlineBrush}" BorderThickness="0,0,1,0" Padding="20,18">
-        <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+        <Grid RowDefinitions="Auto,Auto,*,Auto,Auto" ClipToBounds="True">
           <Grid Width="64" Height="64" HorizontalAlignment="Center">
             <Image x:Name="DarkThemeLogo" Width="64" Height="64" Source="/Assets/logo-dark-56.png" Stretch="Uniform" RenderOptions.BitmapInterpolationMode="HighQuality"/>
             <Image x:Name="LightThemeLogo" Width="64" Height="64" Source="/Assets/logo-light-56.png" Stretch="Uniform" RenderOptions.BitmapInterpolationMode="HighQuality"/>
@@ -92,12 +92,14 @@
               </Border>
             </StackPanel>
           </Border>
-          <StackPanel Grid.Row="2" Width="210" VerticalAlignment="Top" Margin="0,18,0,10" Spacing="8" IsVisible="{Binding HasProfile}">
-            <TextBlock FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" Text="PERFIL IDENTIFICADO"/>
-            <TextBlock FontWeight="Bold" Text="{Binding CandidateName}" TextTrimming="CharacterEllipsis"/><TextBlock Classes="subtitle" Text="{Binding ProfessionalTitle}" TextTrimming="CharacterEllipsis"/>
-            <ItemsControl ItemsSource="{Binding ProfileSkills}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate><Border Classes="pill" Padding="8,3" Margin="0,0,5,5"><TextBlock FontSize="11" Text="{Binding}"/></Border></DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
-            <TextBlock Classes="subtitle" FontSize="11" FontStyle="Italic" IsVisible="{Binding HasAdditionalSkills}" Text="{Binding AdditionalSkillCount, StringFormat='e mais {0} competências'}"/>
-          </StackPanel>
+          <ScrollViewer Grid.Row="2" Margin="0,18,0,10" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" IsVisible="{Binding HasProfile}">
+            <StackPanel Width="198" Margin="0,0,8,0" VerticalAlignment="Top" Spacing="8">
+              <TextBlock FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" Text="PERFIL IDENTIFICADO"/>
+              <TextBlock FontWeight="Bold" Text="{Binding CandidateName}" TextTrimming="CharacterEllipsis"/><TextBlock Classes="subtitle" Text="{Binding ProfessionalTitle}" TextTrimming="CharacterEllipsis"/>
+              <ItemsControl ItemsSource="{Binding ProfileSkills}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate><Border Classes="pill" Padding="8,3" Margin="0,0,5,5"><TextBlock FontSize="11" Text="{Binding}"/></Border></DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+              <TextBlock Classes="subtitle" FontSize="11" FontStyle="Italic" IsVisible="{Binding HasAdditionalSkills}" Text="{Binding AdditionalSkillCount, StringFormat='e mais {0} competências'}"/>
+            </StackPanel>
+          </ScrollViewer>
           <Border Grid.Row="3" Classes="card" Padding="13"><StackPanel Spacing="6"><Grid ColumnDefinitions="*,Auto"><TextBlock FontWeight="Bold" Text="Status"/><Border Grid.Column="1" Classes="pill" Padding="8,3"><TextBlock FontSize="12" Text="{Binding Jobs.Count, StringFormat='{}{0} vagas'}"/></Border></Grid><TextBlock Classes="subtitle" FontSize="12" TextWrapping="Wrap" MaxHeight="52" TextTrimming="CharacterEllipsis" Text="{Binding StatusMessage}"/><ProgressBar Height="3" IsIndeterminate="True" IsVisible="{Binding IsBusy}"/><TextBlock Classes="subtitle" FontSize="10.5" TextWrapping="Wrap" MaxHeight="32" TextTrimming="CharacterEllipsis" Text="{Binding SourceCoverageSummary}" ToolTip.Tip="{Binding SourceCoverageSummary}"/><TextBlock Classes="subtitle" FontSize="11" TextWrapping="Wrap" MaxHeight="34" TextTrimming="CharacterEllipsis" Text="{Binding SourceWarnings}"/></StackPanel></Border>
           <Button Grid.Row="4" Classes="sidebarlink" Width="210" HorizontalAlignment="Stretch" Margin="0,10,0,0" Click="OnAboutClick" ToolTip.Tip="Sobre, privacidade, termos e licenças">
             <StackPanel Orientation="Horizontal" Spacing="9">

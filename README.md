@@ -6,12 +6,13 @@
 ![Avalonia](https://img.shields.io/badge/Avalonia-12-8B44AC?style=for-the-badge)
 ![C#](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=csharp)
 ![Tests](https://img.shields.io/badge/tests-passing-success?style=for-the-badge)
-![Platform](https://img.shields.io/badge/Desktop-Linux%20%7C%20Windows%20%7C%20macOS-blue?style=for-the-badge)
+![Platform](https://img.shields.io/badge/Desktop-Linux%20%7C%20Windows-blue?style=for-the-badge)
+![Android](https://img.shields.io/badge/Android-experimental-3DDC84?style=for-the-badge&logo=android&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-success?style=for-the-badge)
 
 # About
 
-**Vaguei** is an experimental, privacy-conscious desktop application for discovering and ranking job opportunities from multiple public career sources.
+**Vaguei** is a privacy-conscious job-discovery application for desktop, with an experimental Android prototype. Desktop remains the primary development target.
 
 Users can import a resume or search directly by role, technology, or company. Resume content is processed locally to identify professional context and relevant skills; contact details and other unnecessary personal data are discarded. Results keep the original application URL so the candidate always applies on the employer's or recruiting platform's page.
 
@@ -26,20 +27,20 @@ Software development is the initial validation domain because it reflects the fi
 * Avalonia desktop interface with light and grayscale dark themes
 * Theme preference applied before window creation and persisted locally
 * Resume selection and drag-and-drop
-* Fixed candidate sidebar with adaptive overlay on narrow windows
+* Candidate sidebar with constrained scrolling and an adaptive overlay on narrow or short windows
 * Responsive, resizable, movable, and maximizable custom window
 * Direct search by role, technology, or company
-* Brazil-only and Brazil-plus-international scopes
+* Mutually exclusive Brazil-only and international-only scopes
 * Publication filters for 24 hours, 3 days, 7 days, 30 days, and 3 months
 * Work-model filter for remote, hybrid, and on-site opportunities
 * Advanced filters for location, contract type, and seniority, persisted locally between sessions
 * Locally persisted favorite jobs with a saved-results filter
 * Loading and search-attention states that keep work off the UI thread
-* Non-destructive refresh that keeps previous results visible until an updated search completes
+* Search refresh that clears stale results immediately and presents an explicit loading state
 * Theme-aware four-second startup introduction with a fixed logo and smooth fade sequence
 * Keyboard search submission with Enter
 * Source failure warnings without interrupting successful providers
-* Dismissible connection warning with automatic timeout when every source is unreachable
+* Dismissible connection warning for confirmed network loss, without exposing provider exceptions
 * Original job link for every result
 * In-app About area covering purpose, privacy, terms, licenses, and source authorization status
 * Fixed compact footer with copyright, license, and third-party vacancy attribution
@@ -67,6 +68,7 @@ Software development is the initial validation domain because it reflects the fi
 * Compatibility based on role and skills, with penalties for missing core or required skills
 * Compatibility is displayed only when a resume has been analyzed
 * Ranking by compatibility and recency, with compatibility hidden for direct searches without a resume
+* Seniority inferred from explicit direct-search terms such as junior, senior, trainee, internship, and lead
 
 # Job Sources
 
@@ -106,6 +108,8 @@ Vaguei
 ├── Vaguei.Collectors      # Public job-source adapters
 ├── Vaguei.Infrastructure  # Reserved for persistence and platform services
 ├── Vaguei.Desktop         # Avalonia desktop application
+├── Vaguei.Mobile          # Shared small-screen Avalonia presentation
+├── Vaguei.Android         # Experimental Android entry point and package
 ├── Vaguei.Cli             # Local diagnostics
 └── Vaguei.Tests           # Automated test suite
 ```
@@ -154,13 +158,13 @@ Desktop results with original application links
 * No Docker runtime requirement
 * No external generative-AI service
 * No telemetry or resume upload
-* No production Android or iOS application
+* No production mobile release; Android is an installed experimental prototype and iOS has not started
 
 These technologies should be added only when a concrete product requirement justifies their operational and privacy cost.
 
 # Getting Started
 
-The current development baseline requires the .NET 10 SDK.
+The current development baseline requires the .NET 10 SDK. Clone the repository and run commands from its root.
 
 Restore, build, and test the complete solution:
 
@@ -176,6 +180,61 @@ Run the desktop application:
 dotnet run --project src/Vaguei.Desktop
 ```
 
+### Linux
+
+Install the .NET 10 SDK using your distribution or Microsoft's official packages. Restore and start the desktop application:
+
+```bash
+dotnet restore Vaguei.slnx
+dotnet run --project src/Vaguei.Desktop
+```
+
+To create a self-contained per-user installation with desktop entry and icons:
+
+```bash
+./packaging/linux/install-user.sh
+```
+
+The detailed Linux packaging behavior is documented in [`packaging/linux/README.md`](packaging/linux/README.md).
+
+### Windows
+
+Install the .NET 10 SDK, open PowerShell in the repository, and run:
+
+```powershell
+dotnet restore Vaguei.slnx
+dotnet run --project src/Vaguei.Desktop
+```
+
+To generate a self-contained Windows x64 directory:
+
+```powershell
+dotnet publish src/Vaguei.Desktop -c Release -r win-x64 --self-contained true
+```
+
+The executable is produced under `src/Vaguei.Desktop/bin/Release/net10.0/win-x64/publish/`. An installer and code signing are not implemented yet.
+
+### Android experimental
+
+Android development additionally requires the .NET Android workload, Android SDK, `adb`, and JDK 21:
+
+```bash
+dotnet workload install android
+dotnet restore Vaguei.Mobile.slnx
+dotnet build src/Vaguei.Android/Vaguei.Android.csproj \
+  -p:AndroidSdkDirectory="$ANDROID_SDK_ROOT" \
+  -p:JavaSdkDirectory="$JAVA_HOME"
+```
+
+With USB debugging enabled and one device visible in `adb devices`, install the signed debug APK:
+
+```bash
+adb install -r src/Vaguei.Android/bin/Debug/net10.0-android/com.erickecastro.vaguei-Signed.apk
+adb shell monkey -p com.erickecastro.vaguei -c android.intent.category.LAUNCHER 1
+```
+
+The Android application is a test build, not a Play Store release. Its current capabilities, limitations and complete device checklist are documented in [`docs/MOBILE_PROTOTYPE.md`](docs/MOBILE_PROTOTYPE.md) and [`docs/ANDROID_TESTING.md`](docs/ANDROID_TESTING.md).
+
 For local diagnostics, run the CLI with a resume path:
 
 ```bash
@@ -184,21 +243,13 @@ dotnet run --project src/Vaguei.Cli -- "/path/to/resume.pdf"
 
 Resume contents are not printed by default. Use `--show-raw` only in a controlled local environment because resumes contain personal data.
 
-# Desktop Packaging
+# Platform Status
 
-The desktop application targets Linux, Windows, and macOS through Avalonia. Linux and Windows are the currently tested development environments; release installers and code signing are not yet implemented.
+Linux and Windows are the tested desktop development environments. Avalonia also supports macOS, but this repository does not yet provide a validated macOS build. Release installers, signing and automatic updates are not implemented.
 
-For a per-user Linux installation without `sudo`:
+The Android prototype is implemented while desktop remains the primary product. Avalonia 12 and .NET 10 allow the domain, application, collectors, ViewModel, and most UI resources to be shared, while Android keeps a separate entry project, native document picker, lifecycle handling, portrait layout, and small-screen navigation.
 
-```bash
-./packaging/linux/install-user.sh
-```
-
-This publishes a self-contained build, installs the desktop entry and the required freedesktop icon sizes, and refreshes the available desktop caches when supported. See [`packaging/linux/README.md`](packaging/linux/README.md) for details.
-
-An experimental Android prototype is now planned while desktop remains the primary product. Avalonia 12 and .NET 10 allow the domain, application, collectors, and most UI resources to be shared, but Android needs a separate entry project, platform document picker, lifecycle handling, secure storage, and small-screen navigation. See the [mobile prototype plan](docs/MOBILE_PROTOTYPE.md).
-
-The Android prototype compiles in the separate [`Vaguei.Mobile.slnx`](Vaguei.Mobile.slnx) solution. It reuses the desktop search ViewModel and provides a four-second mobile introduction, local resume import, direct and profile-based search, compact expandable filters, virtualized results, favorites, compatibility explanations, connectivity feedback, persistent theme, the same five institutional tabs as desktop, original links, and a compact footer. Mobile searches query the nine independent sources in parallel with short per-source and overall limits plus network-loss cancellation. The Android Activity is locked to portrait and uses a non-resizing keyboard mode for smoother input. Desktop-only window operations are replaced by Android-native behavior. See the [device testing guide](docs/ANDROID_TESTING.md).
+The Android prototype compiles in the separate [`Vaguei.Mobile.slnx`](Vaguei.Mobile.slnx) solution. It reuses the desktop search ViewModel and provides a four-second mobile introduction, local resume import, direct and profile-based search, compact expandable filters, virtualized results, favorites, compatibility explanations, connectivity feedback, persistent theme, the same five institutional tabs as desktop, original links, and a compact footer. Mobile searches use bounded concurrent access to the nine configured sources, short per-source and overall limits, partial-result preservation, and network-loss cancellation. The Android Activity is locked to portrait and uses a non-resizing keyboard mode for smoother input. Desktop-only window operations are replaced by Android-native behavior. See the [device testing guide](docs/ANDROID_TESTING.md).
 
 # Matching Model
 
@@ -217,7 +268,7 @@ The score is intentionally explainable and deterministic. It is not a hiring pre
 * Search breadth is constrained by the configured public sources and employers.
 * The initial skill and role taxonomies are strongest for software development.
 * Matching does not yet model education, language proficiency, years of experience, compensation, or mandatory location constraints in depth.
-* Results are fetched live and cached only in memory for five minutes; there is no persistent local index yet.
+* Desktop keeps successful source responses in a bounded local cache for 30 minutes, but there is no long-lived searchable vacancy index.
 * Favorites are stored only on the current device and are not synchronized.
 * Accessibility, localization, installers, update delivery, and end-to-end UI automation still need production validation.
 
@@ -244,7 +295,7 @@ The score is intentionally explainable and deterministic. It is not a hiring pre
 * Produce reproducible Linux, Windows, and macOS release artifacts
 * Add installers, application metadata, signing, and update delivery
 * Extract reusable presentation components into a shared UI project
-* Build an Android debug prototype before committing to store distribution
+* Stabilize and profile the existing Android prototype before considering store distribution
 * Begin iOS work only after the Android experiment and desktop workflow are stable
 
 # Privacy and Responsible Access

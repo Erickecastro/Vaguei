@@ -148,8 +148,8 @@ public partial class MainViewModel : ViewModelBase
 
     public IReadOnlyList<string> SearchScopes { get; } =
     [
-        "Somente Brasil",
-        "Brasil + exterior"
+        "Brasil",
+        "Exterior"
     ];
 
     public IReadOnlyList<string> PublicationWindows { get; } =
@@ -294,6 +294,9 @@ public partial class MainViewModel : ViewModelBase
     private async Task RefreshJobsAsync()
     {
         DismissConnectionNotice();
+        Jobs.Clear();
+        _allJobs.Clear();
+        HasResults = false;
 
         if (_networkAvailable?.Invoke() == false)
         {
@@ -445,7 +448,7 @@ public partial class MainViewModel : ViewModelBase
 
         var preferences = new JobSearchPreferences
         {
-            IncludeBrazil = true,
+            IncludeBrazil = !IncludeInternational,
             IncludeInternational = IncludeInternational,
             PublicationWindow = GetPublicationWindow()
         };
@@ -465,6 +468,8 @@ public partial class MainViewModel : ViewModelBase
         }
 
         var selectedSeniority = GetSelectedSeniority();
+
+        selectedSeniority ??= InferSeniorityFromDirectSearch(DesiredRole);
 
         if (selectedSeniority is not null)
         {
@@ -711,6 +716,37 @@ public partial class MainViewModel : ViewModelBase
         6 => SeniorityLevel.Lead,
         _ => null
     };
+
+    private static SeniorityLevel? InferSeniorityFromDirectSearch(string? query)
+    {
+        if (string.IsNullOrWhiteSpace(query)) return null;
+
+        var normalized = new string(query
+            .Trim()
+            .ToLowerInvariant()
+            .Select(character => char.IsLetterOrDigit(character) ? character : ' ')
+            .ToArray());
+        var text = $" {string.Join(' ', normalized.Split(
+            ' ',
+            StringSplitOptions.RemoveEmptyEntries))} ";
+
+        if (ContainsAny(text, " estágio ", " estagio ", " internship ", " intern "))
+            return SeniorityLevel.Internship;
+        if (ContainsAny(text, " trainee "))
+            return SeniorityLevel.Trainee;
+        if (ContainsAny(text, " júnior ", " junior ", " jr "))
+            return SeniorityLevel.Junior;
+        if (ContainsAny(text, " pleno ", " mid level "))
+            return SeniorityLevel.MidLevel;
+        if (ContainsAny(text, " sênior ", " senior ", " sr "))
+            return SeniorityLevel.Senior;
+        return ContainsAny(text, " liderança ", " lideranca ", " lead ", " principal ", " staff ")
+            ? SeniorityLevel.Lead
+            : null;
+    }
+
+    private static bool ContainsAny(string text, params string[] terms) =>
+        terms.Any(term => text.Contains(term, StringComparison.OrdinalIgnoreCase));
 
     private void PopulateProfileSkills(
         CandidateProfile profile)

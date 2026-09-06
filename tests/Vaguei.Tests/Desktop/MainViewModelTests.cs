@@ -17,7 +17,7 @@ public sealed class MainViewModelTests
             new StubJobSource());
 
         Assert.Equal(
-            ["Somente Brasil", "Brasil + exterior"],
+            ["Brasil", "Exterior"],
             viewModel.SearchScopes);
         Assert.Equal(
             [
@@ -87,6 +87,37 @@ public sealed class MainViewModelTests
         {
             File.Delete(filePath);
         }
+    }
+
+    [Fact]
+    public async Task DirectSearch_InfersJuniorSeniorityFromQuery()
+    {
+        var source = new StubJobSource();
+        var viewModel = CreateViewModel(source);
+        viewModel.DesiredRole = "Desenvolvedor junior";
+
+        await viewModel.RefreshJobsCommand.ExecuteAsync(null);
+
+        Assert.NotNull(source.LastQuery);
+        Assert.Contains(SeniorityLevel.Junior, source.LastQuery.SeniorityLevels);
+    }
+
+    [Fact]
+    public async Task RefreshJobsCommand_ClearsPreviousResultsImmediately()
+    {
+        var source = new StubJobSource();
+        var viewModel = CreateViewModel(source);
+        viewModel.DesiredRole = "Analista";
+        await viewModel.RefreshJobsCommand.ExecuteAsync(null);
+        Assert.NotEmpty(viewModel.Jobs);
+
+        source.BlockNextSearch();
+        var refresh = viewModel.RefreshJobsCommand.ExecuteAsync(null);
+
+        Assert.True(viewModel.IsBusy);
+        Assert.Empty(viewModel.Jobs);
+        source.ReleaseSearch();
+        await refresh;
     }
 
     [Fact]
