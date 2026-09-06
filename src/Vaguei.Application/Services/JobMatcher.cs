@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using Vaguei.Application.Catalogs;
 using Vaguei.Domain.Entities;
 using Vaguei.Domain.Enums;
 using Vaguei.Domain.Models;
@@ -20,6 +21,13 @@ public sealed class JobMatcher
     private const double RequiredRequirementPenalty = 8;
     private const double MaximumRequirementPenalty = 25;
     private const double MaximumExperiencePenalty = 15;
+    private const double EducationPenalty = 8;
+    private const double CertificationPenalty = 6;
+    private const double LanguageProficiencyPenalty = 6;
+    private const double MaximumQualificationPenalty = 15;
+
+    private static readonly ProfileQualificationAnalyzer QualificationAnalyzer =
+        new();
 
     public JobMatchResult Match(
         CandidateProfile profile,
@@ -118,10 +126,16 @@ public sealed class JobMatcher
             job,
             reasons);
 
+        var qualificationPenalty = CalculateQualificationPenalty(
+            profile,
+            job,
+            reasons);
+
         var score = Math.Round(
             Math.Max(
                 0,
-                baseScore - requirementPenalty - experiencePenalty),
+                baseScore - requirementPenalty - experiencePenalty -
+                qualificationPenalty),
             2);
 
         return new JobMatchResult(
@@ -451,13 +465,19 @@ public sealed class JobMatcher
 
         foreach (var requirement in missingRequirements)
         {
+            var isSpokenLanguage =
+                IsSpokenLanguage(requirement.Name);
+
             reasons.Add(
                 new JobMatchReason
                 {
-                    Criterion = JobMatchCriterion.Skill,
+                    Criterion = isSpokenLanguage
+                        ? JobMatchCriterion.Language
+                        : JobMatchCriterion.Skill,
                     Kind = JobMatchReasonKind.Negative,
-                    Description = requirement.Level ==
-                        JobSkillRequirementLevel.Core
+                    Description = isSpokenLanguage
+                        ? $"Idioma obrigatório não identificado no perfil: {requirement.Name}."
+                        : requirement.Level == JobSkillRequirementLevel.Core
                             ? $"Competência central não identificada no perfil: {requirement.Name}."
                             : $"Competência obrigatória não identificada no perfil: {requirement.Name}."
                 });
@@ -471,6 +491,15 @@ public sealed class JobMatcher
         return Math.Min(
             MaximumRequirementPenalty,
             penalty);
+    }
+
+    private static bool IsSpokenLanguage(string requirementName)
+    {
+        return SkillCatalog.Skills.Any(skill =>
+            skill.Category == SkillCategory.SpokenLanguage &&
+            skill.Name.Equals(
+                requirementName,
+                StringComparison.OrdinalIgnoreCase));
     }
 
     private static double CalculateExperiencePenalty(
@@ -500,6 +529,104 @@ public sealed class JobMatcher
             MaximumExperiencePenalty,
             missingYears / requiredYears.Value * MaximumExperiencePenalty);
     }
+
+    private static double CalculateQualificationPenalty(
+        CandidateProfile profile,
+        JobPosting job,
+        ICollection<JobMatchReason> reasons)
+    {
+        var penalty = 0.0;
+        var vacancyText = $"{job.Title} {job.Description}";
+        var requiredEducation =
+            QualificationAnalyzer.ExtractEducationLevel(vacancyText);
+
+        if (profile.EducationLevel != EducationLevel.Unknown &&
+            requiredEducation != EducationLevel.Unknown &&
+            profile.EducationLevel < requiredEducation)
+        {
+            reasons.Add(new JobMatchReason
+            {
+                Criterion = JobMatchCriterion.Education,
+                Kind = JobMatchReasonKind.Negative,
+                Description =
+                    $"A vaga menciona formação {FormatEducation(requiredEducation)}; o currículo indica {FormatEducation(profile.EducationLevel)}."
+            });
+            penalty += EducationPenalty;
+        }
+
+        if (profile.Certifications.Count > 0)
+        {
+            var requiredCertifications =
+                QualificationAnalyzer.ExtractRequiredCertifications(vacancyText)
+                    .Where(certification =>
+                        !profile.Certifications.Contains(certification))
+                    .ToArray();
+
+            foreach (var certification in requiredCertifications)
+            {
+                reasons.Add(new JobMatchReason
+                {
+                    Criterion = JobMatchCriterion.Certification,
+                    Kind = JobMatchReasonKind.Negative,
+                    Description =
+                        $"Certificação obrigatória não identificada no currículo: {certification}."
+                });
+                penalty += CertificationPenalty;
+            }
+        }
+
+        foreach (var candidateLanguage in profile.Languages)
+        {
+            if (candidateLanguage.Proficiency == LanguageProficiency.Unknown)
+                continue;
+
+            var requiredLanguage =
+                QualificationAnalyzer.ExtractLanguages(vacancyText)
+                    .FirstOrDefault(language =>
+                        language.Name.Equals(
+                            candidateLanguage.Name,
+                            StringComparison.OrdinalIgnoreCase));
+
+            if (requiredLanguage is null ||
+                requiredLanguage.Proficiency == LanguageProficiency.Unknown ||
+                candidateLanguage.Proficiency >= requiredLanguage.Proficiency)
+            {
+                continue;
+            }
+
+            reasons.Add(new JobMatchReason
+            {
+                Criterion = JobMatchCriterion.Language,
+                Kind = JobMatchReasonKind.Negative,
+                Description =
+                    $"A vaga pede {candidateLanguage.Name} {FormatProficiency(requiredLanguage.Proficiency)}; o currículo indica nível {FormatProficiency(candidateLanguage.Proficiency)}."
+            });
+            penalty += LanguageProficiencyPenalty;
+        }
+
+        return Math.Min(MaximumQualificationPenalty, penalty);
+    }
+
+    private static string FormatEducation(EducationLevel level) => level switch
+    {
+        EducationLevel.Secondary => "de ensino médio",
+        EducationLevel.Technical => "técnica",
+        EducationLevel.Undergraduate => "de nível superior",
+        EducationLevel.Graduate => "de pós-graduação",
+        EducationLevel.Masters => "de mestrado",
+        EducationLevel.Doctorate => "de doutorado",
+        _ => "não especificada"
+    };
+
+    private static string FormatProficiency(LanguageProficiency level) => level switch
+    {
+        LanguageProficiency.Basic => "básico",
+        LanguageProficiency.Intermediate => "intermediário",
+        LanguageProficiency.Advanced => "avançado",
+        LanguageProficiency.Fluent => "fluente",
+        LanguageProficiency.Native => "nativo",
+        _ => "não informado"
+    };
 
     private static double? CalculateCandidateExperienceYears(
         IEnumerable<WorkExperience> experiences)

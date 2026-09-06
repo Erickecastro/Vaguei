@@ -852,4 +852,109 @@ public sealed class JobMatcherTests
             reason =>
                 reason.Kind == JobMatchReasonKind.Negative);
     }
+
+    [Fact]
+    public void Match_IdentifiesMissingSpokenLanguageSeparately()
+    {
+        var profile = CreateProfile(
+            "Analista Financeiro",
+            "Excel");
+
+        var job = CreateJob(
+            "Analista Financeiro",
+            "Excel and fluent English required.");
+
+        job.SkillRequirements.Add(
+            new JobSkillRequirement(
+                "Inglês",
+                JobSkillRequirementLevel.Required));
+
+        var result = _matcher.Match(
+            profile,
+            job,
+            new JobSearchPreferences());
+
+        Assert.Contains(
+            result.Reasons,
+            reason =>
+                reason.Criterion == JobMatchCriterion.Language &&
+                reason.Kind == JobMatchReasonKind.Negative &&
+                reason.Description.Contains("Inglês"));
+    }
+
+    [Fact]
+    public void Match_AppliesConservativeEducationPenalty()
+    {
+        var profile = CreateProfile("Analista Financeiro", "Excel");
+        profile.EducationLevel = EducationLevel.Technical;
+        var job = CreateJob(
+            "Analista Financeiro",
+            "Ensino superior completo. Excel.");
+
+        var result = _matcher.Match(
+            profile,
+            job,
+            new JobSearchPreferences());
+
+        Assert.Contains(result.Reasons, reason =>
+            reason.Criterion == JobMatchCriterion.Education &&
+            reason.Kind == JobMatchReasonKind.Negative);
+    }
+
+    [Fact]
+    public void Match_DoesNotAssumeEducationGapWithoutResumeEvidence()
+    {
+        var profile = CreateProfile("Analista Financeiro", "Excel");
+        var job = CreateJob(
+            "Analista Financeiro",
+            "Ensino superior completo. Excel.");
+
+        var result = _matcher.Match(
+            profile,
+            job,
+            new JobSearchPreferences());
+
+        Assert.DoesNotContain(result.Reasons, reason =>
+            reason.Criterion == JobMatchCriterion.Education);
+    }
+
+    [Fact]
+    public void Match_ExplainsLanguageProficiencyGap()
+    {
+        var profile = CreateProfile("Analista Financeiro", "Excel", "Inglês");
+        profile.Languages.Add(new CandidateLanguage(
+            "Inglês",
+            LanguageProficiency.Intermediate));
+        var job = CreateJob(
+            "Analista Financeiro",
+            "Excel. Fluent English is required.");
+
+        var result = _matcher.Match(
+            profile,
+            job,
+            new JobSearchPreferences());
+
+        Assert.Contains(result.Reasons, reason =>
+            reason.Criterion == JobMatchCriterion.Language &&
+            reason.Description.Contains("fluente"));
+    }
+
+    [Fact]
+    public void Match_ExplainsMissingExplicitCertification()
+    {
+        var profile = CreateProfile("Gerente de Projetos", "Scrum");
+        profile.Certifications.Add("Scrum");
+        var job = CreateJob(
+            "Gerente de Projetos",
+            "Certificação PMP obrigatória. Scrum.");
+
+        var result = _matcher.Match(
+            profile,
+            job,
+            new JobSearchPreferences());
+
+        Assert.Contains(result.Reasons, reason =>
+            reason.Criterion == JobMatchCriterion.Certification &&
+            reason.Description.Contains("PMP"));
+    }
 }

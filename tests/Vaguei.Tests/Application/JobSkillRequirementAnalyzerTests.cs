@@ -133,6 +133,22 @@ public sealed class JobSkillRequirementAnalyzerTests
             requirement.Name);
     }
 
+    [Fact]
+    public void Analyze_RecognizesRequiredSpokenLanguageAlias()
+    {
+        var job = CreateJob(
+            "Analista Financeiro",
+            "Fluent English is required for this position.");
+
+        var requirement = Assert.Single(
+            _analyzer.Analyze(job),
+            item => item.Name == "Inglês");
+
+        Assert.Equal(
+            JobSkillRequirementLevel.Required,
+            requirement.Level);
+    }
+
     private static JobPosting CreateJob(
         string title,
         string description)

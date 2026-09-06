@@ -50,7 +50,8 @@ Software development is the initial validation domain because it reflects the fi
 * ODT, DOCX, PDF, and TXT text extraction
 * Candidate name and professional-title identification
 * Professional experience, company, role, and employment-period extraction
-* Skill aliases, evidence, categories, and relevance levels
+* Conservative extraction of explicit education level, known certifications, and Portuguese/English language proficiency
+* Skill aliases, evidence, categories, and relevance levels across technology, administration, finance, HR, design, engineering, healthcare, logistics, sales, and spoken languages
 * Resume-section classification
 * Removal of email addresses, phone numbers, URLs, and empty contact labels before analysis
 * Local processing with no resume upload performed by the current application
@@ -64,9 +65,9 @@ Software development is the initial validation domain because it reflects the fi
 * Publication-date filtering
 * Duplicate removal using stable provider identifiers plus canonical employer names, title, location, URL, and description similarity
 * Role normalization and controlled search-term expansion, including Portuguese and English internship variants
-* Controlled bilingual variants for common technology, data, HR, accounting, healthcare, and logistics roles
-* Compatibility based on role and skills, with penalties for missing core or required skills
-* Limited, explainable experience-gap adjustment when both the vacancy requirement and dated résumé history are available
+* Controlled bilingual variants for common technology, data, administration, finance, HR, design, engineering, accounting, healthcare, logistics, and sales roles
+* Compatibility based on role and skills, with distinct explainable feedback for missing core skills and required spoken languages
+* Limited, explainable adjustments for experience, education, known mandatory certifications, and language proficiency when both sides provide evidence
 * Compatibility is displayed only when a resume has been analyzed
 * Ranking by compatibility and recency, with compatibility hidden for direct searches without a resume
 * Seniority inferred from explicit direct-search terms such as junior, senior, trainee, internship, and lead
@@ -222,9 +223,10 @@ Android development additionally requires the .NET Android workload, Android SDK
 ```bash
 dotnet workload install android
 dotnet restore Vaguei.Mobile.slnx
-dotnet build src/Vaguei.Android/Vaguei.Android.csproj \
+env JAVA_HOME=/caminho/para/o/jdk-21 \
+dotnet build Vaguei.Mobile.slnx -c Debug \
   -p:AndroidSdkDirectory="$ANDROID_SDK_ROOT" \
-  -p:JavaSdkDirectory="$JAVA_HOME"
+  -p:JavaSdkDirectory=/caminho/para/o/jdk-21
 ```
 
 With USB debugging enabled and one device visible in `adb devices`, install the signed debug APK:
@@ -234,7 +236,7 @@ adb install -r src/Vaguei.Android/bin/Debug/net10.0-android/com.erickecastro.vag
 adb shell monkey -p com.erickecastro.vaguei -c android.intent.category.LAUNCHER 1
 ```
 
-The Android application is a test build, not a Play Store release. Its current capabilities, limitations and complete device checklist are documented in [`docs/MOBILE_PROTOTYPE.md`](docs/MOBILE_PROTOTYPE.md) and [`docs/ANDROID_TESTING.md`](docs/ANDROID_TESTING.md).
+The Android application is currently version `0.2.0` (`versionCode` 2) and remains a test build, not a Play Store release. Its current capabilities, limitations and complete device checklist are documented in [`docs/MOBILE_PROTOTYPE.md`](docs/MOBILE_PROTOTYPE.md) and [`docs/ANDROID_TESTING.md`](docs/ANDROID_TESTING.md).
 
 For local diagnostics, run the CLI with a resume path:
 
@@ -258,7 +260,7 @@ When a resume is available, the current score combines:
 
 * Up to 50% for normalized role similarity
 * Up to 50% for skill evidence, weighted by relevance
-* Penalties for missing skills classified as core or required
+* Penalties for missing skills or spoken languages classified as core or required
 
 The score is intentionally explainable and deterministic. It is not a hiring prediction and should not be treated as an assessment of candidate quality. Direct searches without a resume do not display a compatibility percentage.
 
@@ -267,8 +269,8 @@ The score is intentionally explainable and deterministic. It is not a hiring pre
 * The configured employer catalog does not discover every company automatically.
 * Public APIs can change, rate-limit requests, omit publication dates, or become unavailable.
 * Search breadth is constrained by the configured public sources and employers.
-* The initial skill and role taxonomies are strongest for software development.
-* Matching considers only explicit experience-year requirements and does not yet model education, language proficiency, compensation, or mandatory location constraints in depth.
+* Role and skill taxonomies now cover software, administration, finance, HR, design, engineering, healthcare, logistics, and sales, but coverage remains uneven for specialist and regulated occupations.
+* Matching recognizes explicit education and spoken-language proficiency plus a controlled certification catalog, but does not yet understand every degree, certification, compensation condition, or nuanced location constraint.
 * Desktop keeps successful source responses in a bounded local cache for 30 minutes, but there is no long-lived searchable vacancy index.
 * Favorites are stored only on the current device and are not synchronized.
 * Accessibility, localization, installers, update delivery, and end-to-end UI automation still need production validation.
@@ -278,13 +280,13 @@ The score is intentionally explainable and deterministic. It is not a hiring pre
 ### Near term
 
 * Expand authorized public career sources and Brazilian employer coverage
-* Broaden role and skill taxonomies beyond software development
+* Deepen role and skill coverage for specialist and regulated occupations
 * Add accessibility checks and automated desktop UI tests
 
 ### Matching evolution
 
 * Refine experience duration with month-level dates and role relevance
-* Compare seniority, education, languages, and work-model requirements
+* Expand education fields, certification aliases, and language proficiency coverage
 * Distinguish mandatory, preferred, and contextual requirements more precisely
 * Calibrate scores against reviewed, anonymized examples
 * Make every score component visible and auditable to the user

@@ -13,5 +13,14 @@ public enum SkillCategory
     Cloud,
     Mobile,
     OperatingSystem,
-    Tool
+    Tool,
+    SpokenLanguage,
+    Administration,
+    Finance,
+    HumanResources,
+    Design,
+    Engineering,
+    Healthcare,
+    Logistics,
+    Sales
 }

@@ -88,4 +88,24 @@ public sealed class SkillMatcherTests
 
         Assert.False(result);
     }
+
+    [Theory]
+    [InlineData("Fluent English is required.", "Inglês", "english")]
+    [InlineData("Espanhol avançado.", "Espanhol", "spanish")]
+    [InlineData("Experiência com Microsoft Excel.", "Excel", "Microsoft Excel")]
+    [InlineData("Conhecimento em contas a pagar.", "Contas a Pagar", "accounts payable")]
+    public void ContainsSkill_ShouldRecognizeNewDomainAliases(
+        string text,
+        string name,
+        string alias)
+    {
+        var skill = new SkillDefinition
+        {
+            Name = name,
+            Category = SkillCategory.SpokenLanguage,
+            Aliases = [alias]
+        };
+
+        Assert.True(_matcher.ContainsSkill(text, skill));
+    }
 }

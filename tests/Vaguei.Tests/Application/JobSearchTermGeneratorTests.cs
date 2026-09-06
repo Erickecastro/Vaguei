@@ -181,6 +181,12 @@ public sealed class JobSearchTermGeneratorTests
     [InlineData("Contadora", "accountant")]
     [InlineData("Enfermeira", "nurse")]
     [InlineData("Logística", "logistics")]
+    [InlineData("Assistente Administrativa", "administrative assistant")]
+    [InlineData("Analista Financeira", "financial analyst")]
+    [InlineData("Designer Gráfico", "graphic designer")]
+    [InlineData("Engenheira Mecânica", "mechanical engineer")]
+    [InlineData("Farmacêutica", "pharmacist")]
+    [InlineData("Compradora", "procurement specialist")]
     public void Generate_ExpandsControlledBilingualRoleVariants(
         string search,
         string expectedVariant)
@@ -242,5 +248,38 @@ public sealed class JobSearchTermGeneratorTests
                 preferences);
 
         Assert.Empty(terms);
+    }
+
+    [Fact]
+    public void Generate_UsesHighSignalNonTechnologySkills()
+    {
+        var profile = new CandidateProfile
+        {
+            Skills = ["Excel", "Power BI", "Contabilidade"]
+        };
+
+        var terms = new JobSearchTermGenerator().Generate(
+            profile,
+            new JobSearchPreferences());
+
+        Assert.Contains("Excel", terms);
+        Assert.Contains("Power BI", terms);
+        Assert.Contains("Contabilidade", terms);
+    }
+
+    [Fact]
+    public void Generate_DoesNotUseSpokenLanguageAsStandaloneSearch()
+    {
+        var profile = new CandidateProfile
+        {
+            ProfessionalTitle = "Analista Financeiro",
+            Skills = ["Inglês"]
+        };
+
+        var terms = new JobSearchTermGenerator().Generate(
+            profile,
+            new JobSearchPreferences());
+
+        Assert.DoesNotContain("Inglês", terms);
     }
 }

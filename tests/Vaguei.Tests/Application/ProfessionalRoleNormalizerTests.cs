@@ -96,6 +96,28 @@ public sealed class ProfessionalRoleNormalizerTests
             result);
     }
 
+    [Theory]
+    [InlineData("Analista Financeira", "financial", "analyst")]
+    [InlineData("Designer Gráfico", "graphic", "designer")]
+    [InlineData("Engenheira Civil", "civil", "engineer")]
+    [InlineData("Engenheiro Mecânico", "mechanical", "engineer")]
+    [InlineData("Farmacêutica", "pharmacist", null)]
+    [InlineData("Compradora", "buyer", null)]
+    public void Normalize_NormalizesAdditionalBilingualRoles(
+        string role,
+        string expectedToken,
+        string? secondExpectedToken)
+    {
+        var result = _normalizer.Normalize(role);
+
+        Assert.Contains(expectedToken, result);
+
+        if (secondExpectedToken is not null)
+        {
+            Assert.Contains(secondExpectedToken, result);
+        }
+    }
+
     [Fact]
     public void Normalize_NormalizesAccents()
     {

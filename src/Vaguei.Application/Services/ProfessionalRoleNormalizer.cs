@@ -30,7 +30,22 @@ public sealed class ProfessionalRoleNormalizer
                     "fullstack",
 
                 ["full-stack"] =
-                    "fullstack"
+                    "fullstack",
+
+                ["assistente administrativo"] = "administrative assistant",
+                ["assistente administrativa"] = "administrative assistant",
+                ["analista financeiro"] = "financial analyst",
+                ["analista financeira"] = "financial analyst",
+                ["designer grafico"] = "graphic designer",
+                ["engenheiro civil"] = "civil engineer",
+                ["engenheira civil"] = "civil engineer",
+                ["engenheiro mecanico"] = "mechanical engineer",
+                ["engenheira mecanica"] = "mechanical engineer",
+                ["engenheiro eletricista"] = "electrical engineer",
+                ["engenheira eletricista"] = "electrical engineer",
+                ["representante de vendas"] = "sales representative",
+                ["atendimento ao cliente"] = "customer service",
+                ["cadeia de suprimentos"] = "supply chain"
             };
 
     private static readonly IReadOnlyDictionary<string, string>
@@ -79,6 +94,18 @@ public sealed class ProfessionalRoleNormalizer
 
                 ["vendedora"] =
                     "sales",
+
+                ["farmaceutico"] = "pharmacist",
+
+                ["farmaceutica"] = "pharmacist",
+
+                ["comprador"] = "buyer",
+
+                ["compradora"] = "buyer",
+
+                ["financeiro"] = "financial",
+
+                ["financeira"] = "financial",
 
                 ["dados"] =
                     "data",

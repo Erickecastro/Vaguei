@@ -247,6 +247,28 @@ public static class SkillCatalog
         {
             Name = "Android",
             Category = SkillCategory.Mobile
-        }
+        },
+
+        new() { Name = "Excel", Category = SkillCategory.Administration, Aliases = ["Microsoft Excel"] },
+        new() { Name = "Power BI", Category = SkillCategory.Finance, Aliases = ["PowerBI"] },
+        new() { Name = "SAP", Category = SkillCategory.Administration },
+        new() { Name = "Contabilidade", Category = SkillCategory.Finance, Aliases = ["accounting"] },
+        new() { Name = "Análise Financeira", Category = SkillCategory.Finance, Aliases = ["financial analysis"] },
+        new() { Name = "Contas a Pagar", Category = SkillCategory.Finance, Aliases = ["accounts payable"] },
+        new() { Name = "Contas a Receber", Category = SkillCategory.Finance, Aliases = ["accounts receivable"] },
+        new() { Name = "Recrutamento", Category = SkillCategory.HumanResources, Aliases = ["recruiting", "recruitment"] },
+        new() { Name = "Folha de Pagamento", Category = SkillCategory.HumanResources, Aliases = ["payroll"] },
+        new() { Name = "Figma", Category = SkillCategory.Design },
+        new() { Name = "Adobe Photoshop", Category = SkillCategory.Design, Aliases = ["Photoshop"] },
+        new() { Name = "AutoCAD", Category = SkillCategory.Engineering },
+        new() { Name = "SolidWorks", Category = SkillCategory.Engineering },
+        new() { Name = "Boas Práticas de Fabricação", Category = SkillCategory.Healthcare, Aliases = ["BPF", "GMP"] },
+        new() { Name = "Gestão de Estoque", Category = SkillCategory.Logistics, Aliases = ["inventory management"] },
+        new() { Name = "Cadeia de Suprimentos", Category = SkillCategory.Logistics, Aliases = ["supply chain"] },
+        new() { Name = "CRM", Category = SkillCategory.Sales, Aliases = ["customer relationship management"] },
+        new() { Name = "Atendimento ao Cliente", Category = SkillCategory.Sales, Aliases = ["customer service"] },
+        new() { Name = "Inglês", Category = SkillCategory.SpokenLanguage, Aliases = ["english"] },
+        new() { Name = "Espanhol", Category = SkillCategory.SpokenLanguage, Aliases = ["spanish", "español"] },
+        new() { Name = "Francês", Category = SkillCategory.SpokenLanguage, Aliases = ["french", "français"] }
     ];
 }

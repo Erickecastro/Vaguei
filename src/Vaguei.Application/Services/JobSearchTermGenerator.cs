@@ -16,7 +16,15 @@ public sealed class JobSearchTermGenerator
             SkillCategory.Language,
             SkillCategory.Backend,
             SkillCategory.Frontend,
-            SkillCategory.Mobile
+            SkillCategory.Mobile,
+            SkillCategory.Administration,
+            SkillCategory.Finance,
+            SkillCategory.HumanResources,
+            SkillCategory.Design,
+            SkillCategory.Engineering,
+            SkillCategory.Healthcare,
+            SkillCategory.Logistics,
+            SkillCategory.Sales
         ];
 
     private static readonly (Regex Pattern, string[] Variants)[]
@@ -39,7 +47,27 @@ public sealed class JobSearchTermGenerator
             (new Regex(@"\b(enfermeir[oa]|nurse)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
                 ["enfermeiro", "nurse"]),
             (new Regex(@"\b(log[ií]stica|logistics)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
-                ["logística", "logistics"])
+                ["logística", "logistics"]),
+            (new Regex(@"\b(assistente administrativ[oa]|administrative assistant)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+                ["assistente administrativo", "administrative assistant"]),
+            (new Regex(@"\b(analista financeir[oa]|financial analyst)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+                ["analista financeiro", "financial analyst"]),
+            (new Regex(@"\b(designer gr[aá]fic[oa]|graphic designer)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+                ["designer gráfico", "graphic designer"]),
+            (new Regex(@"\b(engenheir[oa] civil|civil engineer)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+                ["engenheiro civil", "civil engineer"]),
+            (new Regex(@"\b(engenheir[oa] mec[aâ]nic[oa]|mechanical engineer)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+                ["engenheiro mecânico", "mechanical engineer"]),
+            (new Regex(@"\b(engenheir[oa] eletricista|electrical engineer)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+                ["engenheiro eletricista", "electrical engineer"]),
+            (new Regex(@"\b(farmac[eê]utic[oa]|pharmacist)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+                ["farmacêutico", "pharmacist"]),
+            (new Regex(@"\b(representante de vendas|sales representative)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+                ["representante de vendas", "sales representative"]),
+            (new Regex(@"\b(atendimento ao cliente|customer service)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+                ["atendimento ao cliente", "customer service"]),
+            (new Regex(@"\b(comprador[a]?|buyer|procurement specialist)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+                ["comprador", "buyer", "procurement specialist"])
         ];
 
     public IReadOnlyCollection<string> Generate(

@@ -13,6 +13,7 @@ public sealed class ResumeAnalyzer
     private readonly SkillRelevanceAnalyzer _skillRelevanceAnalyzer;
     private readonly ResumeSectionClassifier _sectionClassifier;
     private readonly ResumeTextSanitizer _textSanitizer;
+    private readonly ProfileQualificationAnalyzer _qualificationAnalyzer;
 
     public ResumeAnalyzer()
     {
@@ -22,6 +23,7 @@ public sealed class ResumeAnalyzer
         _skillRelevanceAnalyzer = new SkillRelevanceAnalyzer();
         _sectionClassifier = new ResumeSectionClassifier();
         _textSanitizer = new ResumeTextSanitizer();
+        _qualificationAnalyzer = new ProfileQualificationAnalyzer();
     }
 
     public CandidateProfile Analyze(string resumeText)
@@ -47,6 +49,17 @@ public sealed class ResumeAnalyzer
         profile.Name = ExtractName(lines);
         profile.ProfessionalTitle = ExtractProfessionalTitle(lines);
         profile.Summary = _summaryExtractor.Extract(sanitizedText);
+        profile.EducationLevel =
+            _qualificationAnalyzer.ExtractEducationLevel(sanitizedText);
+
+        foreach (var certification in
+            _qualificationAnalyzer.ExtractCertifications(sanitizedText))
+        {
+            profile.Certifications.Add(certification);
+        }
+
+        profile.Languages.AddRange(
+            _qualificationAnalyzer.ExtractLanguages(sanitizedText));
 
         var matchedSkills = ExtractSkills(sanitizedText).ToArray();
 

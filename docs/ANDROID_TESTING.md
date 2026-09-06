@@ -35,7 +35,7 @@ adb shell monkey -p com.erickecastro.vaguei -c android.intent.category.LAUNCHER 
 
 - Alternar tema, fechar e abrir novamente; o tema deve persistir.
 - Pesquisar diretamente por cargo, tecnologia e empresa.
-- Alternar entre Somente Brasil e Brasil + exterior.
+- Alternar entre Brasil e Exterior, verificando que os resultados não misturem os dois escopos.
 - Testar todos os períodos de publicação.
 - Aplicar localização, modelo, contrato e senioridade.
 - Limpar os filtros sem iniciar uma nova busca inesperada.
