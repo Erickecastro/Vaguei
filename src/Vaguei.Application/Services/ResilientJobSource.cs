@@ -13,6 +13,7 @@ public sealed class ResilientJobSource : IJobSource
     private readonly TimeSpan _cacheDuration;
     private readonly int _retryCount;
     private readonly int _maximumCacheEntries;
+    private readonly IPersistentJobCache? _persistentCache;
     private readonly ConcurrentDictionary<string, CacheEntry> _cache = new();
 
     public ResilientJobSource(
@@ -21,7 +22,8 @@ public sealed class ResilientJobSource : IJobSource
         TimeSpan timeout,
         TimeSpan cacheDuration,
         int retryCount = 1,
-        int maximumCacheEntries = 32)
+        int maximumCacheEntries = 32,
+        IPersistentJobCache? persistentCache = null)
     {
         ArgumentNullException.ThrowIfNull(inner);
         ArgumentNullException.ThrowIfNull(concurrencyGate);
@@ -36,6 +38,7 @@ public sealed class ResilientJobSource : IJobSource
         _cacheDuration = cacheDuration;
         _retryCount = retryCount;
         _maximumCacheEntries = maximumCacheEntries;
+        _persistentCache = persistentCache;
     }
 
     public string Name => _inner.Name;
@@ -49,6 +52,18 @@ public sealed class ResilientJobSource : IJobSource
 
         if (TryGetCached(key, out var cachedJobs))
         {
+            return cachedJobs;
+        }
+
+        if (_persistentCache?.TryLoad(
+                Name,
+                key,
+                out cachedJobs,
+                out var persistentExpiresAt) == true)
+        {
+            _cache[key] = new CacheEntry(
+                persistentExpiresAt,
+                cachedJobs);
             return cachedJobs;
         }
 
@@ -74,9 +89,9 @@ public sealed class ResilientJobSource : IJobSource
                             timeoutSource.Token))
                         .ToArray();
                     PruneCache();
-                    _cache[key] = new CacheEntry(
-                        DateTimeOffset.UtcNow.Add(_cacheDuration),
-                        jobs);
+                    var expiresAt = DateTimeOffset.UtcNow.Add(_cacheDuration);
+                    _cache[key] = new CacheEntry(expiresAt, jobs);
+                    _persistentCache?.Save(Name, key, expiresAt, jobs);
                     return jobs;
                 }
                 catch (OperationCanceledException)

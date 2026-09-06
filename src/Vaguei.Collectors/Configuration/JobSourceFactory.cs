@@ -11,8 +11,10 @@ public static class JobSourceFactory
         JobSourceCatalog? catalog = null,
         string? joobleApiKey = null,
         TimeSpan? sourceTimeout = null,
+        TimeSpan? cacheDuration = null,
         int retryCount = 1,
-        int maximumConcurrentSources = 3)
+        int maximumConcurrentSources = 3,
+        IPersistentJobCache? persistentCache = null)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
         catalog ??= JobSourceCatalog.Load();
@@ -45,9 +47,10 @@ public static class JobSourceFactory
                 source,
                 concurrencyGate,
                 timeout: sourceTimeout ?? TimeSpan.FromSeconds(25),
-                cacheDuration: TimeSpan.FromMinutes(5),
+                cacheDuration: cacheDuration ?? TimeSpan.FromMinutes(5),
                 retryCount: retryCount,
-                maximumCacheEntries: 32))
+                maximumCacheEntries: 32,
+                persistentCache: persistentCache))
             .ToArray();
     }
 }

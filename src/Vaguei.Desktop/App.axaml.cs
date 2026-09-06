@@ -42,7 +42,10 @@ public partial class App : Avalonia.Application
                 new TextResumeParser()
             ]);
 
-            var sources = JobSourceFactory.Create(_httpClient);
+            var sources = JobSourceFactory.Create(
+                _httpClient,
+                cacheDuration: TimeSpan.FromMinutes(30),
+                persistentCache: new JsonPersistentJobCache());
 
             desktop.MainWindow = new MainWindow(themeStore)
             {

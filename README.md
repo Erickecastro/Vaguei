@@ -58,7 +58,7 @@ Software development is the initial validation domain because it reflects the fi
 
 * Parallel source orchestration and isolated provider failures
 * Per-source result diagnostics, with contributing providers visible after each search
-* Shared concurrency limit, per-source timeout, one retry for transient network failures, and a five-minute in-memory query cache limited to 32 entries per source
+* Shared concurrency limit, per-source timeout, one retry for transient network failures, and a bounded query cache; desktop keeps successful catalogs locally for 30 minutes across restarts
 * Brazilian location recognition and national-only filtering
 * Publication-date filtering
 * Duplicate removal using stable provider identifiers plus company, title, location, URL, and description similarity
@@ -225,11 +225,10 @@ The score is intentionally explainable and deterministic. It is not a hiring pre
 
 ### Near term
 
-* Add richer per-source diagnostics and an optional persistent cache
+* Add richer user-facing per-source health diagnostics
 * Expand authorized public career sources and Brazilian employer coverage
 * Broaden role and skill taxonomies beyond software development
 * Improve cross-source deduplication with canonical employer identities
-* Add locally persisted search preferences and an optional favorites view
 * Add accessibility checks and automated desktop UI tests
 
 ### Matching evolution
