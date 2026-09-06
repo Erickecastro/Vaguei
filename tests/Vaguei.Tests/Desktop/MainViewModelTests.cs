@@ -332,9 +332,6 @@ public sealed class MainViewModelTests
         Assert.False(job.ShowCompatibility);
         Assert.False(job.HasReasons);
         Assert.False(job.HasSkills);
-        Assert.Equal(
-            "Resultados da pesquisa direta ordenados por recência",
-            viewModel.ResultsSubtitle);
     }
 
     [Fact]
@@ -359,7 +356,7 @@ public sealed class MainViewModelTests
 
         await viewModel.RefreshJobsCommand.ExecuteAsync(null);
 
-        Assert.Contains("Fonte simulada (1)", viewModel.SourceCoverageSummary);
+        Assert.Contains("Fontes ativas: 1/1", viewModel.SourceCoverageSummary);
     }
 
     [Fact]

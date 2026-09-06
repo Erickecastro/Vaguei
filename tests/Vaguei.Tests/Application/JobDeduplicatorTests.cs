@@ -70,6 +70,28 @@ public sealed class JobDeduplicatorTests
         Assert.Single(result);
     }
 
+    [Theory]
+    [InlineData("Empresa Teste Ltda.", "EMPRESA TESTE")]
+    [InlineData("Microsoft Corporation", "Microsoft")]
+    [InlineData("Tecnologia São José S.A.", "Tecnologia Sao Jose")]
+    public void Deduplicate_NormalizesCorporateNames(
+        string firstCompany,
+        string secondCompany)
+    {
+        var first = CreateJob(
+            "Software Engineer",
+            firstCompany,
+            "Desenvolvimento de APIs e serviços distribuídos.",
+            "Fonte A");
+        var second = CreateJob(
+            "Software Engineer",
+            secondCompany,
+            "Desenvolvimento de APIs e serviços distribuídos.",
+            "Fonte B");
+
+        Assert.Single(_deduplicator.Deduplicate([first, second]));
+    }
+
     [Fact]
     public void Deduplicate_UsesStableSourceIdentityWhenContentChanges()
     {

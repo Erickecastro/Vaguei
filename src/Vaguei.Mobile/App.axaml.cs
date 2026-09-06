@@ -58,7 +58,6 @@ public partial class App : Avalonia.Application
             new JsonFavoriteJobStore(),
             new JsonJobSearchSettingsStore(),
             searchTimeout: TimeSpan.FromSeconds(16),
-            networkAvailable: System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable,
-            showDetailedSourceWarnings: false)
+            networkAvailable: System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable)
     };
 }

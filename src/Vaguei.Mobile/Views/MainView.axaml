@@ -220,7 +220,7 @@
           </ListBox>
         </Grid>
       </Grid>
-      <TextBlock Grid.Row="9" HorizontalAlignment="Center" FontSize="9" Foreground="{DynamicResource MobileSecondaryBrush}" Text="&#xA9; 2026 Vaguei &#xB7; MIT &#xB7; Fontes indicadas em cada vaga"/>
+      <TextBlock Grid.Row="9" HorizontalAlignment="Center" FontSize="9" Foreground="{DynamicResource MobileSecondaryBrush}" Text="&#xA9; 2026 Vaguei &#xB7; MIT"/>
     </Grid>
     <Border x:Name="AboutBackdrop" ZIndex="20" IsVisible="False" Background="#88000000">
       <Border Margin="12,28,12,22" Padding="18" CornerRadius="26" ClipToBounds="True" Background="{DynamicResource MobileSurfaceBrush}" BorderBrush="{DynamicResource MobileOutlineBrush}" BorderThickness="1">

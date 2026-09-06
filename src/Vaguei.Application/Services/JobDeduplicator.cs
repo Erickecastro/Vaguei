@@ -1,4 +1,6 @@
 using System.Net;
+using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 using Vaguei.Domain.Entities;
 
@@ -42,8 +44,8 @@ public sealed class JobDeduplicator
             return true;
         }
 
-        if (!Normalize(first.Company).Equals(
-                Normalize(second.Company),
+        if (!NormalizeEmployer(first.Company).Equals(
+                NormalizeEmployer(second.Company),
                 StringComparison.Ordinal) ||
             !Normalize(first.Title).Equals(
                 Normalize(second.Title),
@@ -154,5 +156,52 @@ public sealed class JobDeduplicator
                 " ")
             .Trim()
             .ToLowerInvariant();
+    }
+
+    private static string NormalizeEmployer(string? value)
+    {
+        var normalized = RemoveDiacritics(Normalize(value));
+        normalized = Regex.Replace(normalized, @"[^a-z0-9]+", " ").Trim();
+
+        string[] corporateSuffixes =
+        [
+            "sociedade anonima", "incorporated", "corporation", "limitada",
+            "company", "ltda", "corp", "inc", "llc", "ltd", "plc", "s a", "sa"
+        ];
+
+        var changed = true;
+        while (changed && normalized.Length > 0)
+        {
+            changed = false;
+            foreach (var suffix in corporateSuffixes)
+            {
+                if (normalized.Equals(suffix, StringComparison.Ordinal) ||
+                    normalized.EndsWith($" {suffix}", StringComparison.Ordinal))
+                {
+                    normalized = normalized[..^suffix.Length].TrimEnd();
+                    changed = true;
+                    break;
+                }
+            }
+        }
+
+        return normalized;
+    }
+
+    private static string RemoveDiacritics(string value)
+    {
+        var decomposed = value.Normalize(NormalizationForm.FormD);
+        var builder = new StringBuilder(decomposed.Length);
+
+        foreach (var character in decomposed)
+        {
+            if (CharUnicodeInfo.GetUnicodeCategory(character) !=
+                UnicodeCategory.NonSpacingMark)
+            {
+                builder.Append(character);
+            }
+        }
+
+        return builder.ToString().Normalize(NormalizationForm.FormC);
     }
 }

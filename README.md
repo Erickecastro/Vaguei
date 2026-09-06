@@ -39,11 +39,11 @@ Software development is the initial validation domain because it reflects the fi
 * Search refresh that clears stale results immediately and presents an explicit loading state
 * Theme-aware four-second startup introduction with a fixed logo and smooth fade sequence
 * Keyboard search submission with Enter
-* Source failure warnings without interrupting successful providers
+* Compact source-health summary without exposing provider exception details
 * Dismissible connection warning for confirmed network loss, without exposing provider exceptions
 * Original job link for every result
 * In-app About area covering purpose, privacy, terms, licenses, and source authorization status
-* Fixed compact footer with copyright, license, and third-party vacancy attribution
+* Fixed compact footer with copyright and MIT license identifier
 
 ### Resume processing
 
@@ -58,11 +58,11 @@ Software development is the initial validation domain because it reflects the fi
 ### Search and matching
 
 * Parallel source orchestration and isolated provider failures
-* Per-source result diagnostics, with contributing providers visible after each search
+* Source-health diagnostics showing responsive providers and collected vacancy totals
 * Shared concurrency limit, per-source timeout, one retry for transient network failures, and a bounded query cache; desktop keeps successful catalogs locally for 30 minutes across restarts
 * Brazilian location recognition and national-only filtering
 * Publication-date filtering
-* Duplicate removal using stable provider identifiers plus company, title, location, URL, and description similarity
+* Duplicate removal using stable provider identifiers plus canonical employer names, title, location, URL, and description similarity
 * Role normalization and controlled search-term expansion, including Portuguese and English internship variants
 * Controlled bilingual variants for common technology, data, HR, accounting, healthcare, and logistics roles
 * Compatibility based on role and skills, with penalties for missing core or required skills
@@ -276,10 +276,8 @@ The score is intentionally explainable and deterministic. It is not a hiring pre
 
 ### Near term
 
-* Add richer user-facing per-source health diagnostics
 * Expand authorized public career sources and Brazilian employer coverage
 * Broaden role and skill taxonomies beyond software development
-* Improve cross-source deduplication with canonical employer identities
 * Add accessibility checks and automated desktop UI tests
 
 ### Matching evolution
@@ -305,6 +303,10 @@ Vaguei should collect only the information required to search and rank vacancies
 New providers must use documented APIs, explicitly public employer feeds, licensed aggregators, or written authorization. Credentials must never be committed to the repository, and a provider failure must never expose resume contents in logs or diagnostics.
 
 Jobicy and Remotive results retain their canonical vacancy URLs and source attribution. Their public feeds are cached locally according to provider guidance, so changing filters does not generate unnecessary API traffic.
+
+### License scope
+
+The Vaguei source code is distributed under the permissive MIT License. This choice keeps reuse, contribution, modification, and commercial distribution straightforward while requiring preservation of the copyright and license notice. MIT applies only to code and documentation owned by the project: it does not grant rights over employer names, platform brands, logos, vacancy descriptions, or third-party datasets. Dependency and provider terms remain independently applicable. Apache-2.0 is the principal future alternative if the project needs an explicit contributor patent grant; changing the project license requires confirmation from every relevant copyright holder.
 
 Project governance documents are versioned with the code:
 

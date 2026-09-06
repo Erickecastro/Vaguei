@@ -20,7 +20,6 @@ public partial class MainViewModel : ViewModelBase
     private readonly IJobSearchSettingsStore? _searchSettingsStore;
     private readonly TimeSpan _searchTimeout;
     private readonly Func<bool>? _networkAvailable;
-    private readonly bool _showDetailedSourceWarnings;
     private readonly HashSet<string> _favoriteKeys;
     private readonly List<JobResultItemViewModel> _allJobs = [];
     private bool _searchSettingsLoaded;
@@ -88,7 +87,6 @@ public partial class MainViewModel : ViewModelBase
     private bool _isBusy;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ResultsSubtitle))]
     private bool _hasProfile;
 
     [ObservableProperty]
@@ -118,8 +116,7 @@ public partial class MainViewModel : ViewModelBase
         IFavoriteJobStore? favoriteStore = null,
         IJobSearchSettingsStore? searchSettingsStore = null,
         TimeSpan? searchTimeout = null,
-        Func<bool>? networkAvailable = null,
-        bool showDetailedSourceWarnings = true)
+        Func<bool>? networkAvailable = null)
     {
         _parserService = parserService;
         _resumeAnalyzer = resumeAnalyzer;
@@ -128,7 +125,6 @@ public partial class MainViewModel : ViewModelBase
         _searchSettingsStore = searchSettingsStore;
         _searchTimeout = searchTimeout ?? TimeSpan.FromMinutes(2);
         _networkAvailable = networkAvailable;
-        _showDetailedSourceWarnings = showDetailedSourceWarnings;
         _favoriteKeys = favoriteStore?.Load().ToHashSet(StringComparer.OrdinalIgnoreCase) ??
             new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -214,10 +210,6 @@ public partial class MainViewModel : ViewModelBase
     public string EmptyStateDescription => ShowOnlyFavorites
         ? "Marque a estrela de uma oportunidade para encontrá-la aqui."
         : "Envie seu currículo ou pesquise diretamente por cargo, tecnologia ou empresa.";
-
-    public string ResultsSubtitle => HasProfile
-        ? "Ordenadas por compatibilidade e recência"
-        : "Resultados da pesquisa direta ordenados por recência";
 
     public async Task ProcessResumeAsync(
         string filePath,
@@ -531,12 +523,7 @@ public partial class MainViewModel : ViewModelBase
 
         SourceWarnings = result.AllSourcesFailed || result.SourceFailures.Count == 0
             ? string.Empty
-            : _showDetailedSourceWarnings
-                ? string.Join(
-                    Environment.NewLine,
-                    result.SourceFailures.Select(failure =>
-                        $"{failure.Source}: {failure.Message}"))
-                : $"{result.SourceFailures.Count} fontes ficaram indisponíveis nesta busca.";
+            : $"{result.SourceFailures.Count} fontes indisponíveis nesta busca.";
 
         SourceCoverageSummary = CreateSourceCoverageSummary(
             result.SourceSummaries);
@@ -549,7 +536,7 @@ public partial class MainViewModel : ViewModelBase
                 : "Nenhuma vaga foi encontrada pelas fontes atuais com este filtro."
             : _currentProfile is null
                 ? $"{_allJobs.Count} oportunidades encontradas para “{directSearch}” em {result.SourcesWithResults} fontes."
-                : $"{_allJobs.Count} oportunidades encontradas em {result.SourcesWithResults} fontes e ordenadas por compatibilidade.";
+                : $"{_allJobs.Count} oportunidades encontradas em {result.SourcesWithResults} fontes.";
     }
 
     [RelayCommand]
@@ -672,16 +659,12 @@ public partial class MainViewModel : ViewModelBase
     private static string CreateSourceCoverageSummary(
         IEnumerable<JobSourceSearchSummary> summaries)
     {
-        var sources = summaries
-            .Where(summary => summary.JobCount > 0)
-            .OrderByDescending(summary => summary.JobCount)
-            .ThenBy(summary => summary.Source)
-            .Select(summary => $"{summary.Source} ({summary.JobCount})");
-        var value = string.Join(" · ", sources);
+        var values = summaries.ToArray();
+        if (values.Length == 0) return string.Empty;
 
-        return string.IsNullOrWhiteSpace(value)
-            ? string.Empty
-            : $"Fontes: {value}";
+        var responsiveSources = values.Count(summary => summary.Succeeded);
+        var collectedJobs = values.Sum(summary => summary.JobCount);
+        return $"Fontes ativas: {responsiveSources}/{values.Length} · {collectedJobs} vagas coletadas";
     }
 
     private WorkModel? GetSelectedWorkModel()
