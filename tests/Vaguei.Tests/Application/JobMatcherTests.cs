@@ -176,6 +176,66 @@ public sealed class JobMatcherTests
     }
 
     [Fact]
+    public void Match_AppliesLimitedPenaltyForExplicitExperienceGap()
+    {
+        var profile = CreateProfile("Data Analyst");
+        profile.Experiences.Add(new WorkExperience
+        {
+            Position = "Data Analyst",
+            StartYear = 2022,
+            EndYear = 2024
+        });
+        var job = CreateJob(
+            "Data Analyst",
+            "Requisito: mínimo de 5 anos de experiência profissional.");
+
+        var result = _matcher.Match(profile, job, new JobSearchPreferences());
+
+        Assert.Equal(91, result.Score);
+        Assert.Contains(result.Reasons, reason =>
+            reason.Criterion == JobMatchCriterion.Experience &&
+            reason.Kind == JobMatchReasonKind.Negative);
+    }
+
+    [Fact]
+    public void Match_DoesNotPenalizeExperienceWithoutDatedResumeEvidence()
+    {
+        var profile = CreateProfile("Data Analyst");
+        var job = CreateJob(
+            "Data Analyst",
+            "At least 5 years of experience required.");
+
+        var result = _matcher.Match(profile, job, new JobSearchPreferences());
+
+        Assert.Equal(100, result.Score);
+        Assert.DoesNotContain(result.Reasons, reason =>
+            reason.Criterion == JobMatchCriterion.Experience);
+    }
+
+    [Fact]
+    public void Match_DoesNotDoubleCountOverlappingExperiencePeriods()
+    {
+        var profile = CreateProfile("Data Analyst");
+        profile.Experiences.Add(new WorkExperience
+        {
+            StartYear = 2020,
+            EndYear = 2024
+        });
+        profile.Experiences.Add(new WorkExperience
+        {
+            StartYear = 2022,
+            EndYear = 2024
+        });
+        var job = CreateJob(
+            "Data Analyst",
+            "Minimum of 5 years of experience.");
+
+        var result = _matcher.Match(profile, job, new JobSearchPreferences());
+
+        Assert.Equal(97, result.Score);
+    }
+
+    [Fact]
     public void Match_UsesStructuredJobSkills()
     {
         var profile =

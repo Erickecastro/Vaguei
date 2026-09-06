@@ -54,10 +54,10 @@
               <TextBlock Classes="section" Text="Processamento local"/>
               <TextBlock Classes="body" Text="O currículo é processado no dispositivo. A versão atual não possui conta, backend, telemetria nem upload do arquivo. Dados de contato desnecessários são descartados antes da análise de perfil."/>
               <TextBlock Classes="section" Text="Dados armazenados"/>
-              <TextBlock Classes="body" Text="Tema, preferências de busca e favoritos ficam no armazenamento local. As palavras e localidades pesquisadas são enviadas às fontes de vagas necessárias; o arquivo do currículo não é enviado."/>
+              <TextBlock Classes="body" Text="Tema, preferências de busca e identificadores de favoritos ficam no armazenamento local. O cache desktop mantém catálogos públicos por até 30 minutos. Cargo, competências e localização pesquisados são enviados às fontes necessárias; o arquivo do currículo não é enviado."/>
               <TextBlock Classes="section" Text="Sites externos"/>
               <TextBlock Classes="body" Text="Ao abrir uma vaga, você passa a utilizar o site da empresa ou plataforma e deve consultar a política de privacidade daquele serviço."/>
-              <Border Classes="panel" Margin="0,16,0,0"><TextBlock Classes="body" Text="Esta descrição reflete a arquitetura atual. Novas funções com conta, sincronização ou backend exigirão atualização da política e revisão de conformidade com a LGPD."/></Border>
+              <Border Classes="panel" Margin="0,16,0,0"><TextBlock Classes="body" Text="Esta descrição reflete a arquitetura atual e não representa certificação jurídica. Antes de distribuição pública, o projeto ainda precisa definir controlador, base legal, canal do titular, resposta a incidentes e revisão formal de conformidade com a LGPD."/></Border>
             </StackPanel></ScrollViewer>
           </TabItem>
           <TabItem Header="Termos">

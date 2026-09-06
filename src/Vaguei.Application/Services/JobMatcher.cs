@@ -19,6 +19,7 @@ public sealed class JobMatcher
     private const double CoreRequirementPenalty = 15;
     private const double RequiredRequirementPenalty = 8;
     private const double MaximumRequirementPenalty = 25;
+    private const double MaximumExperiencePenalty = 15;
 
     public JobMatchResult Match(
         CandidateProfile profile,
@@ -112,10 +113,15 @@ public sealed class JobMatcher
                 job,
                 reasons);
 
+        var experiencePenalty = CalculateExperiencePenalty(
+            profile,
+            job,
+            reasons);
+
         var score = Math.Round(
             Math.Max(
                 0,
-                baseScore - requirementPenalty),
+                baseScore - requirementPenalty - experiencePenalty),
             2);
 
         return new JobMatchResult(
@@ -465,6 +471,98 @@ public sealed class JobMatcher
         return Math.Min(
             MaximumRequirementPenalty,
             penalty);
+    }
+
+    private static double CalculateExperiencePenalty(
+        CandidateProfile profile,
+        JobPosting job,
+        ICollection<JobMatchReason> reasons)
+    {
+        var requiredYears = ExtractRequiredExperienceYears(
+            $"{job.Title} {job.Description}");
+        var candidateYears = CalculateCandidateExperienceYears(profile.Experiences);
+
+        if (requiredYears is null || candidateYears is null ||
+            candidateYears.Value >= requiredYears.Value)
+        {
+            return 0;
+        }
+
+        var missingYears = requiredYears.Value - candidateYears.Value;
+        reasons.Add(new JobMatchReason
+        {
+            Criterion = JobMatchCriterion.Experience,
+            Kind = JobMatchReasonKind.Negative,
+            Description = $"A vaga informa mínimo de {requiredYears} anos de experiência; o currículo permite identificar aproximadamente {candidateYears} anos."
+        });
+
+        return Math.Min(
+            MaximumExperiencePenalty,
+            missingYears / requiredYears.Value * MaximumExperiencePenalty);
+    }
+
+    private static double? CalculateCandidateExperienceYears(
+        IEnumerable<WorkExperience> experiences)
+    {
+        var intervals = experiences
+            .Where(experience => experience.StartYear is >= 1950)
+            .Select(experience => (
+                Start: experience.StartYear!.Value,
+                End: experience.IsCurrent
+                    ? DateTimeOffset.UtcNow.Year
+                    : experience.EndYear))
+            .Where(interval => interval.End is not null && interval.End >= interval.Start)
+            .Select(interval => (interval.Start, End: interval.End!.Value))
+            .OrderBy(interval => interval.Start)
+            .ToArray();
+
+        if (intervals.Length == 0) return null;
+
+        var totalYears = 0.0;
+        var currentStart = intervals[0].Start;
+        var currentEnd = intervals[0].End;
+
+        foreach (var interval in intervals.Skip(1))
+        {
+            if (interval.Start <= currentEnd)
+            {
+                currentEnd = Math.Max(currentEnd, interval.End);
+                continue;
+            }
+
+            totalYears += Math.Max(1, currentEnd - currentStart);
+            currentStart = interval.Start;
+            currentEnd = interval.End;
+        }
+
+        return totalYears + Math.Max(1, currentEnd - currentStart);
+    }
+
+    private static double? ExtractRequiredExperienceYears(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return null;
+
+        string[] patterns =
+        [
+            @"\b(?:mínimo(?:\s+de)?|minimo(?:\s+de)?|pelo menos)\s+(?<years>\d{1,2})\s+anos?",
+            @"\b(?<years>\d{1,2})\s*\+?\s+anos?\s+de\s+experi[êe]ncia",
+            @"\b(?:minimum(?:\s+of)?|at least)\s+(?<years>\d{1,2})\s+years?",
+            @"\b(?<years>\d{1,2})\s*\+\s*years?(?:\s+of\s+experience)?"
+        ];
+
+        return patterns
+            .Select(pattern => Regex.Match(
+                text,
+                pattern,
+                RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+            .Where(match => match.Success)
+            .Select(match => double.Parse(
+                match.Groups["years"].Value,
+                CultureInfo.InvariantCulture))
+            .Where(years => years is > 0 and <= 20)
+            .Cast<double?>()
+            .DefaultIfEmpty(null)
+            .Max();
     }
 
     private static void AddSkillReasons(

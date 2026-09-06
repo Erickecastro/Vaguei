@@ -66,6 +66,7 @@ Software development is the initial validation domain because it reflects the fi
 * Role normalization and controlled search-term expansion, including Portuguese and English internship variants
 * Controlled bilingual variants for common technology, data, HR, accounting, healthcare, and logistics roles
 * Compatibility based on role and skills, with penalties for missing core or required skills
+* Limited, explainable experience-gap adjustment when both the vacancy requirement and dated résumé history are available
 * Compatibility is displayed only when a resume has been analyzed
 * Ranking by compatibility and recency, with compatibility hidden for direct searches without a resume
 * Seniority inferred from explicit direct-search terms such as junior, senior, trainee, internship, and lead
@@ -267,7 +268,7 @@ The score is intentionally explainable and deterministic. It is not a hiring pre
 * Public APIs can change, rate-limit requests, omit publication dates, or become unavailable.
 * Search breadth is constrained by the configured public sources and employers.
 * The initial skill and role taxonomies are strongest for software development.
-* Matching does not yet model education, language proficiency, years of experience, compensation, or mandatory location constraints in depth.
+* Matching considers only explicit experience-year requirements and does not yet model education, language proficiency, compensation, or mandatory location constraints in depth.
 * Desktop keeps successful source responses in a bounded local cache for 30 minutes, but there is no long-lived searchable vacancy index.
 * Favorites are stored only on the current device and are not synchronized.
 * Accessibility, localization, installers, update delivery, and end-to-end UI automation still need production validation.
@@ -282,7 +283,7 @@ The score is intentionally explainable and deterministic. It is not a hiring pre
 
 ### Matching evolution
 
-* Consider years and recency of professional experience
+* Refine experience duration with month-level dates and role relevance
 * Compare seniority, education, languages, and work-model requirements
 * Distinguish mandatory, preferred, and contextual requirements more precisely
 * Calibrate scores against reviewed, anonymized examples
@@ -312,6 +313,8 @@ Project governance documents are versioned with the code:
 
 * [Terms of Use](docs/TERMS_OF_USE.md)
 * [Privacy](docs/PRIVACY.md)
+* [Data Inventory](docs/DATA_INVENTORY.md)
+* [LGPD Readiness](docs/LGPD_READINESS.md)
 * [Integrations and Partnerships](docs/PARTNERSHIPS.md)
 * [Partnership Request Templates](docs/PARTNERSHIP_REQUEST_TEMPLATES.md)
 * [Security Policy](SECURITY.md)

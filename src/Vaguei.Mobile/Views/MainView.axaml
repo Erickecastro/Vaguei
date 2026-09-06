@@ -251,11 +251,11 @@
                   <TextBlock Classes="section" Text="Processamento local"/>
                   <TextBlock Classes="body" Text="O curr&#xED;culo &#xE9; processado no dispositivo. A vers&#xE3;o atual n&#xE3;o possui conta, backend, telemetria nem upload do arquivo. Dados de contato desnecess&#xE1;rios s&#xE3;o descartados antes da an&#xE1;lise de perfil."/>
                   <TextBlock Classes="section" Text="Dados armazenados"/>
-                  <TextBlock Classes="body" Text="Tema, prefer&#xEA;ncias de busca e favoritos ficam no armazenamento local. As palavras e localidades pesquisadas s&#xE3;o enviadas &#xE0;s fontes de vagas necess&#xE1;rias; o arquivo do curr&#xED;culo n&#xE3;o &#xE9; enviado."/>
+                  <TextBlock Classes="body" Text="Tema, prefer&#xEA;ncias de busca e identificadores de favoritos ficam no armazenamento local. Cargo, compet&#xEA;ncias e localiza&#xE7;&#xE3;o pesquisados s&#xE3;o enviados &#xE0;s fontes necess&#xE1;rias; o arquivo do curr&#xED;culo n&#xE3;o &#xE9; enviado."/>
                   <TextBlock Classes="section" Text="Sites externos"/>
                   <TextBlock Classes="body" Text="Ao abrir uma vaga, voc&#xEA; passa a utilizar o site da empresa ou plataforma e deve consultar a pol&#xED;tica de privacidade daquele servi&#xE7;o."/>
                   <Border Classes="note" Margin="0,12,0,0">
-                    <TextBlock Classes="body" Text="Esta descri&#xE7;&#xE3;o reflete a arquitetura atual. Novas fun&#xE7;&#xF5;es com conta, sincroniza&#xE7;&#xE3;o ou backend exigir&#xE3;o atualiza&#xE7;&#xE3;o da pol&#xED;tica e revis&#xE3;o de conformidade com a LGPD."/>
+                    <TextBlock Classes="body" Text="Esta descri&#xE7;&#xE3;o reflete a arquitetura atual e n&#xE3;o representa certifica&#xE7;&#xE3;o jur&#xED;dica. Antes de distribui&#xE7;&#xE3;o p&#xFA;blica, ainda ser&#xE1; preciso definir controlador, base legal, canal do titular, resposta a incidentes e revis&#xE3;o formal da LGPD."/>
                   </Border>
                 </StackPanel>
               </ScrollViewer>
