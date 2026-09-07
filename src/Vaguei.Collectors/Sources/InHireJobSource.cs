@@ -22,7 +22,6 @@ public sealed class InHireJobSource : IJobSource
     private const string ApiBaseUrl = "https://api.inhire.app";
     private readonly HttpClient _httpClient;
     private readonly IReadOnlyDictionary<string, string> _tenants;
-    private readonly JobSkillRequirementAnalyzer _requirementAnalyzer = new();
 
     public InHireJobSource(
         HttpClient httpClient,
@@ -141,7 +140,6 @@ public sealed class InHireJobSource : IJobSource
                     .ToHashSet(StringComparer.OrdinalIgnoreCase)
             };
 
-            posting.SkillRequirements = _requirementAnalyzer.Analyze(posting).ToList();
             return posting;
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)

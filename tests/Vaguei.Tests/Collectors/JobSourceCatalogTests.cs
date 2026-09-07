@@ -52,6 +52,21 @@ public sealed class JobSourceCatalogTests
     }
 
     [Fact]
+    public void Load_ReadsEmbeddedCompatibleStream()
+    {
+        using var stream = new MemoryStream(
+            System.Text.Encoding.UTF8.GetBytes(
+                """
+                { "inhire": { "sidia": "Sidia" } }
+                """));
+
+        var catalog = JobSourceCatalog.Load(stream);
+
+        Assert.Equal("Sidia", catalog.InHire["sidia"]);
+        Assert.NotEmpty(catalog.Greenhouse);
+    }
+
+    [Fact]
     public void CreateDefault_IncludesValidatedBrazilianEmployers()
     {
         var catalog = JobSourceCatalog.CreateDefault();

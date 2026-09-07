@@ -13,7 +13,6 @@ public sealed class JoobleJobSource : IJobSource
 {
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;
-    private readonly JobSkillRequirementAnalyzer _requirementAnalyzer = new();
 
     public JoobleJobSource(HttpClient httpClient, string apiKey)
     {
@@ -75,7 +74,6 @@ public sealed class JoobleJobSource : IJobSource
                 ? []
                 : new HashSet<string>([job.Type], StringComparer.OrdinalIgnoreCase)
         };
-        posting.SkillRequirements = _requirementAnalyzer.Analyze(posting).ToList();
         return posting;
     }
 

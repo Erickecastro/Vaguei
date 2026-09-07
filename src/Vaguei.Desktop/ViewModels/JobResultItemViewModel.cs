@@ -32,11 +32,15 @@ public sealed partial class JobResultItemViewModel : ObservableObject
                 result.Reasons
                     .Where(reason =>
                         reason.Criterion !=
-                        Vaguei.Domain.Enums.JobMatchCriterion.ProfessionalRole)
+                            Vaguei.Domain.Enums.JobMatchCriterion.ProfessionalRole &&
+                        !(reason.Criterion ==
+                            Vaguei.Domain.Enums.JobMatchCriterion.Skill &&
+                          reason.Kind ==
+                            Vaguei.Domain.Enums.JobMatchReasonKind.Positive))
                     .Select(reason => $"• {reason.Description}"))
             : string.Empty;
 
-        Skills = showCompatibility
+        var matchedSkills = showCompatibility
             ? result.Reasons
             .Where(reason =>
                 reason.Criterion ==
@@ -53,6 +57,11 @@ public sealed partial class JobResultItemViewModel : ObservableObject
                     .TrimEnd('.'))
             .ToArray()
             : [];
+
+        Skills = matchedSkills.Take(4).ToArray();
+        AdditionalSkillSummary = matchedSkills.Length > Skills.Count
+            ? $"+{matchedSkills.Length - Skills.Count} competências"
+            : string.Empty;
 
         Published = FormatPublishedAt(
             result.Job.PublishedAt,
@@ -82,6 +91,11 @@ public sealed partial class JobResultItemViewModel : ObservableObject
     public string Reasons { get; }
 
     public IReadOnlyCollection<string> Skills { get; }
+
+    public string AdditionalSkillSummary { get; }
+
+    public bool HasAdditionalSkills =>
+        !string.IsNullOrWhiteSpace(AdditionalSkillSummary);
 
     public string Published { get; }
 

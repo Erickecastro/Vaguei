@@ -26,7 +26,6 @@ public sealed class SmartRecruitersJobSource : IJobSource
     private const int MaximumSearchTerms = 6;
     private readonly HttpClient _httpClient;
     private readonly IReadOnlyDictionary<string, string> _companies;
-    private readonly JobSkillRequirementAnalyzer _requirementAnalyzer = new();
 
     public SmartRecruitersJobSource(
         HttpClient httpClient,
@@ -189,7 +188,6 @@ public sealed class SmartRecruitersJobSource : IJobSource
                     .ToHashSet(StringComparer.OrdinalIgnoreCase)
             };
 
-            posting.SkillRequirements = _requirementAnalyzer.Analyze(posting).ToList();
             return posting;
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)

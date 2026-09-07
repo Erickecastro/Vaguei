@@ -14,7 +14,6 @@ public sealed class RemotiveJobSource : IJobSource
     private static readonly TimeSpan CacheDuration = TimeSpan.FromHours(6);
     private readonly HttpClient _httpClient;
     private readonly SemaphoreSlim _cacheGate = new(1, 1);
-    private readonly JobSkillRequirementAnalyzer _requirementAnalyzer = new();
     private IReadOnlyCollection<JobPosting> _cachedJobs = [];
     private DateTimeOffset _cacheExpiresAt;
 
@@ -76,7 +75,6 @@ public sealed class RemotiveJobSource : IJobSource
                 .Select(value => value!)
                 .ToHashSet(StringComparer.OrdinalIgnoreCase)
         };
-        posting.SkillRequirements = _requirementAnalyzer.Analyze(posting).ToList();
         return posting;
     }
 

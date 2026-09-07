@@ -22,7 +22,6 @@ public sealed class LeverJobSource : IJobSource
 
     private readonly HttpClient _httpClient;
     private readonly IReadOnlyDictionary<string, string> _sites;
-    private readonly JobSkillRequirementAnalyzer _requirementAnalyzer = new();
 
     public LeverJobSource(
         HttpClient httpClient,
@@ -115,7 +114,6 @@ public sealed class LeverJobSource : IJobSource
                 .ToHashSet(StringComparer.OrdinalIgnoreCase)
         };
 
-        posting.SkillRequirements = _requirementAnalyzer.Analyze(posting).ToList();
         return posting;
     }
 

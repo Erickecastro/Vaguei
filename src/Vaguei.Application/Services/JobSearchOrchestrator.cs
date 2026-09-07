@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Vaguei.Application.Interfaces;
 using Vaguei.Application.Models;
 using Vaguei.Domain.Entities;
@@ -14,6 +15,7 @@ public sealed class JobSearchOrchestrator
     private readonly JobAttributeFilter _attributeFilter;
     private readonly JobDeduplicator _deduplicator;
     private readonly JobMatcher _matcher;
+    private readonly JobSkillRequirementAnalyzer _requirementAnalyzer = new();
 
     public JobSearchOrchestrator(
         IEnumerable<IJobSource> sources)
@@ -74,24 +76,28 @@ public sealed class JobSearchOrchestrator
                     cancellationToken))
             .ToArray();
 
-        SourceSearchResult[] sourceResults;
+        var completedResults = new List<SourceSearchResult>();
+        var pendingTasks = sourceTasks.ToHashSet();
+
         try
         {
-            sourceResults = await Task.WhenAll(sourceTasks)
-                .WaitAsync(cancellationToken);
-        }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-        {
-            sourceResults = sourceTasks
-                .Where(task => task.IsCompletedSuccessfully)
-                .Select(task => task.Result)
-                .ToArray();
-
-            if (sourceResults.Length == 0)
+            while (pendingTasks.Count > 0)
             {
-                throw;
+                var completedTask = await Task.WhenAny(pendingTasks)
+                    .WaitAsync(cancellationToken);
+                pendingTasks.Remove(completedTask);
+                completedResults.Add(await completedTask);
             }
         }
+        catch (OperationCanceledException) when (
+            cancellationToken.IsCancellationRequested &&
+            completedResults.Count > 0)
+        {
+            Console.WriteLine(
+                $"[Vaguei.Search] status=partial completedSources={completedResults.Count} pendingSources={pendingTasks.Count}");
+        }
+
+        var sourceResults = completedResults.ToArray();
 
         var collectedJobs = sourceResults
             .SelectMany(result => result.Jobs)
@@ -111,6 +117,15 @@ public sealed class JobSearchOrchestrator
             preferences);
 
         var uniqueJobs = _deduplicator.Deduplicate(attributeAllowedJobs);
+
+        foreach (var job in uniqueJobs)
+        {
+            if (job.SkillRequirements.Count == 0)
+            {
+                job.SkillRequirements =
+                    _requirementAnalyzer.Analyze(job).ToList();
+            }
+        }
 
         var matches = uniqueJobs
             .Select(job =>
@@ -148,15 +163,21 @@ public sealed class JobSearchOrchestrator
         JobSearchQuery query,
         CancellationToken cancellationToken)
     {
+        var stopwatch = Stopwatch.StartNew();
+
         try
         {
             var jobs = await source.SearchAsync(
                 query,
                 cancellationToken);
 
+            var materializedJobs = jobs.ToArray();
+            Console.WriteLine(
+                $"[Vaguei.Search] source={source.Name} status=ok jobs={materializedJobs.Length} elapsedMs={stopwatch.ElapsedMilliseconds}");
+
             return new SourceSearchResult(
                 source.Name,
-                jobs.ToArray(),
+                materializedJobs,
                 null);
         }
         catch (OperationCanceledException)
@@ -166,6 +187,9 @@ public sealed class JobSearchOrchestrator
         }
         catch (Exception exception)
         {
+            Console.WriteLine(
+                $"[Vaguei.Search] source={source.Name} status=failed type={exception.GetType().Name} elapsedMs={stopwatch.ElapsedMilliseconds}");
+
             return new SourceSearchResult(
                 source.Name,
                 [],

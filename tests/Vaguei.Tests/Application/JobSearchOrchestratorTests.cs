@@ -168,6 +168,35 @@ public sealed class JobSearchOrchestratorTests
     }
 
     [Fact]
+    public async Task SearchAsync_AnalyzesRequirementsAfterCentralFiltering()
+    {
+        var job = CreateJob(
+            ".NET Developer",
+            "C# obrigatório.",
+            "Fonte");
+        var orchestrator = new JobSearchOrchestrator(
+        [
+            new StubJobSource("Fonte", [job])
+        ]);
+
+        var result = await orchestrator.SearchAsync(
+            new CandidateProfile
+            {
+                ProfessionalTitle = ".NET Developer",
+                Skills = [".NET"]
+            },
+            new JobSearchPreferences(),
+            ReferenceTime);
+
+        Assert.Contains(
+            Assert.Single(result.Matches).Job.SkillRequirements,
+            requirement =>
+                requirement.Name == "C#" &&
+                requirement.Level ==
+                    Vaguei.Domain.Enums.JobSkillRequirementLevel.Required);
+    }
+
+    [Fact]
     public async Task SearchAsync_BrazilOnly_RejectsInternationalJobsCentrally()
     {
         var brazilianJob = CreateJob(

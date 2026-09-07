@@ -18,23 +18,26 @@ adb devices -l
 O APK de debug não é versionado no Git. Depois de compilá-lo, instale com:
 
 ```bash
-adb install -r src/Vaguei.Android/bin/Debug/net10.0-android/com.erickecastro.vaguei-Signed.apk
+adb install -r src/Vaguei.Maui/bin/Debug/net10.0-android/com.erickecastro.vaguei.maui-Signed.apk
 ```
 
 A configuração de debug incorpora os assemblies .NET no APK e não depende de Fast Deployment, portanto o arquivo funciona com instalação manual por `adb install` sem depender do pipeline do IDE.
 
 A inicialização dessa configuração foi validada em um aparelho ARM64 real, com Android 16: o processo permaneceu ativo e o buffer de crashes ficou vazio.
 
+A versão MAUI registra no `logcat` apenas fonte, duração, quantidade e tipo técnico da falha de busca. Termos pesquisados e conteúdo do currículo não são registrados.
+
 Abra **Vaguei** pela lista de aplicativos. Também é possível iniciar pelo terminal:
 
 ```bash
-adb shell monkey -p com.erickecastro.vaguei -c android.intent.category.LAUNCHER 1
+adb shell monkey -p com.erickecastro.vaguei.maui -c android.intent.category.LAUNCHER 1
 ```
 
 ## Roteiro funcional
 
 - Alternar tema, fechar e abrir novamente; o tema deve persistir.
 - Pesquisar diretamente por cargo, tecnologia e empresa.
+- Rolar diversos cards sem que o toque de rolagem acione seleção ou destaque do fundo.
 - Alternar entre Brasil e Exterior, verificando que os resultados não misturem os dois escopos.
 - Testar todos os períodos de publicação.
 - Aplicar localização, modelo, contrato e senioridade.
@@ -62,7 +65,7 @@ adb shell monkey -p com.erickecastro.vaguei -c android.intent.category.LAUNCHER 
 Para acompanhar apenas mensagens relacionadas ao processo do aplicativo:
 
 ```bash
-adb logcat --pid="$(adb shell pidof com.erickecastro.vaguei)"
+adb logcat --pid="$(adb shell pidof com.erickecastro.vaguei.maui)"
 ```
 
 Se uma instalação anterior usar assinatura incompatível, registre primeiro os dados que deseja preservar. Desinstalar o aplicativo apaga preferências e favoritos locais.

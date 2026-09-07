@@ -14,7 +14,6 @@ public sealed class JobicyJobSource : IJobSource
     private static readonly TimeSpan CacheDuration = TimeSpan.FromHours(1);
     private readonly HttpClient _httpClient;
     private readonly SemaphoreSlim _cacheGate = new(1, 1);
-    private readonly JobSkillRequirementAnalyzer _requirementAnalyzer = new();
     private IReadOnlyCollection<JobPosting> _cachedJobs = [];
     private DateTimeOffset _cacheExpiresAt;
 
@@ -82,7 +81,6 @@ public sealed class JobicyJobSource : IJobSource
                 .Where(value => !string.IsNullOrWhiteSpace(value))
                 .ToHashSet(StringComparer.OrdinalIgnoreCase)
         };
-        posting.SkillRequirements = _requirementAnalyzer.Analyze(posting).ToList();
         return posting;
     }
 

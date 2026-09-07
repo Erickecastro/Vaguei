@@ -18,7 +18,6 @@ public sealed class AshbyJobSource : IJobSource
 
     private readonly HttpClient _httpClient;
     private readonly IReadOnlyDictionary<string, string> _boards;
-    private readonly JobSkillRequirementAnalyzer _requirementAnalyzer = new();
 
     public AshbyJobSource(
         HttpClient httpClient,
@@ -102,7 +101,6 @@ public sealed class AshbyJobSource : IJobSource
                 .ToHashSet(StringComparer.OrdinalIgnoreCase)
         };
 
-        posting.SkillRequirements = _requirementAnalyzer.Analyze(posting).ToList();
         return posting;
     }
 

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Vaguei.Maui.AboutPage"
+             NavigationPage.HasNavigationBar="False">
+  <Grid Padding="20,20,12,16" RowDefinitions="Auto,Auto,*"
+        BackgroundColor="{AppThemeBinding Light=#F6F7FB, Dark=#121212}">
+    <Grid ColumnDefinitions="*,Auto" Margin="0,0,8,14">
+      <Label Text="Sobre o Vaguei" FontSize="25" FontAttributes="Bold" VerticalOptions="Center" />
+      <Button Grid.Column="1" Text="×" WidthRequest="46" HeightRequest="46" Padding="0"
+              FontSize="22" Clicked="OnCloseClicked" />
+    </Grid>
+    <ScrollView Grid.Row="1" Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+      <HorizontalStackLayout Spacing="8" Padding="0,0,8,12">
+        <Button Text="Sobre" CommandParameter="Sobre" Clicked="OnSectionClicked" />
+        <Button Text="Privacidade" CommandParameter="Privacidade" Clicked="OnSectionClicked" />
+        <Button Text="Termos" CommandParameter="Termos" Clicked="OnSectionClicked" />
+        <Button Text="Licenças" CommandParameter="Licenças" Clicked="OnSectionClicked" />
+        <Button Text="Fontes" CommandParameter="Fontes" Clicked="OnSectionClicked" />
+      </HorizontalStackLayout>
+    </ScrollView>
+    <ScrollView Grid.Row="2" Padding="0,0,14,0">
+      <VerticalStackLayout Spacing="12">
+        <Label x:Name="SectionTitle" Text="Sobre" FontSize="21" FontAttributes="Bold" />
+        <Label x:Name="SectionBody" FontSize="14" LineHeight="1.35"
+               TextColor="{AppThemeBinding Light=#626879, Dark=#B5B5B5}" />
+      </VerticalStackLayout>
+    </ScrollView>
+  </Grid>
+</ContentPage>

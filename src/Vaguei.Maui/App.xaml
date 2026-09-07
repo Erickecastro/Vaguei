@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Vaguei.Maui.App">
+  <Application.Resources>
+    <ResourceDictionary>
+      <Style TargetType="ContentPage">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#F6F7FB, Dark=#121212}" />
+      </Style>
+      <Style TargetType="NavigationPage">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#F6F7FB, Dark=#121212}" />
+        <Setter Property="BarBackgroundColor" Value="{AppThemeBinding Light=#F6F7FB, Dark=#121212}" />
+        <Setter Property="BarTextColor" Value="{AppThemeBinding Light=#1A1D26, Dark=#F2F2F2}" />
+      </Style>
+      <Style TargetType="Label">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light=#1A1D26, Dark=#F2F2F2}" />
+      </Style>
+      <Style TargetType="Button">
+        <Setter Property="CornerRadius" Value="14" />
+        <Setter Property="HeightRequest" Value="50" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light=#1A1D26, Dark=#F2F2F2}" />
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#ECEEF4, Dark=#292929}" />
+      </Style>
+      <Style TargetType="Entry">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light=#1A1D26, Dark=#F2F2F2}" />
+        <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light=#7B8190, Dark=#A8A8A8}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+      </Style>
+      <Style TargetType="Picker">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light=#1A1D26, Dark=#F2F2F2}" />
+        <Setter Property="TitleColor" Value="{AppThemeBinding Light=#7B8190, Dark=#A8A8A8}" />
+      </Style>
+    </ResourceDictionary>
+  </Application.Resources>
+</Application>

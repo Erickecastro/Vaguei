@@ -4,6 +4,7 @@
 
 ![.NET](https://img.shields.io/badge/.NET-10-512BD4?style=for-the-badge&logo=dotnet)
 ![Avalonia](https://img.shields.io/badge/Avalonia-12-8B44AC?style=for-the-badge)
+![MAUI](https://img.shields.io/badge/.NET_MAUI-10-512BD4?style=for-the-badge&logo=dotnet)
 ![C#](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=csharp)
 ![Tests](https://img.shields.io/badge/tests-passing-success?style=for-the-badge)
 ![Platform](https://img.shields.io/badge/Desktop-Linux%20%7C%20Windows-blue?style=for-the-badge)
@@ -12,7 +13,7 @@
 
 # About
 
-**Vaguei** is a privacy-conscious job-discovery application for desktop, with an experimental Android prototype. Desktop remains the primary development target.
+**Vaguei** is a privacy-conscious job-discovery application for desktop, with an experimental native-control Android client built with .NET MAUI. Desktop remains the primary development target; the previous Avalonia Android client is retained temporarily as a migration reference.
 
 Users can import a resume or search directly by role, technology, or company. Resume content is processed locally to identify professional context and relevant skills; contact details and other unnecessary personal data are discarded. Results keep the original application URL so the candidate always applies on the employer's or recruiting platform's page.
 
@@ -110,8 +111,9 @@ Vaguei
 ├── Vaguei.Collectors      # Public job-source adapters
 ├── Vaguei.Infrastructure  # Reserved for persistence and platform services
 ├── Vaguei.Desktop         # Avalonia desktop application
-├── Vaguei.Mobile          # Shared small-screen Avalonia presentation
-├── Vaguei.Android         # Experimental Android entry point and package
+├── Vaguei.Maui            # Current experimental .NET MAUI Android client
+├── Vaguei.Mobile          # Previous small-screen Avalonia reference
+├── Vaguei.Android         # Previous Avalonia Android entry point
 ├── Vaguei.Cli             # Local diagnostics
 └── Vaguei.Tests           # Automated test suite
 ```
@@ -149,6 +151,7 @@ Desktop results with original application links
 
 * C# and .NET 10
 * Avalonia 12
+* .NET MAUI 10 for the current Android experiment
 * CommunityToolkit.Mvvm
 * xUnit
 * LINQ, regular expressions, JSON, XML, and HTTP APIs
@@ -221,10 +224,10 @@ The executable is produced under `src/Vaguei.Desktop/bin/Release/net10.0/win-x64
 Android development additionally requires the .NET Android workload, Android SDK, `adb`, and JDK 21:
 
 ```bash
-dotnet workload install android
-dotnet restore Vaguei.Mobile.slnx
+dotnet workload install maui-android
+dotnet restore Vaguei.Maui.slnx
 env JAVA_HOME=/caminho/para/o/jdk-21 \
-dotnet build Vaguei.Mobile.slnx -c Debug \
+dotnet build src/Vaguei.Maui/Vaguei.Maui.csproj -c Debug \
   -p:AndroidSdkDirectory="$ANDROID_SDK_ROOT" \
   -p:JavaSdkDirectory=/caminho/para/o/jdk-21
 ```
@@ -232,11 +235,11 @@ dotnet build Vaguei.Mobile.slnx -c Debug \
 With USB debugging enabled and one device visible in `adb devices`, install the signed debug APK:
 
 ```bash
-adb install -r src/Vaguei.Android/bin/Debug/net10.0-android/com.erickecastro.vaguei-Signed.apk
-adb shell monkey -p com.erickecastro.vaguei -c android.intent.category.LAUNCHER 1
+adb install -r src/Vaguei.Maui/bin/Debug/net10.0-android/com.erickecastro.vaguei.maui-Signed.apk
+adb shell monkey -p com.erickecastro.vaguei.maui -c android.intent.category.LAUNCHER 1
 ```
 
-The Android application is currently version `0.2.0` (`versionCode` 2) and remains a test build, not a Play Store release. Its current capabilities, limitations and complete device checklist are documented in [`docs/MOBILE_PROTOTYPE.md`](docs/MOBILE_PROTOTYPE.md) and [`docs/ANDROID_TESTING.md`](docs/ANDROID_TESTING.md).
+The MAUI Android application is currently at version `0.1.2` (`versionCode` 3) and remains a test build, not a Play Store release. Its package id is `com.erickecastro.vaguei.maui`, allowing side-by-side comparison with the previous Avalonia experiment. Its current capabilities, limitations and complete device checklist are documented in [`docs/MOBILE_PROTOTYPE.md`](docs/MOBILE_PROTOTYPE.md) and [`docs/ANDROID_TESTING.md`](docs/ANDROID_TESTING.md).
 
 For local diagnostics, run the CLI with a resume path:
 
@@ -250,9 +253,9 @@ Resume contents are not printed by default. Use `--show-raw` only in a controlle
 
 Linux and Windows are the tested desktop development environments. Avalonia also supports macOS, but this repository does not yet provide a validated macOS build. Release installers, signing and automatic updates are not implemented.
 
-The Android prototype is implemented while desktop remains the primary product. Avalonia 12 and .NET 10 allow the domain, application, collectors, ViewModel, and most UI resources to be shared, while Android keeps a separate entry project, native document picker, lifecycle handling, portrait layout, and small-screen navigation.
+The Android prototype is implemented while desktop remains the primary product. The current mobile migration uses .NET MAUI 10 native controls while sharing the domain, application, collectors, ViewModel, infrastructure, and resume parsers with desktop.
 
-The Android prototype compiles in the separate [`Vaguei.Mobile.slnx`](Vaguei.Mobile.slnx) solution. It reuses the desktop search ViewModel and provides a four-second mobile introduction, local resume import, direct and profile-based search, compact expandable filters, virtualized results, favorites, compatibility explanations, connectivity feedback, persistent theme, the same five institutional tabs as desktop, original links, and a compact footer. Mobile searches use bounded concurrent access to the nine configured sources, short per-source and overall limits, partial-result preservation, and network-loss cancellation. The Android Activity is locked to portrait and uses a non-resizing keyboard mode for smoother input. Desktop-only window operations are replaced by Android-native behavior. See the [device testing guide](docs/ANDROID_TESTING.md).
+The new client compiles through [`Vaguei.Maui.slnx`](Vaguei.Maui.slnx). It uses exclusive preparation, loading, and results stages; a centered preparation layout; equal search/filter actions; native inertial `CollectionView` scrolling without selection; compact cards; back and scroll-to-top actions; local document selection; filters; favorites; theme persistence; five institutional sections; and original vacancy links. It embeds the same complete employer catalog used by desktop and keeps the 30-minute persistent cache. Searches start all configured sources, apply individual limits, return completed partial results at the overall deadline, cancel on network loss, and emit privacy-safe source timing diagnostics. See the [device testing guide](docs/ANDROID_TESTING.md).
 
 # Matching Model
 

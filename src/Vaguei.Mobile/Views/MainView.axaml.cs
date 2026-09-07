@@ -145,6 +145,12 @@ public partial class MainView : UserControl
     private void OnFiltersCloseClick(object? sender, RoutedEventArgs eventArgs) =>
         FiltersPanel.IsVisible = false;
 
+    private void OnSearchClick(object? sender, RoutedEventArgs eventArgs) =>
+        FiltersPanel.IsVisible = false;
+
+    private void OnScrollToTopClick(object? sender, RoutedEventArgs eventArgs) =>
+        ResultsScrollViewer.Offset = new Vector(0, 0);
+
     private void OnAboutClick(object? sender, RoutedEventArgs eventArgs) => AboutBackdrop.IsVisible = true;
 
     private void OnAboutCloseClick(object? sender, RoutedEventArgs eventArgs) => AboutBackdrop.IsVisible = false;

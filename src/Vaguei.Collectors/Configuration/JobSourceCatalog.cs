@@ -55,6 +55,29 @@ public sealed class JobSourceCatalog
         }
     }
 
+    public static JobSourceCatalog Load(Stream stream)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+
+        try
+        {
+            var configured = JsonSerializer.Deserialize<JobSourceCatalog>(
+                stream,
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+            return configured is null
+                ? CreateDefault()
+                : Validate(configured);
+        }
+        catch (JsonException)
+        {
+            return CreateDefault();
+        }
+    }
+
     public static JobSourceCatalog CreateDefault() => new()
     {
         Ashby = Clone(Sources.AshbyJobSource.DefaultBoards),

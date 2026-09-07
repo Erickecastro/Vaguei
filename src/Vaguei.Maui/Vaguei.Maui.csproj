@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-android</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Vaguei.Maui</RootNamespace>
+    <UseMaui>true</UseMaui>
+    <SingleProject>true</SingleProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <SupportedOSPlatformVersion>23.0</SupportedOSPlatformVersion>
+    <ApplicationTitle>Vaguei</ApplicationTitle>
+    <ApplicationId>com.erickecastro.vaguei.maui</ApplicationId>
+    <ApplicationDisplayVersion>0.1.3</ApplicationDisplayVersion>
+    <ApplicationVersion>4</ApplicationVersion>
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
+    <!-- A standalone APK must carry the managed payload and native runtime in the
+         package. Keeping .so/.blob entries stored also avoids the Android 16
+         loader abort seen when a sideloaded debug package compressed them. -->
+    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <AndroidUseAssemblyStore>true</AndroidUseAssemblyStore>
+    <AndroidStoreUncompressedFileExtensions>.so;.blob;$(AndroidStoreUncompressedFileExtensions)</AndroidStoreUncompressedFileExtensions>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <MauiIcon Include="..\Vaguei.Desktop\Assets\vaguei.png" />
+    <MauiSplashScreen Include="..\Vaguei.Desktop\Assets\logo-light-56.png"
+                      Link="Resources\Splash\vaguei_splash.png"
+                      Color="#FFFFFF" BaseSize="96,96" />
+    <MauiImage Include="..\Vaguei.Desktop\Assets\logo-dark-56.png" Link="Resources\Images\logo_dark_56.png" />
+    <MauiImage Include="..\Vaguei.Desktop\Assets\logo-light-56.png" Link="Resources\Images\logo_light_56.png" />
+    <EmbeddedResource Include="..\..\config\job-sources.json" LogicalName="Vaguei.Maui.job-sources.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Vaguei.Desktop\ViewModels\ViewModelBase.cs" Link="ViewModels\ViewModelBase.cs" />
+    <Compile Include="..\Vaguei.Desktop\ViewModels\MainViewModel.cs" Link="ViewModels\MainViewModel.cs" />
+    <Compile Include="..\Vaguei.Desktop\ViewModels\JobResultItemViewModel.cs" Link="ViewModels\JobResultItemViewModel.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vaguei.Application\Vaguei.Application.csproj" />
+    <ProjectReference Include="..\Vaguei.Collectors\Vaguei.Collectors.csproj" />
+    <ProjectReference Include="..\Vaguei.Domain\Vaguei.Domain.csproj" />
+    <ProjectReference Include="..\Vaguei.Infrastructure\Vaguei.Infrastructure.csproj" />
+    <ProjectReference Include="..\Vaguei.ResumeParser\Vaguei.ResumeParser.csproj" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.20" />
+  </ItemGroup>
+</Project>

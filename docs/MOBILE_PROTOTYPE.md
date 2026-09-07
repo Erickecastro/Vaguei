@@ -2,7 +2,7 @@
 
 ## Decisão
 
-Um protótipo Android é viável no ecossistema atual porque Avalonia 12 suporta Android com .NET 10. Ele deve ser criado como um projeto de entrada separado, referenciando uma camada compartilhada, sem converter o executável desktop em um projeto Android.
+O protótipo Android está migrando da primeira interface Avalonia para um frontend .NET MAUI 10 com controles nativos. O desktop permanece em Avalonia; domínio, aplicação, coletores, infraestrutura, ViewModel e parsers continuam compartilhados.
 
 O objetivo inicial é validar busca, filtros, resultados, tema, favoritos, compatibilidade, abertura de vagas e seleção de currículo em um aparelho. Publicação na loja e iOS ficam fora do primeiro experimento.
 
@@ -22,9 +22,8 @@ Vaguei.Application     busca, filtros e matching compartilhados
 Vaguei.Collectors      integrações HTTP compartilhadas
 Vaguei.ResumeParser    parsers compatíveis; validar APIs por plataforma
 Vaguei.Infrastructure  persistência com implementação por plataforma
-Vaguei.UI              views, estilos e componentes compartilhados
 Vaguei.Desktop         janela, barra de título e integração desktop
-Vaguei.Android         Activity, permissões e ciclo de vida Android
+Vaguei.Maui            UI nativa, seletor, ciclo de vida e navegação Android
 ```
 
 A extração de `Vaguei.UI` deve acontecer gradualmente. A tela desktop atual não deve ser duplicada inteira, pois isso criaria duas interfaces difíceis de manter.
@@ -34,15 +33,15 @@ A extração de `Vaguei.UI` deve acontecer gradualmente. A tela desktop atual n�
 - Pesquisa direta e pesquisa baseada no currículo.
 - Importação local de PDF, DOCX, ODT e TXT pelo seletor Android.
 - Remoção do arquivo temporário logo após a análise.
-- Escopo Brasil e Brasil + exterior.
+- Escopos exclusivos Brasil e Exterior.
 - Filtros de período, localização, modelo, contrato e senioridade.
 - Limpeza de filtros, favoritos persistentes e visualização de salvas.
-- Introdução mobile de quatro segundos, com logo fixa e saída em fade.
-- Filtros avançados em painel recolhível para preservar a área de resultados.
+- Fluxo exclusivo por etapas: preparação, carregamento e resultados.
+- Preparação centralizada e filtros avançados em painel recolhível.
 - Timeout geral de busca e política de rede mobile sem repetição demorada.
 - Cancelamento imediato ao perder a conexão e mensagens técnicas resumidas na tela pequena.
 - Orientação bloqueada em retrato e cinco abas institucionais equivalentes ao desktop.
-- Resultados virtualizados e teclado sem redimensionamento integral da árvore visual.
+- Resultados em `CollectionView` nativa, sem seleção, com rolagem inercial e cards compactos.
 - Consulta paralela das nove fontes independentes, com limites curtos por fonte e para a busca completa.
 - Acesso a currículo pelo Storage Access Framework: somente o documento escolhido é concedido ao aplicativo, sem permissão ampla para fotos, vídeos ou armazenamento.
 - Compatibilidade, justificativas e competências nos resultados.
@@ -64,12 +63,12 @@ A extração de `Vaguei.UI` deve acontecer gradualmente. A tela desktop atual n�
 O Fedora está configurado globalmente com JDK 25, mas o .NET Android 10 requer JDK 21. A build aponta explicitamente para o JDK compatível e não altera o Java do sistema:
 
 ```bash
-dotnet build src/Vaguei.Android/Vaguei.Android.csproj \
+dotnet build src/Vaguei.Maui/Vaguei.Maui.csproj \
   -p:AndroidSdkDirectory=/home/ericke/Android/Sdk \
   -p:JavaSdkDirectory=/usr/lib/jvm/java-21-temurin-jdk
 ```
 
-O APK de debug é gerado sob `src/Vaguei.Android/bin/Debug/net10.0-android/`. A pasta `bin` e arquivos `*.apk` são ignorados pelo Git.
+O APK de debug é gerado sob `src/Vaguei.Maui/bin/Debug/net10.0-android/`. A pasta `bin` e arquivos `*.apk` são ignorados pelo Git.
 
 Consulte o [roteiro de instalação e testes](ANDROID_TESTING.md).
 

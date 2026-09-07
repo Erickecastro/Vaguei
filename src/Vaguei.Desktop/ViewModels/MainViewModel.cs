@@ -84,6 +84,10 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(RefreshJobsCommand))]
     [NotifyPropertyChangedFor(nameof(ShowEmptyState))]
+    [NotifyPropertyChangedFor(nameof(ShowSearchChrome))]
+    [NotifyPropertyChangedFor(nameof(ShowSearchProgress))]
+    [NotifyPropertyChangedFor(nameof(ShowResultsContent))]
+    [NotifyPropertyChangedFor(nameof(ShowJobArea))]
     private bool _isBusy;
 
     [ObservableProperty]
@@ -94,6 +98,9 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowEmptyState))]
+    [NotifyPropertyChangedFor(nameof(ShowSearchChrome))]
+    [NotifyPropertyChangedFor(nameof(ShowResultsContent))]
+    [NotifyPropertyChangedFor(nameof(ShowJobArea))]
     private bool _hasResults;
 
     [ObservableProperty]
@@ -187,7 +194,21 @@ public partial class MainViewModel : ViewModelBase
         "Liderança"
     ];
 
+    public string SelectedSearchScopeLabel => SearchScopes[Math.Clamp(SearchScopeIndex, 0, SearchScopes.Count - 1)];
+    public string SelectedPublicationWindowLabel => PublicationWindows[Math.Clamp(PublicationWindowIndex, 0, PublicationWindows.Count - 1)];
+    public string SelectedWorkModelLabel => WorkModelOptions[Math.Clamp(WorkModelIndex, 0, WorkModelOptions.Count - 1)];
+    public string SelectedEmploymentTypeLabel => EmploymentTypeOptions[Math.Clamp(EmploymentTypeIndex, 0, EmploymentTypeOptions.Count - 1)];
+    public string SelectedSeniorityLabel => SeniorityOptions[Math.Clamp(SeniorityIndex, 0, SeniorityOptions.Count - 1)];
+
     public bool ShowEmptyState => !IsBusy && !HasResults;
+
+    public bool ShowSearchChrome => !IsBusy && !HasResults;
+
+    public bool ShowSearchProgress => IsBusy;
+
+    public bool ShowResultsContent => !IsBusy && HasResults;
+
+    public bool ShowJobArea => IsBusy || HasResults;
 
     public bool HasAdditionalSkills => AdditionalSkillCount > 0;
 
@@ -413,13 +434,30 @@ public partial class MainViewModel : ViewModelBase
         int value)
     {
         IncludeInternational = value == 1;
+        OnPropertyChanged(nameof(SelectedSearchScopeLabel));
         PersistSearchSettings();
     }
 
-    partial void OnPublicationWindowIndexChanged(int value) => OnFilterChanged();
-    partial void OnWorkModelIndexChanged(int value) => OnFilterChanged();
-    partial void OnEmploymentTypeIndexChanged(int value) => OnFilterChanged();
-    partial void OnSeniorityIndexChanged(int value) => OnFilterChanged();
+    partial void OnPublicationWindowIndexChanged(int value)
+    {
+        OnPropertyChanged(nameof(SelectedPublicationWindowLabel));
+        OnFilterChanged();
+    }
+    partial void OnWorkModelIndexChanged(int value)
+    {
+        OnPropertyChanged(nameof(SelectedWorkModelLabel));
+        OnFilterChanged();
+    }
+    partial void OnEmploymentTypeIndexChanged(int value)
+    {
+        OnPropertyChanged(nameof(SelectedEmploymentTypeLabel));
+        OnFilterChanged();
+    }
+    partial void OnSeniorityIndexChanged(int value)
+    {
+        OnPropertyChanged(nameof(SelectedSeniorityLabel));
+        OnFilterChanged();
+    }
     partial void OnLocationFilterChanged(string value) => OnFilterChanged();
     partial void OnShowOnlyFavoritesChanged(bool value) => OnPropertyChanged(nameof(HasActiveFilters));
 
@@ -428,6 +466,24 @@ public partial class MainViewModel : ViewModelBase
     {
         ShowOnlyFavorites = !ShowOnlyFavorites;
         ApplyVisibleJobFilter();
+    }
+
+    [RelayCommand]
+    private void ReturnToSearch()
+    {
+        if (IsBusy)
+        {
+            _activeSearchCancellation?.Cancel();
+        }
+
+        Jobs.Clear();
+        _allJobs.Clear();
+        HasResults = false;
+        SourceWarnings = string.Empty;
+        SourceCoverageSummary = string.Empty;
+        StatusMessage = HasProfile
+            ? "Perfil pronto. Ajuste a busca ou pesquise novamente."
+            : "Digite um cargo, tecnologia ou empresa para pesquisar.";
     }
 
     private async Task SearchJobsAsync(

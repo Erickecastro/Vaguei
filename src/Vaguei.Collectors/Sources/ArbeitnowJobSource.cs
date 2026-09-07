@@ -12,12 +12,10 @@ public sealed class ArbeitnowJobSource : IJobSource
 {
     private const int MaximumPages = 3;
     private readonly HttpClient _httpClient;
-    private readonly JobSkillRequirementAnalyzer _requirementAnalyzer;
 
     public ArbeitnowJobSource(HttpClient httpClient)
     {
         _httpClient = httpClient;
-        _requirementAnalyzer = new JobSkillRequirementAnalyzer();
     }
 
     public string Name => "Arbeitnow";
@@ -112,11 +110,6 @@ public sealed class ArbeitnowJobSource : IJobSource
                 .Select(tag => tag.Trim())
                 .ToHashSet(StringComparer.OrdinalIgnoreCase)
         };
-
-        posting.SkillRequirements =
-            _requirementAnalyzer
-                .Analyze(posting)
-                .ToList();
 
         return posting;
     }
