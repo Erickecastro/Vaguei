@@ -2,7 +2,7 @@
 
 ## Decisão
 
-O protótipo Android está migrando da primeira interface Avalonia para um frontend .NET MAUI 10 com controles nativos. O desktop permanece em Avalonia; domínio, aplicação, coletores, infraestrutura, ViewModel e parsers continuam compartilhados.
+O protótipo Android usa um frontend .NET MAUI 10 com controles nativos. A implementação Android anterior em Avalonia foi removida. O desktop permanece em Avalonia; domínio, aplicação, coletores, infraestrutura, ViewModel e parsers continuam compartilhados.
 
 O objetivo inicial é validar busca, filtros, resultados, tema, favoritos, compatibilidade, abertura de vagas e seleção de currículo em um aparelho. Publicação na loja e iOS ficam fora do primeiro experimento.
 
@@ -41,7 +41,10 @@ A extração de `Vaguei.UI` deve acontecer gradualmente. A tela desktop atual n�
 - Timeout geral de busca e política de rede mobile sem repetição demorada.
 - Cancelamento imediato ao perder a conexão e mensagens técnicas resumidas na tela pequena.
 - Orientação bloqueada em retrato e cinco abas institucionais equivalentes ao desktop.
-- Resultados em `CollectionView` nativa, sem seleção, com rolagem inercial e cards compactos.
+- Resultados renderizados diretamente por `RecyclerView`, `LinearLayoutManager` e `ViewHolder` do Android. A física de rolagem, reciclagem e inércia permanece integralmente nativa; os cards compactos conservam o tema e os comandos compartilhados do MAUI.
+- Coleta, leitura de cache, normalização e compatibilidade executadas fora da thread visual; a busca mantém todas as fontes configuradas e apenas devolve a interface após consolidar os resultados disponíveis.
+- Seletores de filtros próprios, em estilo rádio, coerentes com os temas do Vaguei e sem empilhamento de diálogos Android.
+- Ícone adaptativo e splash próprios; o splash usa marca preta transparente sobre branco puro.
 - Consulta paralela das nove fontes independentes, com limites curtos por fonte e para a busca completa.
 - Acesso a currículo pelo Storage Access Framework: somente o documento escolhido é concedido ao aplicativo, sem permissão ampla para fotos, vídeos ou armazenamento.
 - Compatibilidade, justificativas e competências nos resultados.

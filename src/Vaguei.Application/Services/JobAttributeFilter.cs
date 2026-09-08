@@ -33,7 +33,15 @@ public sealed class JobAttributeFilter
 
         var text = $"{job.Title} {job.Description}";
 
-        if (ContainsAny(text, "estágio", "estagio", "internship", " intern "))
+        if (ContainsAny(
+                text,
+                "estágio",
+                "estagio",
+                "estagiário",
+                "estagiaria",
+                "estagiária",
+                "internship",
+                " intern "))
         {
             return SeniorityLevel.Internship;
         }

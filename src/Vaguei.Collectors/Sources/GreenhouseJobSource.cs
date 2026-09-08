@@ -45,7 +45,9 @@ public sealed class GreenhouseJobSource : IJobSource
     {
         var searches = _boards.Select(board =>
             SearchBoardAsync(board.Key, board.Value, cancellationToken));
-        var results = await Task.WhenAll(searches);
+        var results = await Task.WhenAll(searches).WaitAsync(cancellationToken);
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         if (results.All(result => !result.Succeeded))
         {

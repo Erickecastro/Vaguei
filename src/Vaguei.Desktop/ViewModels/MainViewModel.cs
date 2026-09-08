@@ -28,6 +28,7 @@ public partial class MainViewModel : ViewModelBase
     private string _detectedProfessionalTitle = string.Empty;
     private CancellationTokenSource? _connectionNoticeCancellation;
     private CancellationTokenSource? _activeSearchCancellation;
+    private bool _searchCancelledByUser;
     private bool _connectionLostDuringSearch;
 
     [ObservableProperty]
@@ -104,6 +105,11 @@ public partial class MainViewModel : ViewModelBase
     private bool _hasResults;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowSearchChrome))]
+    [NotifyPropertyChangedFor(nameof(ShowResultsContent))]
+    private bool _hasSearchCompleted;
+
+    [ObservableProperty]
     private bool _isConnectionNoticeVisible;
 
     [ObservableProperty]
@@ -145,7 +151,7 @@ public partial class MainViewModel : ViewModelBase
         _searchSettingsLoaded = true;
     }
 
-    public ObservableCollection<JobResultItemViewModel> Jobs { get; } = [];
+    public BulkObservableCollection<JobResultItemViewModel> Jobs { get; } = [];
 
     public ObservableCollection<string> ProfileSkills { get; } = [];
 
@@ -202,11 +208,11 @@ public partial class MainViewModel : ViewModelBase
 
     public bool ShowEmptyState => !IsBusy && !HasResults;
 
-    public bool ShowSearchChrome => !IsBusy && !HasResults;
+    public bool ShowSearchChrome => !IsBusy && !HasSearchCompleted;
 
     public bool ShowSearchProgress => IsBusy;
 
-    public bool ShowResultsContent => !IsBusy && HasResults;
+    public bool ShowResultsContent => !IsBusy && HasSearchCompleted;
 
     public bool ShowJobArea => IsBusy || HasResults;
 
@@ -243,6 +249,7 @@ public partial class MainViewModel : ViewModelBase
 
         IsBusy = true;
         HasResults = false;
+        HasSearchCompleted = false;
         HasProfile = false;
         IsSearchAttentionActive = false;
         _currentProfile = null;
@@ -310,6 +317,7 @@ public partial class MainViewModel : ViewModelBase
         Jobs.Clear();
         _allJobs.Clear();
         HasResults = false;
+        HasSearchCompleted = false;
 
         if (_networkAvailable?.Invoke() == false)
         {
@@ -322,6 +330,7 @@ public partial class MainViewModel : ViewModelBase
         using var timeoutSource = new CancellationTokenSource(_searchTimeout);
         _activeSearchCancellation = timeoutSource;
         _connectionLostDuringSearch = false;
+        _searchCancelledByUser = false;
 
         IsSearchAttentionActive = false;
         IsBusy = true;
@@ -333,16 +342,19 @@ public partial class MainViewModel : ViewModelBase
         catch (OperationCanceledException)
             when (timeoutSource.IsCancellationRequested)
         {
-            StatusMessage = _connectionLostDuringSearch
-                ? "Busca interrompida: conexão perdida."
-                : "As fontes de vagas demoraram mais que o esperado. Tente novamente.";
-            if (_connectionLostDuringSearch)
+            if (!_searchCancelledByUser)
             {
-                ShowConnectionNotice();
+                HasSearchCompleted = true;
+                StatusMessage = _connectionLostDuringSearch
+                    ? "Busca interrompida: conexão perdida."
+                    : "As fontes de vagas demoraram mais que o esperado. Tente novamente.";
+                if (_connectionLostDuringSearch)
+                    ShowConnectionNotice();
             }
         }
         catch (Exception)
         {
+            HasSearchCompleted = true;
             StatusMessage = "Não foi possível consultar as fontes de vagas agora. Tente novamente em instantes.";
         }
         finally
@@ -412,6 +424,7 @@ public partial class MainViewModel : ViewModelBase
         SourceWarnings = string.Empty;
         HasProfile = false;
         HasResults = false;
+        HasSearchCompleted = false;
         IsSearchAttentionActive = false;
         StatusMessage =
             "Arraste seu currículo para começar ou escolha um arquivo.";
@@ -473,12 +486,15 @@ public partial class MainViewModel : ViewModelBase
     {
         if (IsBusy)
         {
+            _searchCancelledByUser = true;
             _activeSearchCancellation?.Cancel();
+            IsBusy = false;
         }
 
         Jobs.Clear();
         _allJobs.Clear();
         HasResults = false;
+        HasSearchCompleted = false;
         SourceWarnings = string.Empty;
         SourceCoverageSummary = string.Empty;
         StatusMessage = HasProfile
@@ -549,10 +565,13 @@ public partial class MainViewModel : ViewModelBase
                 .ConfigureAwait(false),
             cancellationToken);
 
-        if (cancellationToken.IsCancellationRequested && _connectionLostDuringSearch)
-        {
+        // A global timeout intentionally returns the useful partial result from
+        // sources that completed in time. Only an explicit navigation/network
+        // cancellation must discard it, otherwise the UI appears to return to
+        // the search screen after a successful partial collection.
+        if (cancellationToken.IsCancellationRequested &&
+            (_searchCancelledByUser || _connectionLostDuringSearch))
             cancellationToken.ThrowIfCancellationRequested();
-        }
 
         Jobs.Clear();
         _allJobs.Clear();
@@ -570,6 +589,7 @@ public partial class MainViewModel : ViewModelBase
         ApplyVisibleJobFilter();
 
         HasResults = Jobs.Count > 0;
+        HasSearchCompleted = true;
 
         var connectionUnavailable = _networkAvailable?.Invoke() == false;
         if (result.AllSourcesFailed && connectionUnavailable)
@@ -590,9 +610,7 @@ public partial class MainViewModel : ViewModelBase
             ? IsValidDirectSearch(directSearch)
                 ? $"Nenhum resultado relacionado a “{directSearch}”. Tente outro cargo, tecnologia ou empresa."
                 : "Nenhuma vaga foi encontrada pelas fontes atuais com este filtro."
-            : _currentProfile is null
-                ? $"{_allJobs.Count} oportunidades encontradas para “{directSearch}” em {result.SourcesWithResults} fontes."
-                : $"{_allJobs.Count} oportunidades encontradas em {result.SourcesWithResults} fontes.";
+            : $"{_allJobs.Count} oportunidades encontradas";
     }
 
     [RelayCommand]
@@ -645,11 +663,8 @@ public partial class MainViewModel : ViewModelBase
 
     private void ApplyVisibleJobFilter()
     {
-        Jobs.Clear();
-        foreach (var job in _allJobs.Where(job => !ShowOnlyFavorites || job.IsFavorite))
-        {
-            Jobs.Add(job);
-        }
+        Jobs.ReplaceAll(
+            _allJobs.Where(job => !ShowOnlyFavorites || job.IsFavorite));
 
         HasResults = Jobs.Count > 0;
     }

@@ -15,17 +15,8 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder.UseMauiApp<App>();
 
-#if ANDROID
-        Microsoft.Maui.Controls.Handlers.Items.CollectionViewHandler.Mapper.AppendToMapping(
-            "VagueiSmoothScrolling",
-            (handler, _) =>
-            {
-                handler.PlatformView.SetItemViewCacheSize(12);
-                handler.PlatformView.SetItemAnimator(null);
-                handler.PlatformView.NestedScrollingEnabled = true;
-                handler.PlatformView.OverScrollMode = Android.Views.OverScrollMode.Always;
-            });
-#endif
+        builder.ConfigureMauiHandlers(handlers =>
+            handlers.AddHandler<AndroidJobListView, AndroidJobListViewHandler>());
 
         builder.Services.AddSingleton(_ => new HttpClient
         {
@@ -45,7 +36,15 @@ public static class MauiProgram
                 cacheDuration: TimeSpan.FromMinutes(30),
                 retryCount: 0,
                 maximumConcurrentSources: 9,
-                persistentCache: new JsonPersistentJobCache());
+                // The very large Greenhouse payload can take tens of seconds to
+                // deserialize on Android and cannot be interrupted through the
+                // synchronous cache contract. Other sources retain their disk
+                // cache; Greenhouse uses only the fast in-memory cache on mobile.
+                persistentCache: new JsonPersistentJobCache(),
+                persistentCacheExclusions: new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    "Greenhouse"
+                });
 
             return new MainViewModel(
                 new ResumeParserService(
@@ -67,4 +66,5 @@ public static class MauiProgram
 
         return builder.Build();
     }
+
 }

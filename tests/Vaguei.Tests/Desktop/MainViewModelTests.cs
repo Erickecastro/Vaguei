@@ -346,6 +346,9 @@ public sealed class MainViewModelTests
         Assert.Contains(
             "Nenhum resultado relacionado",
             viewModel.StatusMessage);
+        Assert.True(viewModel.HasSearchCompleted);
+        Assert.True(viewModel.ShowResultsContent);
+        Assert.False(viewModel.ShowSearchChrome);
     }
 
     [Fact]

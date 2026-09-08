@@ -8,6 +8,7 @@ public partial class MainPage : ContentPage
 {
     private Action<int>? _applyFilterSelection;
     private CancellationTokenSource? _searchPulseCancellation;
+    private CancellationTokenSource? _networkLossDebounceCancellation;
 
     private static readonly FilePickerFileType ResumeFiles = new(
         new Dictionary<DevicePlatform, IEnumerable<string>>
@@ -43,6 +44,7 @@ public partial class MainPage : ContentPage
 
     protected override void OnDisappearing()
     {
+        _networkLossDebounceCancellation?.Cancel();
         ResetTransientUi();
         base.OnDisappearing();
     }
@@ -51,6 +53,7 @@ public partial class MainPage : ContentPage
     {
         FiltersSheet.IsVisible = false;
         FilterOptionsOverlay.IsVisible = false;
+        ExitConfirmationOverlay.IsVisible = false;
     }
 
     private async void OnChooseResumeClicked(object? sender, EventArgs eventArgs)
@@ -85,6 +88,16 @@ public partial class MainPage : ContentPage
     private void OnFiltersClicked(object? sender, EventArgs eventArgs) =>
         FiltersSheet.IsVisible = true;
 
+    private void OnSearchButtonClicked(object? sender, EventArgs eventArgs) =>
+        SearchEntry.Unfocus();
+
+    private void OnSearchEntryCompleted(object? sender, EventArgs eventArgs)
+    {
+        SearchEntry.Unfocus();
+        if (ViewModel.RefreshJobsCommand.CanExecute(null))
+            ViewModel.RefreshJobsCommand.Execute(null);
+    }
+
     private void OnFiltersCloseClicked(object? sender, EventArgs eventArgs) =>
         FiltersSheet.IsVisible = false;
 
@@ -115,11 +128,19 @@ public partial class MainPage : ContentPage
         Action<int> applySelection)
     {
         FilterOptionsTitle.Text = title;
-        FilterOptionsList.ItemsSource = options
-            .Select((label, index) => new FilterOption(
-                index,
-                $"{(index == selectedIndex ? "●" : "○")}   {label}"))
-            .ToArray();
+        FilterOptionsListHost.Clear();
+        for (var index = 0; index < options.Count; index++)
+        {
+            var optionButton = new Button
+            {
+                Text = $"{(index == selectedIndex ? "●" : "○")}   {options[index]}",
+                CommandParameter = index,
+                HorizontalOptions = LayoutOptions.Fill,
+                Margin = new Thickness(0, 2)
+            };
+            optionButton.Clicked += OnFilterOptionClicked;
+            FilterOptionsListHost.Add(optionButton);
+        }
         _applyFilterSelection = applySelection;
         FilterOptionsOverlay.IsVisible = true;
     }
@@ -134,15 +155,14 @@ public partial class MainPage : ContentPage
     private void OnFilterOptionsCloseClicked(object? sender, EventArgs eventArgs) =>
         FilterOptionsOverlay.IsVisible = false;
 
-    private async void OnOpenJobClicked(object? sender, EventArgs eventArgs)
+    private async void OnOpenJobRequested(object? sender, string url)
     {
-        if (sender is Button { CommandParameter: string url } &&
-            Uri.TryCreate(url, UriKind.Absolute, out var uri))
-            await Launcher.Default.OpenAsync(uri);
+        if (Uri.TryCreate(url, UriKind.Absolute, out var uri))
+            await Browser.Default.OpenAsync(uri, BrowserLaunchMode.SystemPreferred);
     }
 
     private void OnScrollToTopClicked(object? sender, EventArgs eventArgs) =>
-        JobsCollection.ScrollTo(0, position: ScrollToPosition.Start, animate: false);
+        JobsCollection.ScrollToTop();
 
     private async void OnAboutClicked(object? sender, EventArgs eventArgs) =>
         await Navigation.PushModalAsync(new NavigationPage(new AboutPage()));
@@ -156,15 +176,79 @@ public partial class MainPage : ContentPage
             : AppTheme.Dark;
         if (Platform.CurrentActivity is MainActivity activity)
             activity.ApplySystemBars(app.UserAppTheme == AppTheme.Dark);
+        JobsCollection.RefreshTheme();
         new JsonThemePreferenceStore().Save(
             app.UserAppTheme == AppTheme.Dark ? "Dark" : "Light");
     }
 
+    protected override bool OnBackButtonPressed()
+        => HandleSystemBack();
+
+    public bool HandleSystemBack()
+    {
+        if (ExitConfirmationOverlay.IsVisible)
+        {
+            ExitConfirmationOverlay.IsVisible = false;
+            return true;
+        }
+
+        if (FilterOptionsOverlay.IsVisible)
+        {
+            FilterOptionsOverlay.IsVisible = false;
+            return true;
+        }
+
+        if (FiltersSheet.IsVisible)
+        {
+            FiltersSheet.IsVisible = false;
+            return true;
+        }
+
+        if (ViewModel.ShowResultsContent || ViewModel.ShowSearchProgress)
+        {
+            if (ViewModel.ReturnToSearchCommand.CanExecute(null))
+                ViewModel.ReturnToSearchCommand.Execute(null);
+            return true;
+        }
+
+        ExitConfirmationOverlay.IsVisible = true;
+        return true;
+    }
+
+    private void OnExitCancelClicked(object? sender, EventArgs eventArgs) =>
+        ExitConfirmationOverlay.IsVisible = false;
+
+    private void OnExitConfirmClicked(object? sender, EventArgs eventArgs)
+    {
+        ExitConfirmationOverlay.IsVisible = false;
+        if (Platform.CurrentActivity is MainActivity activity)
+            activity.CloseApplication();
+    }
+
     private void OnConnectivityChanged(object? sender, ConnectivityChangedEventArgs eventArgs)
     {
-        if (eventArgs.NetworkAccess != NetworkAccess.Internet)
-            MainThread.BeginInvokeOnMainThread(() =>
-                ViewModel.HandleNetworkAvailabilityChanged(false));
+        _networkLossDebounceCancellation?.Cancel();
+        _networkLossDebounceCancellation?.Dispose();
+        _networkLossDebounceCancellation = null;
+
+        if (eventArgs.NetworkAccess == NetworkAccess.Internet) return;
+
+        _networkLossDebounceCancellation = new CancellationTokenSource();
+        _ = ConfirmNetworkLossAsync(_networkLossDebounceCancellation.Token);
+    }
+
+    private async Task ConfirmNetworkLossAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+            if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+                MainThread.BeginInvokeOnMainThread(() =>
+                    ViewModel.HandleNetworkAvailabilityChanged(false));
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs eventArgs)
@@ -194,12 +278,8 @@ public partial class MainPage : ContentPage
         {
             while (!cancellationToken.IsCancellationRequested && ViewModel.IsSearchAttentionActive)
             {
-                await Task.WhenAll(
-                    SearchButton.FadeToAsync(0.76, 520, Easing.SinInOut),
-                    SearchButton.ScaleToAsync(1.035, 520, Easing.SinInOut));
-                await Task.WhenAll(
-                    SearchButton.FadeToAsync(1, 520, Easing.SinInOut),
-                    SearchButton.ScaleToAsync(1, 520, Easing.SinInOut));
+                await SearchButton.FadeToAsync(0.82, 560, Easing.SinInOut);
+                await SearchButton.FadeToAsync(1, 560, Easing.SinInOut);
             }
         }
         finally
@@ -209,5 +289,4 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private sealed record FilterOption(int Index, string DisplayText);
 }

@@ -84,10 +84,12 @@ public sealed class ResilientJobSource : IJobSource
 
                 try
                 {
-                    var jobs = (await _inner.SearchAsync(
-                            query,
-                            timeoutSource.Token))
-                        .ToArray();
+                    var sourceJobs = await _inner.SearchAsync(
+                        query,
+                        timeoutSource.Token);
+                    timeoutSource.Token.ThrowIfCancellationRequested();
+                    var jobs = sourceJobs.ToArray();
+                    timeoutSource.Token.ThrowIfCancellationRequested();
                     PruneCache();
                     var expiresAt = DateTimeOffset.UtcNow.Add(_cacheDuration);
                     _cache[key] = new CacheEntry(expiresAt, jobs);

@@ -48,13 +48,17 @@ public sealed class JobSkillRequirementAnalyzer
         ArgumentNullException.ThrowIfNull(job);
 
         var definitions = GetSkillDefinitions(job);
+        // Splitting a full description is one of the most expensive operations
+        // in matching. It must happen once per job, not once per catalog skill.
+        var descriptionContexts = SplitContexts(job.Description).ToArray();
         var requirements = new List<JobSkillRequirement>();
 
         foreach (var definition in definitions)
         {
             var level = GetRequirementLevel(
                 job,
-                definition);
+                definition,
+                descriptionContexts);
 
             if (level is null)
             {
@@ -72,7 +76,8 @@ public sealed class JobSkillRequirementAnalyzer
 
     private JobSkillRequirementLevel? GetRequirementLevel(
         JobPosting job,
-        SkillDefinition skill)
+        SkillDefinition skill,
+        IReadOnlyCollection<string> descriptionContexts)
     {
         if (_skillMatcher.ContainsSkill(
                 job.Title,
@@ -81,7 +86,7 @@ public sealed class JobSkillRequirementAnalyzer
             return JobSkillRequirementLevel.Core;
         }
 
-        var matchingContexts = SplitContexts(job.Description)
+        var matchingContexts = descriptionContexts
             .Where(context =>
                 _skillMatcher.ContainsSkill(
                     context,

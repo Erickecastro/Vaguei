@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:Vaguei.Maui"
              xmlns:vm="clr-namespace:Vaguei.Desktop.ViewModels;assembly=Vaguei.Maui"
              x:Class="Vaguei.Maui.MainPage"
              x:DataType="vm:MainViewModel"
              NavigationPage.HasNavigationBar="False">
-  <Grid Padding="18,16" RowDefinitions="*"
+  <Grid RowDefinitions="*"
         BackgroundColor="{AppThemeBinding Light=#F6F7FB, Dark=#121212}">
-    <Grid IsVisible="{Binding ShowSearchChrome}" RowDefinitions="*,Auto,*">
+    <Grid IsVisible="{Binding ShowSearchChrome}" RowDefinitions="*,Auto,*" Padding="18,16">
       <VerticalStackLayout Grid.Row="1" Spacing="14">
         <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10">
           <Image WidthRequest="54" HeightRequest="54"
@@ -17,12 +18,26 @@
             <Label Text="Sua próxima oportunidade" FontSize="12"
                    TextColor="{AppThemeBinding Light=#626879, Dark=#B5B5B5}" />
           </VerticalStackLayout>
-          <Button Grid.Column="2" Text="ⓘ" WidthRequest="52" HeightRequest="52"
-                  CornerRadius="26" Padding="0" FontSize="27"
-                  SemanticProperties.Description="Sobre o Vaguei" Clicked="OnAboutClicked" />
-          <Button Grid.Column="3" Text="◐" WidthRequest="52" HeightRequest="52"
-                  CornerRadius="26" Padding="0" FontSize="30"
-                  SemanticProperties.Description="Alternar tema" Clicked="OnThemeClicked" />
+          <Border Grid.Column="2" WidthRequest="54" HeightRequest="54" Padding="0"
+                  BackgroundColor="{AppThemeBinding Light=#ECEEF4, Dark=#292929}"
+                  StrokeThickness="0" StrokeShape="RoundRectangle 17"
+                  SemanticProperties.Description="Sobre o Vaguei">
+            <Label Text="ⓘ" FontSize="32" HorizontalTextAlignment="Center"
+                   VerticalTextAlignment="Center" TranslationY="-1" InputTransparent="True" />
+            <Border.GestureRecognizers>
+              <TapGestureRecognizer Tapped="OnAboutClicked" />
+            </Border.GestureRecognizers>
+          </Border>
+          <Border Grid.Column="3" WidthRequest="54" HeightRequest="54" Padding="0"
+                  BackgroundColor="{AppThemeBinding Light=#ECEEF4, Dark=#292929}"
+                  StrokeThickness="0" StrokeShape="RoundRectangle 17"
+                  SemanticProperties.Description="Alternar tema">
+            <Label Text="◐" FontSize="44.3" HorizontalTextAlignment="Center"
+                   VerticalTextAlignment="Center" TranslationY="-7" InputTransparent="True" />
+            <Border.GestureRecognizers>
+              <TapGestureRecognizer Tapped="OnThemeClicked" />
+            </Border.GestureRecognizers>
+          </Border>
         </Grid>
 
         <Border Padding="16" Stroke="{AppThemeBinding Light=#DDE1EA, Dark=#383838}"
@@ -48,8 +63,16 @@
                 <Label Text="{Binding ProfileSummary}" MaxLines="2" LineBreakMode="TailTruncation" FontSize="11"
                        TextColor="{AppThemeBinding Light=#626879, Dark=#B5B5B5}" />
               </VerticalStackLayout>
-              <Button Grid.Column="1" Text="×" WidthRequest="44" HeightRequest="44" Padding="0"
-                      Command="{Binding RemoveResumeCommand}" SemanticProperties.Description="Remover currículo" />
+              <Border Grid.Column="1" WidthRequest="44" HeightRequest="44" Padding="0"
+                      BackgroundColor="{AppThemeBinding Light=#ECEEF4, Dark=#292929}"
+                      StrokeThickness="0" StrokeShape="RoundRectangle 14"
+                      SemanticProperties.Description="Remover currículo">
+                <Label Text="×" FontSize="22" HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center" InputTransparent="True" />
+                <Border.GestureRecognizers>
+                  <TapGestureRecognizer Command="{Binding RemoveResumeCommand}" />
+                </Border.GestureRecognizers>
+              </Border>
             </Grid>
           </Grid>
         </Border>
@@ -57,12 +80,14 @@
         <Border Padding="12,3" Stroke="{AppThemeBinding Light=#DDE1EA, Dark=#383838}"
                 BackgroundColor="{AppThemeBinding Light=White, Dark=#1B1B1B}"
                 StrokeShape="RoundRectangle 14">
-          <Entry Text="{Binding DesiredRole}" Placeholder="Cargo, tecnologia ou empresa"
-                 ReturnType="Search" />
+          <Entry x:Name="SearchEntry" Text="{Binding DesiredRole}"
+                 Placeholder="Cargo, tecnologia ou empresa" ReturnType="Search"
+                 Completed="OnSearchEntryCompleted" />
         </Border>
 
         <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
           <Button x:Name="SearchButton" Text="Pesquisar" Command="{Binding RefreshJobsCommand}"
+                  Clicked="OnSearchButtonClicked"
                   BackgroundColor="{AppThemeBinding Light=#5856D6, Dark=#F0F0F0}"
                   TextColor="{AppThemeBinding Light=White, Dark=#151515}" FontAttributes="Bold" />
           <Button Grid.Column="1" Text="Filtros" Clicked="OnFiltersClicked" />
@@ -70,7 +95,8 @@
       </VerticalStackLayout>
     </Grid>
 
-    <Grid IsVisible="{Binding ShowSearchProgress}" VerticalOptions="Center" RowDefinitions="Auto,Auto,Auto" RowSpacing="12">
+    <Grid IsVisible="{Binding ShowSearchProgress}" VerticalOptions="Center"
+          Padding="18,16" RowDefinitions="Auto,Auto,Auto" RowSpacing="12">
       <Label Text="Buscando oportunidades" HorizontalTextAlignment="Center"
              FontSize="22" FontAttributes="Bold" />
       <ActivityIndicator Grid.Row="1" IsRunning="{Binding IsBusy}"
@@ -80,10 +106,18 @@
              FontSize="13" TextColor="{AppThemeBinding Light=#626879, Dark=#B5B5B5}" />
     </Grid>
 
-    <Grid IsVisible="{Binding ShowResultsContent}" RowDefinitions="Auto,10,*">
+    <Grid IsVisible="{Binding ShowResultsContent}" RowDefinitions="Auto,10,*" Padding="18,16">
       <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-        <Button Text="‹" WidthRequest="44" HeightRequest="44" Padding="0" FontSize="25"
-                Command="{Binding ReturnToSearchCommand}" SemanticProperties.Description="Voltar para a busca" />
+        <Border WidthRequest="44" HeightRequest="44" Padding="0"
+                BackgroundColor="{AppThemeBinding Light=#ECEEF4, Dark=#292929}"
+                StrokeThickness="0" StrokeShape="RoundRectangle 14"
+                SemanticProperties.Description="Voltar para a busca">
+          <Label Text="‹" FontSize="27" HorizontalTextAlignment="Center"
+                 VerticalTextAlignment="Center" TranslationY="-2" InputTransparent="True" />
+          <Border.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding ReturnToSearchCommand}" />
+          </Border.GestureRecognizers>
+        </Border>
         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="0">
           <Label Text="Oportunidades" FontSize="21" FontAttributes="Bold" />
           <Label Text="{Binding StatusMessage}" MaxLines="1" LineBreakMode="TailTruncation" FontSize="11"
@@ -91,59 +125,52 @@
         </VerticalStackLayout>
       </Grid>
 
-      <CollectionView Grid.Row="2" x:Name="JobsCollection" ItemsSource="{Binding Jobs}"
-                      SelectionMode="None" ItemSizingStrategy="MeasureAllItems">
-          <CollectionView.ItemsLayout>
-            <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
-          </CollectionView.ItemsLayout>
-          <CollectionView.ItemTemplate>
-            <DataTemplate x:DataType="vm:JobResultItemViewModel">
-              <Border Padding="13,11" MinimumHeightRequest="174"
-                      Stroke="{AppThemeBinding Light=#DDE1EA, Dark=#383838}"
-                      BackgroundColor="{AppThemeBinding Light=White, Dark=#1B1B1B}"
-                      StrokeShape="RoundRectangle 16">
-                <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="3">
-                  <VerticalStackLayout Grid.ColumnSpan="2" Spacing="1">
-                    <Label Text="{Binding Title}" FontSize="15" FontAttributes="Bold"
-                           MaxLines="2" LineBreakMode="TailTruncation" />
-                    <Label Text="{Binding Company}" FontSize="12" FontAttributes="Bold" />
-                    <Label Text="{Binding Location}" FontSize="11" MaxLines="1" LineBreakMode="TailTruncation"
-                           TextColor="{AppThemeBinding Light=#626879, Dark=#B5B5B5}" />
-                  </VerticalStackLayout>
-                  <Label Grid.Row="1" Margin="0,4,0,0" IsVisible="{Binding ShowCompatibility}"
-                         Text="{Binding Score, StringFormat='Compatibilidade {0}'}" FontSize="11" FontAttributes="Bold" />
-                  <Label Grid.Row="2" FontSize="10" Text="{Binding Source}"
-                         TextColor="{AppThemeBinding Light=#626879, Dark=#B5B5B5}" />
-                  <Label Grid.Row="3" FontSize="10" Text="{Binding Published}"
-                         TextColor="{AppThemeBinding Light=#626879, Dark=#B5B5B5}" />
-                  <HorizontalStackLayout Grid.Row="1" Grid.RowSpan="3" Grid.Column="1"
-                                         VerticalOptions="End" Spacing="7">
-                    <Button Text="{Binding FavoriteSymbol}" WidthRequest="44" HeightRequest="44" Padding="0"
-                            FontSize="18" Command="{Binding ToggleFavoriteCommand}" />
-                    <Button Text="Abrir ›" WidthRequest="86" HeightRequest="44" Padding="8,0"
-                            CommandParameter="{Binding Url}" Clicked="OnOpenJobClicked" />
-                  </HorizontalStackLayout>
-                </Grid>
-              </Border>
-            </DataTemplate>
-          </CollectionView.ItemTemplate>
-      </CollectionView>
+      <Grid Grid.Row="2" IsClippedToBounds="True">
+        <local:AndroidJobListView x:Name="JobsCollection"
+                                  ItemsSource="{Binding Jobs}"
+                                  OpenRequested="OnOpenJobRequested" />
+      </Grid>
+
+      <VerticalStackLayout Grid.Row="2" IsVisible="{Binding ShowEmptyState}"
+                           VerticalOptions="Center" Spacing="8" Margin="18">
+        <Label Text="Nenhuma oportunidade encontrada" FontSize="18"
+               FontAttributes="Bold" HorizontalTextAlignment="Center" />
+        <Label Text="{Binding StatusMessage}" FontSize="13" HorizontalTextAlignment="Center"
+               TextColor="{AppThemeBinding Light=#626879, Dark=#B5B5B5}" />
+      </VerticalStackLayout>
     </Grid>
 
-    <Button IsVisible="{Binding ShowResultsContent}" HorizontalOptions="Start" VerticalOptions="End"
-            Margin="4,0,0,6" Text="↑" WidthRequest="46" HeightRequest="46" Padding="0"
-            FontSize="21" CornerRadius="23" Clicked="OnScrollToTopClicked"
-            SemanticProperties.Description="Voltar ao topo" />
+    <Border IsVisible="{Binding ShowResultsContent}" HorizontalOptions="Start" VerticalOptions="End"
+            Margin="22,0,0,22" WidthRequest="46" HeightRequest="46" Padding="0"
+            BackgroundColor="{AppThemeBinding Light=#ECEEF4, Dark=#292929}"
+            StrokeThickness="0" StrokeShape="RoundRectangle 23"
+            SemanticProperties.Description="Voltar ao topo">
+      <Label Text="↑" FontSize="21" HorizontalTextAlignment="Center"
+             VerticalTextAlignment="Center" InputTransparent="True" />
+      <Border.GestureRecognizers>
+        <TapGestureRecognizer Tapped="OnScrollToTopClicked" />
+      </Border.GestureRecognizers>
+    </Border>
 
-    <Border x:Name="FiltersSheet" IsVisible="False" VerticalOptions="End" Padding="18"
-            Stroke="{AppThemeBinding Light=#DDE1EA, Dark=#383838}"
-            BackgroundColor="{AppThemeBinding Light=White, Dark=#1B1B1B}"
-            StrokeShape="RoundRectangle 24">
-      <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,*"
-            ColumnSpacing="10" RowSpacing="10">
+    <Grid x:Name="FiltersSheet" IsVisible="False"
+          BackgroundColor="{AppThemeBinding Light=#66000000, Dark=#99000000}">
+      <Border VerticalOptions="Center" HorizontalOptions="Fill" MaximumWidthRequest="440"
+              Padding="18" Margin="30"
+              Stroke="{AppThemeBinding Light=#DDE1EA, Dark=#383838}"
+              BackgroundColor="{AppThemeBinding Light=White, Dark=#1B1B1B}"
+              StrokeShape="RoundRectangle 24">
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,*"
+              ColumnSpacing="10" RowSpacing="10">
         <Label Text="Filtros" FontSize="20" FontAttributes="Bold" VerticalOptions="Center" />
-        <Button Grid.Column="1" HorizontalOptions="End" Text="×" WidthRequest="44" HeightRequest="44"
-                Padding="0" Clicked="OnFiltersCloseClicked" />
+        <Border Grid.Column="1" HorizontalOptions="End" WidthRequest="44" HeightRequest="44"
+                Padding="0" BackgroundColor="{AppThemeBinding Light=#ECEEF4, Dark=#292929}"
+                StrokeThickness="0" StrokeShape="RoundRectangle 14">
+          <Label Text="×" FontSize="22" HorizontalTextAlignment="Center"
+                 VerticalTextAlignment="Center" InputTransparent="True" />
+          <Border.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnFiltersCloseClicked" />
+          </Border.GestureRecognizers>
+        </Border>
         <Button Grid.Row="1" Text="{Binding SelectedSearchScopeLabel}" Clicked="OnSearchScopeFilterClicked" />
         <Button Grid.Row="1" Grid.Column="1" Text="{Binding SelectedPublicationWindowLabel}" Clicked="OnPublicationFilterClicked" />
         <Entry Grid.Row="2" Placeholder="Cidade ou estado" Text="{Binding LocationFilter}" />
@@ -151,29 +178,43 @@
         <Button Grid.Row="3" Text="{Binding SelectedEmploymentTypeLabel}" Clicked="OnEmploymentFilterClicked" />
         <Button Grid.Row="3" Grid.Column="1" Text="{Binding SelectedSeniorityLabel}" Clicked="OnSeniorityFilterClicked" />
         <Button Grid.Row="4" Grid.ColumnSpan="2" Text="Limpar filtros" Command="{Binding ClearAdvancedFiltersCommand}" />
-      </Grid>
-    </Border>
+        </Grid>
+      </Border>
+    </Grid>
 
     <Grid x:Name="FilterOptionsOverlay" IsVisible="False"
           BackgroundColor="{AppThemeBinding Light=#66000000, Dark=#99000000}">
-      <Border Margin="18" Padding="18" VerticalOptions="Center"
-              MaximumHeightRequest="620"
+      <Border Margin="30" Padding="18" VerticalOptions="Center"
+              HorizontalOptions="Fill" MaximumWidthRequest="440"
               BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1B1B1B}"
               Stroke="{AppThemeBinding Light=#DDE1EA, Dark=#3A3A3A}"
               StrokeShape="RoundRectangle 24">
-        <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
+        <VerticalStackLayout Spacing="12">
           <Label x:Name="FilterOptionsTitle" FontSize="21" FontAttributes="Bold" />
-          <CollectionView Grid.Row="1" x:Name="FilterOptionsList" SelectionMode="None">
-            <CollectionView.ItemTemplate>
-              <DataTemplate>
-                <Button Text="{Binding DisplayText}" CommandParameter="{Binding Index}"
-                        Clicked="OnFilterOptionClicked" HorizontalOptions="Fill"
-                        HorizontalTextAlignment="Start" Margin="0,2" />
-              </DataTemplate>
-            </CollectionView.ItemTemplate>
-          </CollectionView>
-          <Button Grid.Row="2" Text="Cancelar" Clicked="OnFilterOptionsCloseClicked" />
-        </Grid>
+          <VerticalStackLayout x:Name="FilterOptionsListHost" Spacing="4" />
+          <Button Text="Cancelar" Clicked="OnFilterOptionsCloseClicked" />
+        </VerticalStackLayout>
+      </Border>
+    </Grid>
+
+    <Grid x:Name="ExitConfirmationOverlay" IsVisible="False"
+          BackgroundColor="{AppThemeBinding Light=#66000000, Dark=#99000000}">
+      <Border Margin="30" Padding="22" VerticalOptions="Center"
+              HorizontalOptions="Fill" MaximumWidthRequest="440"
+              BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1B1B1B}"
+              Stroke="{AppThemeBinding Light=#DDE1EA, Dark=#3A3A3A}"
+              StrokeShape="RoundRectangle 24">
+        <VerticalStackLayout Spacing="14">
+          <Label Text="Sair do Vaguei?" FontSize="22" FontAttributes="Bold" />
+          <Label Text="Deseja realmente fechar o aplicativo?" FontSize="14"
+                 TextColor="{AppThemeBinding Light=#626879, Dark=#B5B5B5}" />
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,6,0,0">
+            <Button Text="Cancelar" Clicked="OnExitCancelClicked" />
+            <Button Grid.Column="1" Text="Confirmar" Clicked="OnExitConfirmClicked"
+                    BackgroundColor="{AppThemeBinding Light=#1A1D26, Dark=#F0F0F0}"
+                    TextColor="{AppThemeBinding Light=#FFFFFF, Dark=#151515}" />
+          </Grid>
+        </VerticalStackLayout>
       </Border>
     </Grid>
   </Grid>

@@ -7,8 +7,15 @@
         BackgroundColor="{AppThemeBinding Light=#F6F7FB, Dark=#121212}">
     <Grid ColumnDefinitions="*,Auto" Margin="0,0,8,14">
       <Label Text="Sobre o Vaguei" FontSize="25" FontAttributes="Bold" VerticalOptions="Center" />
-      <Button Grid.Column="1" Text="×" WidthRequest="46" HeightRequest="46" Padding="0"
-              FontSize="22" Clicked="OnCloseClicked" />
+      <Border Grid.Column="1" WidthRequest="46" HeightRequest="46" Padding="0"
+              BackgroundColor="{AppThemeBinding Light=#ECEEF4, Dark=#292929}"
+              StrokeThickness="0" StrokeShape="RoundRectangle 23">
+        <Label Text="×" FontSize="23" HorizontalTextAlignment="Center"
+               VerticalTextAlignment="Center" InputTransparent="True" />
+        <Border.GestureRecognizers>
+          <TapGestureRecognizer Tapped="OnCloseClicked" />
+        </Border.GestureRecognizers>
+      </Border>
     </Grid>
     <ScrollView Grid.Row="1" Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
       <HorizontalStackLayout Spacing="8" Padding="0,0,8,12">

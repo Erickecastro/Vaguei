@@ -69,11 +69,16 @@ public sealed class JobSearchOrchestrator
             profile,
             preferences);
 
+        // Algumas fontes consultam cache persistente antes do primeiro await.
+        // Em clientes MAUI isso não pode ocupar a thread visual: a leitura,
+        // desserialização, coleta e normalização permanecem em segundo plano,
+        // enquanto a interface continua responsiva.
         var sourceTasks = _sources.Select(source =>
-                SearchSourceAsync(
-                    source,
-                    query,
-                    cancellationToken))
+                Task.Run(
+                    () => SearchSourceAsync(
+                        source,
+                        query,
+                        cancellationToken)))
             .ToArray();
 
         var completedResults = new List<SourceSearchResult>();
@@ -84,9 +89,10 @@ public sealed class JobSearchOrchestrator
             while (pendingTasks.Count > 0)
             {
                 var completedTask = await Task.WhenAny(pendingTasks)
-                    .WaitAsync(cancellationToken);
+                    .WaitAsync(cancellationToken)
+                    .ConfigureAwait(false);
                 pendingTasks.Remove(completedTask);
-                completedResults.Add(await completedTask);
+                completedResults.Add(await completedTask.ConfigureAwait(false));
             }
         }
         catch (OperationCanceledException) when (
@@ -116,23 +122,25 @@ public sealed class JobSearchOrchestrator
             freshJobs,
             preferences);
 
-        var uniqueJobs = _deduplicator.Deduplicate(attributeAllowedJobs);
+        var uniqueJobs = _deduplicator.Deduplicate(attributeAllowedJobs).ToArray();
 
-        foreach (var job in uniqueJobs)
+        Parallel.ForEach(uniqueJobs, job =>
         {
             if (job.SkillRequirements.Count == 0)
             {
                 job.SkillRequirements =
                     _requirementAnalyzer.Analyze(job).ToList();
             }
-        }
+        });
 
         var matches = uniqueJobs
+            .AsParallel()
             .Select(job =>
                 _matcher.Match(
                     profile,
                     job,
                     preferences))
+            .ToArray()
             .OrderByDescending(result => result.Score)
             .ThenByDescending(result => result.Job.PublishedAt)
             .ToArray();
@@ -152,7 +160,7 @@ public sealed class JobSearchOrchestrator
                     result.Failure is null))
                 .ToArray(),
             CollectedJobCount = collectedJobs.Length,
-            UniqueJobCount = uniqueJobs.Count,
+            UniqueJobCount = uniqueJobs.Length,
             AllSourcesFailed = sourceResults.Length > 0 &&
                                sourceResults.All(result => result.Failure is not null)
         };

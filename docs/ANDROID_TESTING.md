@@ -40,6 +40,7 @@ adb shell monkey -p com.erickecastro.vaguei.maui -c android.intent.category.LAUN
 - Rolar diversos cards sem que o toque de rolagem acione seleção ou destaque do fundo.
 - Alternar entre Brasil e Exterior, verificando que os resultados não misturem os dois escopos.
 - Testar todos os períodos de publicação.
+- Confirmar que os seletores de filtro usam o painel visual do Vaguei em vez do diálogo padrão do Android.
 - Aplicar localização, modelo, contrato e senioridade.
 - Limpar os filtros sem iniciar uma nova busca inesperada.
 - Abrir e recolher o painel compacto de filtros.

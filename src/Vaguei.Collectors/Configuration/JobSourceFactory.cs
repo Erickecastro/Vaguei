@@ -14,7 +14,8 @@ public static class JobSourceFactory
         TimeSpan? cacheDuration = null,
         int retryCount = 1,
         int maximumConcurrentSources = 3,
-        IPersistentJobCache? persistentCache = null)
+        IPersistentJobCache? persistentCache = null,
+        IReadOnlySet<string>? persistentCacheExclusions = null)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
         catalog ??= JobSourceCatalog.Load();
@@ -50,7 +51,9 @@ public static class JobSourceFactory
                 cacheDuration: cacheDuration ?? TimeSpan.FromMinutes(5),
                 retryCount: retryCount,
                 maximumCacheEntries: 32,
-                persistentCache: persistentCache))
+                persistentCache: persistentCacheExclusions?.Contains(source.Name) == true
+                    ? null
+                    : persistentCache))
             .ToArray();
     }
 }

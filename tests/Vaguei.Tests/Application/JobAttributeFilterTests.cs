@@ -48,6 +48,8 @@ public sealed class JobAttributeFilterTests
     [InlineData("Senior Software Engineer", SeniorityLevel.Senior)]
     [InlineData("Tech Lead", SeniorityLevel.Lead)]
     [InlineData("Estágio em Administração", SeniorityLevel.Internship)]
+    [InlineData("Estagiário de Engenharia", SeniorityLevel.Internship)]
+    [InlineData("Estagiária Administrativa", SeniorityLevel.Internship)]
     public void Filter_InfersSeniorityFromJobContent(
         string title,
         SeniorityLevel expected)

@@ -1,6 +1,7 @@
 using Android.App;
 using Android.Content.PM;
 using Android.OS;
+using AndroidX.Activity;
 using AndroidX.Core.View;
 
 namespace Vaguei.Maui;
@@ -23,6 +24,7 @@ public class MainActivity : MauiAppCompatActivity
         // from Android's fragment/dialog stack. This prevents old filter sheets
         // and modal pages from reopening after the process is recreated.
         base.OnCreate(null);
+        OnBackPressedDispatcher.AddCallback(this, new VagueiBackCallback(this));
         ApplySystemBars(AppInfo.RequestedTheme == AppTheme.Dark);
     }
 
@@ -30,6 +32,22 @@ public class MainActivity : MauiAppCompatActivity
     {
         base.OnResume();
         ApplySystemBars(AppInfo.RequestedTheme == AppTheme.Dark);
+    }
+
+    private bool HandleBackNavigation()
+    {
+        var currentPage = Microsoft.Maui.Controls.Application.Current?
+            .Windows.FirstOrDefault()?.Page;
+        if (currentPage is not NavigationPage navigation) return false;
+
+        if (navigation.Navigation.ModalStack.Count > 0)
+        {
+            _ = navigation.Navigation.PopModalAsync();
+            return true;
+        }
+
+        return navigation.CurrentPage is MainPage mainPage &&
+               mainPage.HandleSystemBack();
     }
 
     public void ApplySystemBars(bool dark)
@@ -44,5 +62,20 @@ public class MainActivity : MauiAppCompatActivity
         if (controller is null) return;
         controller.AppearanceLightStatusBars = !dark;
         controller.AppearanceLightNavigationBars = !dark;
+    }
+
+    public void CloseApplication() => FinishAndRemoveTask();
+
+    private sealed class VagueiBackCallback(MainActivity activity)
+        : OnBackPressedCallback(true)
+    {
+        public override void HandleOnBackPressed()
+        {
+            if (activity.HandleBackNavigation()) return;
+
+            Enabled = false;
+            activity.OnBackPressedDispatcher.OnBackPressed();
+            Enabled = true;
+        }
     }
 }

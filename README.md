@@ -13,7 +13,7 @@
 
 # About
 
-**Vaguei** is a privacy-conscious job-discovery application for desktop, with an experimental native-control Android client built with .NET MAUI. Desktop remains the primary development target; the previous Avalonia Android client is retained temporarily as a migration reference.
+**Vaguei** is a privacy-conscious job-discovery application for desktop and Android. The desktop client uses Avalonia, while the experimental Android client is implemented entirely with .NET MAUI native controls. Domain rules, search, collectors, persistence, matching and resume parsing are shared; each platform keeps a purpose-built interface.
 
 Users can import a resume or search directly by role, technology, or company. Resume content is processed locally to identify professional context and relevant skills; contact details and other unnecessary personal data are discarded. Results keep the original application URL so the candidate always applies on the employer's or recruiting platform's page.
 
@@ -111,9 +111,7 @@ Vaguei
 ├── Vaguei.Collectors      # Public job-source adapters
 ├── Vaguei.Infrastructure  # Reserved for persistence and platform services
 ├── Vaguei.Desktop         # Avalonia desktop application
-├── Vaguei.Maui            # Current experimental .NET MAUI Android client
-├── Vaguei.Mobile          # Previous small-screen Avalonia reference
-├── Vaguei.Android         # Previous Avalonia Android entry point
+├── Vaguei.Maui            # Experimental native-control .NET MAUI Android client
 ├── Vaguei.Cli             # Local diagnostics
 └── Vaguei.Tests           # Automated test suite
 ```
@@ -142,7 +140,7 @@ Cross-source deduplication
 Matching and ranking
         |
         v
-Desktop results with original application links
+Desktop or Android results with original application links
 ```
 
 # Tech Stack
@@ -150,8 +148,8 @@ Desktop results with original application links
 ### In use
 
 * C# and .NET 10
-* Avalonia 12
-* .NET MAUI 10 for the current Android experiment
+* Avalonia 12 for Linux and Windows desktop
+* .NET MAUI 10 for Android
 * CommunityToolkit.Mvvm
 * xUnit
 * LINQ, regular expressions, JSON, XML, and HTTP APIs
@@ -239,7 +237,7 @@ adb install -r src/Vaguei.Maui/bin/Debug/net10.0-android/com.erickecastro.vaguei
 adb shell monkey -p com.erickecastro.vaguei.maui -c android.intent.category.LAUNCHER 1
 ```
 
-The MAUI Android application is currently at version `0.1.2` (`versionCode` 3) and remains a test build, not a Play Store release. Its package id is `com.erickecastro.vaguei.maui`, allowing side-by-side comparison with the previous Avalonia experiment. Its current capabilities, limitations and complete device checklist are documented in [`docs/MOBILE_PROTOTYPE.md`](docs/MOBILE_PROTOTYPE.md) and [`docs/ANDROID_TESTING.md`](docs/ANDROID_TESTING.md).
+The MAUI Android application is currently at version `0.1.8` (`versionCode` 9) and remains a test build, not a Play Store release. Its package id is `com.erickecastro.vaguei.maui`. The superseded Avalonia Android prototype has been removed; Avalonia remains the desktop UI technology. Current mobile capabilities, limitations and the complete device checklist are documented in [`docs/MOBILE_PROTOTYPE.md`](docs/MOBILE_PROTOTYPE.md) and [`docs/ANDROID_TESTING.md`](docs/ANDROID_TESTING.md).
 
 For local diagnostics, run the CLI with a resume path:
 
@@ -253,9 +251,9 @@ Resume contents are not printed by default. Use `--show-raw` only in a controlle
 
 Linux and Windows are the tested desktop development environments. Avalonia also supports macOS, but this repository does not yet provide a validated macOS build. Release installers, signing and automatic updates are not implemented.
 
-The Android prototype is implemented while desktop remains the primary product. The current mobile migration uses .NET MAUI 10 native controls while sharing the domain, application, collectors, ViewModel, infrastructure, and resume parsers with desktop.
+The Android prototype is implemented entirely with .NET MAUI 10 native controls while sharing the domain, application, collectors, ViewModel, infrastructure, and resume parsers with desktop. Avalonia is required only by the Linux/Windows desktop client and is no longer part of the Android dependency graph.
 
-The new client compiles through [`Vaguei.Maui.slnx`](Vaguei.Maui.slnx). It uses exclusive preparation, loading, and results stages; a centered preparation layout; equal search/filter actions; native inertial `CollectionView` scrolling without selection; compact cards; back and scroll-to-top actions; local document selection; filters; favorites; theme persistence; five institutional sections; and original vacancy links. It embeds the same complete employer catalog used by desktop and keeps the 30-minute persistent cache. Searches start all configured sources, apply individual limits, return completed partial results at the overall deadline, cancel on network loss, and emit privacy-safe source timing diagnostics. See the [device testing guide](docs/ANDROID_TESTING.md).
+The Android client compiles through [`Vaguei.Maui.slnx`](Vaguei.Maui.slnx). It uses exclusive preparation, loading, and results stages; a centered preparation layout; equal search/filter actions; a direct Android `RecyclerView`/`ViewHolder` results surface with native inertial physics; compact adaptive cards; back and scroll-to-top actions; local document selection; theme-aware in-app filter choice panels; favorites; theme persistence; five institutional sections; and original vacancy links. The page and application architecture remain MAUI; only the high-volume results surface uses its Android-native handler to avoid MAUI cell measurement during a gesture. It embeds the same employer catalog used by desktop and keeps the 30-minute persistent cache. Searches start all configured sources, apply individual limits, return completed partial results at the overall deadline, cancel on network loss, and emit privacy-safe source timing diagnostics. See the [device testing guide](docs/ANDROID_TESTING.md).
 
 # Matching Model
 
