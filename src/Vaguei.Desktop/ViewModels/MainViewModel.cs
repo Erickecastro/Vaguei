@@ -88,6 +88,7 @@ public partial class MainViewModel : ViewModelBase
     [NotifyPropertyChangedFor(nameof(ShowEmptyState))]
     [NotifyPropertyChangedFor(nameof(ShowSearchChrome))]
     [NotifyPropertyChangedFor(nameof(ShowSearchProgress))]
+    [NotifyPropertyChangedFor(nameof(IsProgressivelyUpdating))]
     [NotifyPropertyChangedFor(nameof(ShowResultsContent))]
     [NotifyPropertyChangedFor(nameof(ShowJobArea))]
     private bool _isBusy;
@@ -110,6 +111,7 @@ public partial class MainViewModel : ViewModelBase
     [NotifyPropertyChangedFor(nameof(ShowResultsContent))]
     [NotifyPropertyChangedFor(nameof(ShowEmptyState))]
     [NotifyPropertyChangedFor(nameof(ShowSearchProgress))]
+    [NotifyPropertyChangedFor(nameof(IsProgressivelyUpdating))]
     private bool _hasSearchCompleted;
 
     [ObservableProperty]
@@ -217,6 +219,9 @@ public partial class MainViewModel : ViewModelBase
     public bool ShowSearchChrome => !IsBusy && !HasSearchCompleted;
 
     public bool ShowSearchProgress => IsBusy && !HasSearchCompleted;
+
+    public bool IsProgressivelyUpdating =>
+        _enableProgressiveSearch && IsBusy && HasSearchCompleted;
 
     public bool ShowResultsContent => HasSearchCompleted;
 
@@ -619,7 +624,8 @@ public partial class MainViewModel : ViewModelBase
             // Evita abrir uma lista vazia ou instável. Cinco resultados são
             // suficientes para uma primeira tela útil; a consolidação final
             // ainda considera todas as fontes disponíveis.
-            if (!initialResultsPresented && result.Matches.Count >= 5)
+            if (!initialResultsPresented &&
+                (result.Matches.Count >= 5 || result.SourceSummaries.Count >= 2))
             {
                 PresentSearchResult(result, directSearch);
                 initialResultsPresented = true;

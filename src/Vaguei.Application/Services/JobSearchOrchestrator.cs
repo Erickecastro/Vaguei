@@ -127,6 +127,7 @@ public sealed class JobSearchOrchestrator
             .ToHashSet();
         var completedResults = new List<SourceSearchResult>();
         var cancelled = false;
+        var initialCoveragePublished = false;
 
         while (pendingTasks.Count > 0)
         {
@@ -146,12 +147,25 @@ public sealed class JobSearchOrchestrator
             pendingTasks.Remove(completedTask);
             completedResults.Add(await completedTask.ConfigureAwait(false));
 
-            yield return BuildExecutionResult(
-                query,
-                completedResults,
-                profile,
-                preferences,
-                referenceTime);
+            // Enquanto ainda não há uma lista útil, cada fonte concluída pode
+            // ajudar a alcançá-la. Depois disso, evitamos normalizar e pontuar
+            // toda a coleção repetidamente: basta publicar a consolidação no
+            // término da coleta.
+            if (!initialCoveragePublished || pendingTasks.Count == 0)
+            {
+                var result = BuildExecutionResult(
+                    query,
+                    completedResults,
+                    profile,
+                    preferences,
+                    referenceTime);
+
+                yield return result;
+
+                initialCoveragePublished = result.Matches.Count >= 5 ||
+                                         completedResults.Count >= 2 ||
+                                         pendingTasks.Count == 0;
+            }
         }
 
         if (cancelled && completedResults.Count > 0)

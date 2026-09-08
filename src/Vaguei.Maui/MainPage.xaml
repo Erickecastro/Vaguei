@@ -122,6 +122,8 @@
           <Label Text="Oportunidades" FontSize="21" FontAttributes="Bold" />
           <Label Text="{Binding StatusMessage}" MaxLines="1" LineBreakMode="TailTruncation" FontSize="11"
                  TextColor="{AppThemeBinding Light=#626879, Dark=#B5B5B5}" />
+          <Label Text="Atualizando mais fontes…" IsVisible="{Binding IsProgressivelyUpdating}"
+                 FontSize="10" TextColor="{AppThemeBinding Light=#5856D6, Dark=#B8B6FF}" />
         </VerticalStackLayout>
       </Grid>
 

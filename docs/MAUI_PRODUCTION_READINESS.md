@@ -34,7 +34,8 @@ Android neste momento.
 - Leitura de cache, coleta, normalização, deduplicação e matching não ocupam a
   thread visual.
 - A busca publica lotes por fonte concluída e exibe a primeira lista útil ao
-  alcançar cinco vagas compatíveis, enquanto a cobertura restante continua.
+  alcançar cinco vagas compatíveis ou duas fontes concluídas, enquanto a
+  cobertura restante continua.
 - O adaptador Android usa chaves estáveis e `DiffUtil` para aplicar a
   consolidação sem recriar a lista, interromper o gesto ou perder a posição.
 - Cada fonte possui limite individual, falhas isoladas e prazo geral de busca.
