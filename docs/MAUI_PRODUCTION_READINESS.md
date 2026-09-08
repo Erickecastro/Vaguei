@@ -35,10 +35,12 @@ Android neste momento.
   thread visual.
 - A busca publica lotes por fonte concluída e exibe a primeira lista útil ao
   alcançar cinco vagas compatíveis, enquanto a cobertura restante continua.
+- O adaptador Android usa chaves estáveis e `DiffUtil` para aplicar a
+  consolidação sem recriar a lista, interromper o gesto ou perder a posição.
 - Cada fonte possui limite individual, falhas isoladas e prazo geral de busca.
 - O aplicativo nunca deve expor detalhes técnicos de falha ao usuário.
 
-### Próxima evolução: atualização diferencial dos resultados progressivos
+### Próxima evolução: feedback discreto da atualização progressiva
 
 A melhoria de maior impacto é separar **primeiros resultados úteis** de
 **cobertura completa**:
@@ -53,12 +55,11 @@ consulta iniciada
       +-- prazo final -> manter resultados já obtidos e informar cobertura resumida
 ```
 
-O primeiro estágio já está implementado. A próxima etapa recomendada é:
+Os dois primeiros estágios já estão implementados: publicação progressiva e
+atualização diferencial da lista nativa. A próxima etapa recomendada é:
 
-1. Aplicar atualizações com identificadores estáveis e `DiffUtil` no adaptador Android,
-   preservando posição, gesto atual e vagas salvas.
-2. Manter uma mensagem discreta como “Atualizando mais fontes…” sem bloquear a lista.
-3. Ao final, atualizar somente o texto resumido de cobertura; não exibir erros técnicos.
+1. Manter uma mensagem discreta como “Atualizando mais fontes…” sem bloquear a lista.
+2. Ao final, atualizar somente o texto resumido de cobertura; não exibir erros técnicos.
 
 Isso reduz o tempo até a primeira vaga sem abandonar fontes lentas nem diminuir a
 qualidade da busca final.

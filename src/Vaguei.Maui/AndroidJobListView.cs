@@ -142,9 +142,24 @@ public sealed class AndroidJobListViewHandler
 
         public void SetItems(IReadOnlyList<JobResultItemViewModel> items, bool dark)
         {
+            var previousItems = _items;
+            var themeChanged = _dark != dark;
             _items = items;
             _dark = dark;
-            NotifyDataSetChanged();
+
+            // A busca progressiva pode publicar uma primeira cobertura e, pouco
+            // depois, a cobertura consolidada. NotifyDataSetChanged recriava a
+            // janela visível nessa segunda etapa e interrompia a posição do
+            // usuário. O diff nativo preserva o RecyclerView e só altera os
+            // cards que realmente mudaram.
+            if (themeChanged || previousItems.Count == 0 || items.Count == 0)
+            {
+                NotifyDataSetChanged();
+                return;
+            }
+
+            DiffUtil.CalculateDiff(new JobDiffCallback(previousItems, items), false)
+                .DispatchUpdatesTo(this);
         }
 
         public void SetTheme(bool dark)
@@ -163,6 +178,38 @@ public sealed class AndroidJobListViewHandler
             var item = _items[position];
             jobHolder.Bind(item, _dark);
             jobHolder.SetClickHandlers(owner, item);
+        }
+
+        private sealed class JobDiffCallback(
+            IReadOnlyList<JobResultItemViewModel> oldItems,
+            IReadOnlyList<JobResultItemViewModel> newItems)
+            : DiffUtil.Callback
+        {
+            public override int OldListSize => oldItems.Count;
+
+            public override int NewListSize => newItems.Count;
+
+            public override bool AreItemsTheSame(int oldItemPosition, int newItemPosition) =>
+                string.Equals(
+                    oldItems[oldItemPosition].FavoriteKey,
+                    newItems[newItemPosition].FavoriteKey,
+                    StringComparison.Ordinal);
+
+            public override bool AreContentsTheSame(int oldItemPosition, int newItemPosition)
+            {
+                var oldItem = oldItems[oldItemPosition];
+                var newItem = newItems[newItemPosition];
+
+                return oldItem.Title == newItem.Title &&
+                       oldItem.Company == newItem.Company &&
+                       oldItem.Location == newItem.Location &&
+                       oldItem.Score == newItem.Score &&
+                       oldItem.ShowCompatibility == newItem.ShowCompatibility &&
+                       oldItem.Source == newItem.Source &&
+                       oldItem.Url == newItem.Url &&
+                       oldItem.Published == newItem.Published &&
+                       oldItem.IsFavorite == newItem.IsFavorite;
+            }
         }
 
         private static JobHolder CreateHolder(Context context)
