@@ -6,7 +6,7 @@ O protótipo Android usa um frontend .NET MAUI 10 com controles nativos. A imple
 
 O objetivo inicial é validar busca, filtros, resultados, tema, favoritos, compatibilidade, abertura de vagas e seleção de currículo em um aparelho. Publicação na loja e iOS ficam fora do primeiro experimento.
 
-## Estado do ambiente em 5 de setembro de 2026
+## Estado do ambiente em 8 de setembro de 2026
 
 - .NET SDK 10.0.400 instalado.
 - Android SDK e `adb` encontrados.
@@ -43,6 +43,7 @@ A extração de `Vaguei.UI` deve acontecer gradualmente. A tela desktop atual n�
 - Orientação bloqueada em retrato e cinco abas institucionais equivalentes ao desktop.
 - Resultados renderizados diretamente por `RecyclerView`, `LinearLayoutManager` e `ViewHolder` do Android. A física de rolagem, reciclagem e inércia permanece integralmente nativa; os cards compactos conservam o tema e os comandos compartilhados do MAUI.
 - Coleta, leitura de cache, normalização e compatibilidade executadas fora da thread visual; a busca mantém todas as fontes configuradas e apenas devolve a interface após consolidar os resultados disponíveis.
+- Primeira lista útil exibida progressivamente ao alcançar cinco vagas compatíveis; a consolidação final continua aguardando as demais fontes dentro do prazo global.
 - Seletores de filtros próprios, em estilo rádio, coerentes com os temas do Vaguei e sem empilhamento de diálogos Android.
 - Ícone adaptativo e splash próprios; o splash usa marca preta transparente sobre branco puro.
 - Consulta paralela das nove fontes independentes, com limites curtos por fonte e para a busca completa.

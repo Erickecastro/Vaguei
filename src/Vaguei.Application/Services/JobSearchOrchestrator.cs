@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Vaguei.Application.Interfaces;
 using Vaguei.Application.Models;
 using Vaguei.Domain.Entities;
@@ -103,7 +104,74 @@ public sealed class JobSearchOrchestrator
                 $"[Vaguei.Search] status=partial completedSources={completedResults.Count} pendingSources={pendingTasks.Count}");
         }
 
-        var sourceResults = completedResults.ToArray();
+        return BuildExecutionResult(
+            query,
+            completedResults,
+            profile,
+            preferences,
+            referenceTime);
+    }
+
+    public async IAsyncEnumerable<JobSearchExecutionResult> SearchProgressivelyAsync(
+        CandidateProfile profile,
+        JobSearchPreferences preferences,
+        DateTimeOffset referenceTime,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(profile);
+        ArgumentNullException.ThrowIfNull(preferences);
+
+        var query = _queryBuilder.Build(profile, preferences);
+        var pendingTasks = _sources.Select(source =>
+                Task.Run(() => SearchSourceAsync(source, query, cancellationToken)))
+            .ToHashSet();
+        var completedResults = new List<SourceSearchResult>();
+        var cancelled = false;
+
+        while (pendingTasks.Count > 0)
+        {
+            Task<SourceSearchResult> completedTask;
+            try
+            {
+                completedTask = await Task.WhenAny(pendingTasks)
+                    .WaitAsync(cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                cancelled = true;
+                break;
+            }
+
+            pendingTasks.Remove(completedTask);
+            completedResults.Add(await completedTask.ConfigureAwait(false));
+
+            yield return BuildExecutionResult(
+                query,
+                completedResults,
+                profile,
+                preferences,
+                referenceTime);
+        }
+
+        if (cancelled && completedResults.Count > 0)
+        {
+            yield return BuildExecutionResult(
+                query,
+                completedResults,
+                profile,
+                preferences,
+                referenceTime);
+        }
+    }
+
+    private JobSearchExecutionResult BuildExecutionResult(
+        JobSearchQuery query,
+        IReadOnlyCollection<SourceSearchResult> sourceResults,
+        CandidateProfile profile,
+        JobSearchPreferences preferences,
+        DateTimeOffset referenceTime)
+    {
 
         var collectedJobs = sourceResults
             .SelectMany(result => result.Jobs)
@@ -161,7 +229,7 @@ public sealed class JobSearchOrchestrator
                 .ToArray(),
             CollectedJobCount = collectedJobs.Length,
             UniqueJobCount = uniqueJobs.Length,
-            AllSourcesFailed = sourceResults.Length > 0 &&
+            AllSourcesFailed = sourceResults.Count > 0 &&
                                sourceResults.All(result => result.Failure is not null)
         };
     }

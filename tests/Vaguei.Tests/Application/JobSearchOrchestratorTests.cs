@@ -64,6 +64,34 @@ public sealed class JobSearchOrchestratorTests
     }
 
     [Fact]
+    public async Task SearchProgressivelyAsync_PublishesCoverageAsSourcesComplete()
+    {
+        var orchestrator = new JobSearchOrchestrator(
+        [
+            new StubJobSource(
+                "Fonte A",
+                [CreateJob("Analista", "Excel", "Fonte A")]),
+            new StubJobSource(
+                "Fonte B",
+                [CreateJob("Analista", "SQL", "Fonte B")])
+        ]);
+        var batches = new List<Vaguei.Application.Models.JobSearchExecutionResult>();
+
+        await foreach (var batch in orchestrator.SearchProgressivelyAsync(
+            new CandidateProfile { ProfessionalTitle = "Analista" },
+            new JobSearchPreferences(),
+            ReferenceTime))
+        {
+            batches.Add(batch);
+        }
+
+        Assert.Collection(batches, _ => { }, _ => { });
+        Assert.Single(batches[0].SourceSummaries);
+        Assert.Equal(2, batches[^1].SourceSummaries.Count);
+        Assert.Collection(batches[^1].Matches, _ => { }, _ => { });
+    }
+
+    [Fact]
     public async Task SearchAsync_IsolatesSourceFailure()
     {
         var orchestrator = new JobSearchOrchestrator(

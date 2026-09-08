@@ -21,6 +21,16 @@ O APK de debug não é versionado no Git. Depois de compilá-lo, instale com:
 adb install -r src/Vaguei.Maui/bin/Debug/net10.0-android/com.erickecastro.vaguei.maui-Signed.apk
 ```
 
+Para substituir completamente uma instalação anterior de teste — inclusive dados,
+preferências e favoritos locais — desinstale antes e instale novamente:
+
+```bash
+adb uninstall com.erickecastro.vaguei.maui
+adb install src/Vaguei.Maui/bin/Debug/net10.0-android/com.erickecastro.vaguei.maui-Signed.apk
+```
+
+Use `adb install -r` quando quiser atualizar o aplicativo sem apagar dados locais.
+
 A configuração de debug incorpora os assemblies .NET no APK e não depende de Fast Deployment, portanto o arquivo funciona com instalação manual por `adb install` sem depender do pipeline do IDE.
 
 A inicialização dessa configuração foi validada em um aparelho ARM64 real, com Android 16: o processo permaneceu ativo e o buffer de crashes ficou vazio.

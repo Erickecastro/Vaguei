@@ -20,6 +20,7 @@ public partial class MainViewModel : ViewModelBase
     private readonly IJobSearchSettingsStore? _searchSettingsStore;
     private readonly TimeSpan _searchTimeout;
     private readonly Func<bool>? _networkAvailable;
+    private readonly bool _enableProgressiveSearch;
     private readonly HashSet<string> _favoriteKeys;
     private readonly List<JobResultItemViewModel> _allJobs = [];
     private bool _searchSettingsLoaded;
@@ -107,6 +108,8 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowSearchChrome))]
     [NotifyPropertyChangedFor(nameof(ShowResultsContent))]
+    [NotifyPropertyChangedFor(nameof(ShowEmptyState))]
+    [NotifyPropertyChangedFor(nameof(ShowSearchProgress))]
     private bool _hasSearchCompleted;
 
     [ObservableProperty]
@@ -129,7 +132,8 @@ public partial class MainViewModel : ViewModelBase
         IFavoriteJobStore? favoriteStore = null,
         IJobSearchSettingsStore? searchSettingsStore = null,
         TimeSpan? searchTimeout = null,
-        Func<bool>? networkAvailable = null)
+        Func<bool>? networkAvailable = null,
+        bool enableProgressiveSearch = false)
     {
         _parserService = parserService;
         _resumeAnalyzer = resumeAnalyzer;
@@ -138,6 +142,7 @@ public partial class MainViewModel : ViewModelBase
         _searchSettingsStore = searchSettingsStore;
         _searchTimeout = searchTimeout ?? TimeSpan.FromMinutes(2);
         _networkAvailable = networkAvailable;
+        _enableProgressiveSearch = enableProgressiveSearch;
         _favoriteKeys = favoriteStore?.Load().ToHashSet(StringComparer.OrdinalIgnoreCase) ??
             new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -206,13 +211,14 @@ public partial class MainViewModel : ViewModelBase
     public string SelectedEmploymentTypeLabel => EmploymentTypeOptions[Math.Clamp(EmploymentTypeIndex, 0, EmploymentTypeOptions.Count - 1)];
     public string SelectedSeniorityLabel => SeniorityOptions[Math.Clamp(SeniorityIndex, 0, SeniorityOptions.Count - 1)];
 
-    public bool ShowEmptyState => !IsBusy && !HasResults;
+    public bool ShowEmptyState => !HasResults &&
+                                  (!IsBusy || HasSearchCompleted);
 
     public bool ShowSearchChrome => !IsBusy && !HasSearchCompleted;
 
-    public bool ShowSearchProgress => IsBusy;
+    public bool ShowSearchProgress => IsBusy && !HasSearchCompleted;
 
-    public bool ShowResultsContent => !IsBusy && HasSearchCompleted;
+    public bool ShowResultsContent => HasSearchCompleted;
 
     public bool ShowJobArea => IsBusy || HasResults;
 
@@ -556,6 +562,16 @@ public partial class MainViewModel : ViewModelBase
             preferences.DesiredRoles.Add(directSearch);
         }
 
+        if (_enableProgressiveSearch)
+        {
+            await SearchJobsProgressivelyAsync(
+                profile,
+                preferences,
+                directSearch,
+                cancellationToken);
+            return;
+        }
+
         var result = await Task.Run(
             async () => await _searchOrchestrator.SearchAsync(
                     profile,
@@ -573,6 +589,62 @@ public partial class MainViewModel : ViewModelBase
             (_searchCancelledByUser || _connectionLostDuringSearch))
             cancellationToken.ThrowIfCancellationRequested();
 
+        PresentSearchResult(result, directSearch);
+    }
+
+    private async Task SearchJobsProgressivelyAsync(
+        CandidateProfile profile,
+        JobSearchPreferences preferences,
+        string directSearch,
+        CancellationToken cancellationToken)
+    {
+        JobSearchExecutionResult? latestResult = null;
+        var initialResultsPresented = false;
+
+        await foreach (var result in _searchOrchestrator
+            .SearchProgressivelyAsync(
+                profile,
+                preferences,
+                DateTimeOffset.UtcNow,
+                cancellationToken)
+            .WithCancellation(cancellationToken))
+        {
+            latestResult = result;
+
+            if (_searchCancelledByUser || _connectionLostDuringSearch)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
+            // Evita abrir uma lista vazia ou instável. Cinco resultados são
+            // suficientes para uma primeira tela útil; a consolidação final
+            // ainda considera todas as fontes disponíveis.
+            if (!initialResultsPresented && result.Matches.Count >= 5)
+            {
+                PresentSearchResult(result, directSearch);
+                initialResultsPresented = true;
+            }
+        }
+
+        if (latestResult is null)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return;
+        }
+
+        if (cancellationToken.IsCancellationRequested &&
+            (_searchCancelledByUser || _connectionLostDuringSearch))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+        }
+
+        PresentSearchResult(latestResult, directSearch);
+    }
+
+    private void PresentSearchResult(
+        JobSearchExecutionResult result,
+        string directSearch)
+    {
         Jobs.Clear();
         _allJobs.Clear();
 

@@ -253,7 +253,11 @@ Linux and Windows are the tested desktop development environments. Avalonia also
 
 The Android prototype is implemented entirely with .NET MAUI 10 native controls while sharing the domain, application, collectors, ViewModel, infrastructure, and resume parsers with desktop. Avalonia is required only by the Linux/Windows desktop client and is no longer part of the Android dependency graph.
 
-The Android client compiles through [`Vaguei.Maui.slnx`](Vaguei.Maui.slnx). It uses exclusive preparation, loading, and results stages; a centered preparation layout; equal search/filter actions; a direct Android `RecyclerView`/`ViewHolder` results surface with native inertial physics; compact adaptive cards; back and scroll-to-top actions; local document selection; theme-aware in-app filter choice panels; favorites; theme persistence; five institutional sections; and original vacancy links. The page and application architecture remain MAUI; only the high-volume results surface uses its Android-native handler to avoid MAUI cell measurement during a gesture. It embeds the same employer catalog used by desktop and keeps the 30-minute persistent cache. Searches start all configured sources, apply individual limits, return completed partial results at the overall deadline, cancel on network loss, and emit privacy-safe source timing diagnostics. See the [device testing guide](docs/ANDROID_TESTING.md).
+The complete Android production-readiness plan, including the MAUI/native boundary,
+progressive search, performance, accessibility, privacy, and release criteria, is
+documented in [`docs/MAUI_PRODUCTION_READINESS.md`](docs/MAUI_PRODUCTION_READINESS.md).
+
+The Android client compiles through [`Vaguei.Maui.slnx`](Vaguei.Maui.slnx). It uses exclusive preparation, loading, and results stages; a centered preparation layout; equal search/filter actions; a centered, touch-blocking filter modal; compact result status text; a direct Android `RecyclerView`/`ViewHolder` results surface with native inertial physics; compact adaptive cards; back and scroll-to-top actions; local document selection; theme-aware in-app filter choice panels; favorites; theme persistence; five institutional sections; and original vacancy links. The page and application architecture remain MAUI; only the high-volume results surface uses its Android-native handler to avoid MAUI cell measurement during a gesture. It embeds the same employer catalog used by desktop and keeps a 30-minute persistent cache. Source collection, cache reading, normalization, and matching run outside the visual thread. Android progressively shows a useful first batch after at least five matching vacancies are available, then consolidates the completed source coverage. Searches start all configured sources, apply individual limits, return completed partial results at the overall deadline, cancel on network loss, and emit privacy-safe source timing diagnostics. See the [device testing guide](docs/ANDROID_TESTING.md).
 
 # Matching Model
 
@@ -272,7 +276,7 @@ The score is intentionally explainable and deterministic. It is not a hiring pre
 * Search breadth is constrained by the configured public sources and employers.
 * Role and skill taxonomies now cover software, administration, finance, HR, design, engineering, healthcare, logistics, and sales, but coverage remains uneven for specialist and regulated occupations.
 * Matching recognizes explicit education and spoken-language proficiency plus a controlled certification catalog, but does not yet understand every degree, certification, compensation condition, or nuanced location constraint.
-* Desktop keeps successful source responses in a bounded local cache for 30 minutes, but there is no long-lived searchable vacancy index.
+* Desktop and Android keep successful source responses in a bounded local cache for 30 minutes, but there is no long-lived searchable vacancy index.
 * Favorites are stored only on the current device and are not synchronized.
 * Accessibility, localization, installers, update delivery, and end-to-end UI automation still need production validation.
 
