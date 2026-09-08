@@ -93,7 +93,7 @@ public sealed class ResilientJobSource : IJobSource
                     PruneCache();
                     var expiresAt = DateTimeOffset.UtcNow.Add(_cacheDuration);
                     _cache[key] = new CacheEntry(expiresAt, jobs);
-                    _persistentCache?.Save(Name, key, expiresAt, jobs);
+                    PersistCacheInBackground(Name, key, expiresAt, jobs);
                     return jobs;
                 }
                 catch (OperationCanceledException)
@@ -137,6 +137,23 @@ public sealed class ResilientJobSource : IJobSource
                 break;
             }
         }
+    }
+
+    private void PersistCacheInBackground(
+        string source,
+        string key,
+        DateTimeOffset expiresAt,
+        IReadOnlyCollection<JobPosting> jobs)
+    {
+        if (_persistentCache is null)
+        {
+            return;
+        }
+
+        // A persistência é uma otimização para a próxima busca. Não deve atrasar
+        // a primeira lista útil atual, sobretudo quando uma fonte devolve muitos
+        // anúncios e a serialização de JSON leva alguns milissegundos no Android.
+        _ = Task.Run(() => _persistentCache.Save(source, key, expiresAt, jobs));
     }
 
     private bool TryGetCached(
