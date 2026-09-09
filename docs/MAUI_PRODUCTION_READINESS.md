@@ -33,37 +33,38 @@ Android neste momento.
 - Cache persistente de 30 minutos reduz consultas repetidas.
 - Leitura de cache, coleta, normalização, deduplicação e matching não ocupam a
   thread visual.
-- A busca publica lotes por fonte concluída e exibe a primeira lista útil ao
-  alcançar cinco vagas compatíveis ou duas fontes concluídas, enquanto a
-  cobertura restante continua.
+- A busca coleta fontes em paralelo e apresenta uma lista única consolidada ao
+  término da cobertura disponível ou do prazo global, sem estados intermediários
+  vazios para o usuário.
 - O adaptador Android usa chaves estáveis e `DiffUtil` para aplicar a
   consolidação sem recriar a lista, interromper o gesto ou perder a posição.
 - Cada fonte possui limite individual, falhas isoladas e prazo geral de busca.
 - O aplicativo nunca deve expor detalhes técnicos de falha ao usuário.
 
-### Próxima evolução: feedback discreto da atualização progressiva
+### Próxima evolução: cobertura confiável sem ruído visual
 
-A melhoria de maior impacto é separar **primeiros resultados úteis** de
-**cobertura completa**:
+A experiência móvel prioriza uma única resposta consolidada:
 
 ```text
 consulta iniciada
       |
-      +-- fontes rápidas / cache -> exibir primeiras vagas utilizáveis
+      +-- fontes rápidas / cache -> consolidar em segundo plano
       |
-      +-- fontes restantes -> normalizar, deduplicar e atualizar sem tirar o usuário da lista
+      +-- fontes restantes -> normalizar e deduplicar
       |
-      +-- prazo final -> manter resultados já obtidos e informar cobertura resumida
+      +-- prazo final -> apresentar a cobertura disponível uma única vez
 ```
 
-Os dois primeiros estágios já estão implementados: publicação progressiva e
-atualização diferencial da lista nativa. A próxima etapa recomendada é:
+Isso evita que a interface apresente uma lista vazia ou parcial como resultado
+final. A próxima etapa recomendada é:
 
-1. Manter uma mensagem discreta como “Atualizando mais fontes…” sem bloquear a lista.
-2. Ao final, atualizar somente o texto resumido de cobertura; não exibir erros técnicos.
+1. Mostrar, após o resultado, uma cobertura resumida opcional e não técnica,
+   como “fontes atualizadas”.
+2. Medir localmente tempo, sucesso e volume por fonte para ajustar catálogos e
+   prazos sem registrar currículo, pessoa ou consulta completa.
 
-Isso reduz o tempo até a primeira vaga sem abandonar fontes lentas nem diminuir a
-qualidade da busca final.
+Isso preserva previsibilidade para a pessoa usuária sem abandonar fontes lentas
+nem diminuir a qualidade da busca final.
 
 ### Cache e rede
 

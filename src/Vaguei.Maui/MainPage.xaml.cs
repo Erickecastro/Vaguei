@@ -101,6 +101,9 @@ public partial class MainPage : ContentPage
     private void OnFiltersCloseClicked(object? sender, EventArgs eventArgs) =>
         FiltersSheet.IsVisible = false;
 
+    private void OnFiltersBackdropClicked(object? sender, EventArgs eventArgs) =>
+        FiltersSheet.IsVisible = false;
+
     private void OnSearchScopeFilterClicked(object? sender, EventArgs eventArgs) =>
         ShowFilterOptions("Região", ViewModel.SearchScopes, ViewModel.SearchScopeIndex,
             value => ViewModel.SearchScopeIndex = value);
@@ -153,6 +156,9 @@ public partial class MainPage : ContentPage
     }
 
     private void OnFilterOptionsCloseClicked(object? sender, EventArgs eventArgs) =>
+        FilterOptionsOverlay.IsVisible = false;
+
+    private void OnFilterOptionsBackdropClicked(object? sender, EventArgs eventArgs) =>
         FilterOptionsOverlay.IsVisible = false;
 
     private async void OnOpenJobRequested(object? sender, string url)
@@ -216,6 +222,9 @@ public partial class MainPage : ContentPage
     }
 
     private void OnExitCancelClicked(object? sender, EventArgs eventArgs) =>
+        ExitConfirmationOverlay.IsVisible = false;
+
+    private void OnExitBackdropClicked(object? sender, EventArgs eventArgs) =>
         ExitConfirmationOverlay.IsVisible = false;
 
     private void OnExitConfirmClicked(object? sender, EventArgs eventArgs)

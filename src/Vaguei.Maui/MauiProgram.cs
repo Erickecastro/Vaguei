@@ -69,8 +69,7 @@ public static class MauiProgram
                 new JsonJobSearchSettingsStore(),
                 searchTimeout: TimeSpan.FromSeconds(16),
                 networkAvailable: () => Connectivity.Current.NetworkAccess ==
-                    NetworkAccess.Internet,
-                enableProgressiveSearch: true);
+                    NetworkAccess.Internet);
         });
         builder.Services.AddSingleton<MainPage>();
 

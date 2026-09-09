@@ -89,7 +89,6 @@ public partial class MainViewModel : ViewModelBase
     [NotifyPropertyChangedFor(nameof(ShowSearchChrome))]
     [NotifyPropertyChangedFor(nameof(ShowSearchProgress))]
     [NotifyPropertyChangedFor(nameof(ShowResumeProcessing))]
-    [NotifyPropertyChangedFor(nameof(IsProgressivelyUpdating))]
     [NotifyPropertyChangedFor(nameof(ShowResultsContent))]
     [NotifyPropertyChangedFor(nameof(ShowJobArea))]
     private bool _isBusy;
@@ -117,7 +116,6 @@ public partial class MainViewModel : ViewModelBase
     [NotifyPropertyChangedFor(nameof(ShowResultsContent))]
     [NotifyPropertyChangedFor(nameof(ShowEmptyState))]
     [NotifyPropertyChangedFor(nameof(ShowSearchProgress))]
-    [NotifyPropertyChangedFor(nameof(IsProgressivelyUpdating))]
     private bool _hasSearchCompleted;
 
     [ObservableProperty]
@@ -228,9 +226,6 @@ public partial class MainViewModel : ViewModelBase
         IsBusy && !HasSearchCompleted && !IsProcessingResume;
 
     public bool ShowResumeProcessing => IsBusy && IsProcessingResume;
-
-    public bool IsProgressivelyUpdating =>
-        _enableProgressiveSearch && IsBusy && HasSearchCompleted;
 
     public bool ShowResultsContent => HasSearchCompleted;
 
@@ -615,7 +610,6 @@ public partial class MainViewModel : ViewModelBase
         CancellationToken cancellationToken)
     {
         JobSearchExecutionResult? latestResult = null;
-        var initialResultsPresented = false;
 
         await foreach (var result in _searchOrchestrator
             .SearchProgressivelyAsync(
@@ -632,15 +626,9 @@ public partial class MainViewModel : ViewModelBase
                 cancellationToken.ThrowIfCancellationRequested();
             }
 
-            // Evita abrir uma lista vazia ou instável. Cinco resultados são
-            // suficientes para uma primeira tela útil; a consolidação final
-            // ainda considera todas as fontes disponíveis.
-            if (!initialResultsPresented &&
-                (result.Matches.Count >= 5 || result.SourceSummaries.Count >= 2))
-            {
-                PresentSearchResult(result, directSearch);
-                initialResultsPresented = true;
-            }
+            // Os lotes intermediários aceleram a coleta e a consolidação, mas
+            // não alteram a tela. O usuário recebe uma única lista consistente
+            // ao fim da busca, sem estados vazios ou contagens enganosas.
         }
 
         if (latestResult is null)

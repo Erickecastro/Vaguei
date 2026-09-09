@@ -133,8 +133,6 @@
           <Label Text="Oportunidades" FontSize="21" FontAttributes="Bold" />
           <Label Text="{Binding StatusMessage}" MaxLines="1" LineBreakMode="TailTruncation" FontSize="11"
                  TextColor="{AppThemeBinding Light=#626879, Dark=#B5B5B5}" />
-          <Label Text="Atualizando mais fontes…" IsVisible="{Binding IsProgressivelyUpdating}"
-                 FontSize="10" TextColor="{AppThemeBinding Light=#5856D6, Dark=#B8B6FF}" />
         </VerticalStackLayout>
       </Grid>
 
@@ -165,8 +163,13 @@
       </Border.GestureRecognizers>
     </Border>
 
-    <Grid x:Name="FiltersSheet" IsVisible="False"
-          BackgroundColor="{AppThemeBinding Light=#66000000, Dark=#99000000}">
+    <Grid x:Name="FiltersSheet" IsVisible="False">
+      <Border BackgroundColor="{AppThemeBinding Light=#66000000, Dark=#99000000}"
+              InputTransparent="False">
+        <Border.GestureRecognizers>
+          <TapGestureRecognizer Tapped="OnFiltersBackdropClicked" />
+        </Border.GestureRecognizers>
+      </Border>
       <Border VerticalOptions="Center" HorizontalOptions="Fill" MaximumWidthRequest="440"
               Padding="18" Margin="30"
               Stroke="{AppThemeBinding Light=#DDE1EA, Dark=#383838}"
@@ -195,8 +198,13 @@
       </Border>
     </Grid>
 
-    <Grid x:Name="FilterOptionsOverlay" IsVisible="False"
-          BackgroundColor="{AppThemeBinding Light=#66000000, Dark=#99000000}">
+    <Grid x:Name="FilterOptionsOverlay" IsVisible="False">
+      <Border BackgroundColor="{AppThemeBinding Light=#66000000, Dark=#99000000}"
+              InputTransparent="False">
+        <Border.GestureRecognizers>
+          <TapGestureRecognizer Tapped="OnFilterOptionsBackdropClicked" />
+        </Border.GestureRecognizers>
+      </Border>
       <Border Margin="30" Padding="18" VerticalOptions="Center"
               HorizontalOptions="Fill" MaximumWidthRequest="440"
               BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1B1B1B}"
@@ -210,8 +218,13 @@
       </Border>
     </Grid>
 
-    <Grid x:Name="ExitConfirmationOverlay" IsVisible="False"
-          BackgroundColor="{AppThemeBinding Light=#66000000, Dark=#99000000}">
+    <Grid x:Name="ExitConfirmationOverlay" IsVisible="False">
+      <Border BackgroundColor="{AppThemeBinding Light=#66000000, Dark=#99000000}"
+              InputTransparent="False">
+        <Border.GestureRecognizers>
+          <TapGestureRecognizer Tapped="OnExitBackdropClicked" />
+        </Border.GestureRecognizers>
+      </Border>
       <Border Margin="30" Padding="22" VerticalOptions="Center"
               HorizontalOptions="Fill" MaximumWidthRequest="440"
               BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1B1B1B}"
