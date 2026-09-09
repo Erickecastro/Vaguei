@@ -10,6 +10,7 @@ namespace Vaguei.Application.Services;
 public sealed class JobSearchOrchestrator
 {
     private readonly IReadOnlyCollection<IJobSource> _sources;
+    private readonly IReadOnlyDictionary<string, int> _sourceOrder;
     private readonly JobSearchQueryBuilder _queryBuilder;
     private readonly JobGeographyFilter _geographyFilter;
     private readonly JobFreshnessFilter _freshnessFilter;
@@ -49,6 +50,11 @@ public sealed class JobSearchOrchestrator
         ArgumentNullException.ThrowIfNull(matcher);
 
         _sources = sources.ToArray();
+        _sourceOrder = _sources
+            .Select((source, index) => (Name: source.Name, Index: index))
+            .GroupBy(entry => entry.Name, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(group => group.Key, group => group.First().Index,
+                StringComparer.OrdinalIgnoreCase);
         _queryBuilder = queryBuilder;
         _geographyFilter = geographyFilter;
         _freshnessFilter = freshnessFilter;
@@ -96,10 +102,15 @@ public sealed class JobSearchOrchestrator
                 completedResults.Add(await completedTask.ConfigureAwait(false));
             }
         }
-        catch (OperationCanceledException) when (
-            cancellationToken.IsCancellationRequested &&
-            completedResults.Count > 0)
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
+            CaptureCompletedTasks(pendingTasks, completedResults);
+
+            if (completedResults.Count == 0)
+            {
+                throw;
+            }
+
             Console.WriteLine(
                 $"[Vaguei.Search] status=partial completedSources={completedResults.Count} pendingSources={pendingTasks.Count}");
         }
@@ -188,6 +199,9 @@ public sealed class JobSearchOrchestrator
     {
 
         var collectedJobs = sourceResults
+            .OrderBy(result => _sourceOrder.TryGetValue(result.Source, out var index)
+                ? index
+                : int.MaxValue)
             .SelectMany(result => result.Jobs)
             .ToArray();
 
@@ -286,6 +300,19 @@ public sealed class JobSearchOrchestrator
                 new JobSourceFailure(
                     source.Name,
                     exception.Message));
+        }
+    }
+
+    private static void CaptureCompletedTasks(
+        ISet<Task<SourceSearchResult>> pendingTasks,
+        ICollection<SourceSearchResult> completedResults)
+    {
+        foreach (var completedTask in pendingTasks
+                     .Where(task => task.Status == TaskStatus.RanToCompletion)
+                     .ToArray())
+        {
+            pendingTasks.Remove(completedTask);
+            completedResults.Add(completedTask.Result);
         }
     }
 

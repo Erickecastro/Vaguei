@@ -23,17 +23,26 @@ public sealed class SmartRecruitersJobSource : IJobSource
         };
 
     private const string ApiBaseUrl = "https://api.smartrecruiters.com/v1/companies";
-    private const int MaximumSearchTerms = 6;
     private readonly HttpClient _httpClient;
     private readonly IReadOnlyDictionary<string, string> _companies;
+    private readonly int _maximumSearchTerms;
+    private readonly TimeSpan _companyTimeout;
 
     public SmartRecruitersJobSource(
         HttpClient httpClient,
-        IReadOnlyDictionary<string, string>? companies = null)
+        IReadOnlyDictionary<string, string>? companies = null,
+        int maximumSearchTerms = 6,
+        TimeSpan? companyTimeout = null)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maximumSearchTerms);
         _httpClient = httpClient;
         _companies = companies ?? DefaultCompanies;
+        _maximumSearchTerms = maximumSearchTerms;
+        _companyTimeout = companyTimeout ?? TimeSpan.FromSeconds(10);
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(
+            _companyTimeout,
+            TimeSpan.Zero);
     }
 
     public string Name => "SmartRecruiters";
@@ -62,11 +71,15 @@ public sealed class SmartRecruitersJobSource : IJobSource
         JobSearchQuery query,
         CancellationToken cancellationToken)
     {
+        using var companyTimeout = CancellationTokenSource.CreateLinkedTokenSource(
+            cancellationToken);
+        companyTimeout.CancelAfter(_companyTimeout);
+
         try
         {
             var searchTerms = GetSearchTerms(query, company);
             var listTasks = searchTerms.Select(term =>
-                GetSummariesAsync(identifier, term, query, cancellationToken));
+                GetSummariesAsync(identifier, term, query, companyTimeout.Token));
             var summaries = (await Task.WhenAll(listTasks))
                 .SelectMany(result => result)
                 .GroupBy(job => job.Id, StringComparer.OrdinalIgnoreCase)
@@ -76,14 +89,14 @@ public sealed class SmartRecruitersJobSource : IJobSource
             using var requestGate = new SemaphoreSlim(6);
             var detailTasks = summaries.Select(async summary =>
             {
-                await requestGate.WaitAsync(cancellationToken);
+                await requestGate.WaitAsync(companyTimeout.Token);
                 try
                 {
                     return await GetJobAsync(
                         identifier,
                         company,
                         summary,
-                        cancellationToken);
+                        companyTimeout.Token);
                 }
                 finally
                 {
@@ -200,7 +213,7 @@ public sealed class SmartRecruitersJobSource : IJobSource
         }
     }
 
-    private static IReadOnlyCollection<string?> GetSearchTerms(
+    private IReadOnlyCollection<string?> GetSearchTerms(
         JobSearchQuery query,
         string company)
     {
@@ -214,7 +227,7 @@ public sealed class SmartRecruitersJobSource : IJobSource
         return query.Keywords
             .Where(keyword => !string.IsNullOrWhiteSpace(keyword))
             .Distinct(StringComparer.OrdinalIgnoreCase)
-            .Take(MaximumSearchTerms)
+            .Take(_maximumSearchTerms)
             .Cast<string?>()
             .ToArray();
     }

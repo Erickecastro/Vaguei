@@ -27,14 +27,17 @@ public sealed class GreenhouseJobSource : IJobSource
 
     private readonly HttpClient _httpClient;
     private readonly IReadOnlyDictionary<string, string> _boards;
+    private readonly bool _includeContent;
 
     public GreenhouseJobSource(
         HttpClient httpClient,
-        IReadOnlyDictionary<string, string>? boards = null)
+        IReadOnlyDictionary<string, string>? boards = null,
+        bool includeContent = true)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
         _httpClient = httpClient;
         _boards = boards ?? DefaultBoards;
+        _includeContent = includeContent;
     }
 
     public string Name => "Greenhouse";
@@ -69,7 +72,7 @@ public sealed class GreenhouseJobSource : IJobSource
         try
         {
             var url =
-                $"https://boards-api.greenhouse.io/v1/boards/{Uri.EscapeDataString(boardToken)}/jobs?content=true";
+                $"https://boards-api.greenhouse.io/v1/boards/{Uri.EscapeDataString(boardToken)}/jobs?content={_includeContent.ToString().ToLowerInvariant()}";
             var response = await _httpClient.GetFromJsonAsync<GreenhouseResponse>(
                 url,
                 cancellationToken);

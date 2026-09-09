@@ -88,10 +88,16 @@ public partial class MainViewModel : ViewModelBase
     [NotifyPropertyChangedFor(nameof(ShowEmptyState))]
     [NotifyPropertyChangedFor(nameof(ShowSearchChrome))]
     [NotifyPropertyChangedFor(nameof(ShowSearchProgress))]
+    [NotifyPropertyChangedFor(nameof(ShowResumeProcessing))]
     [NotifyPropertyChangedFor(nameof(IsProgressivelyUpdating))]
     [NotifyPropertyChangedFor(nameof(ShowResultsContent))]
     [NotifyPropertyChangedFor(nameof(ShowJobArea))]
     private bool _isBusy;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowResumeProcessing))]
+    [NotifyPropertyChangedFor(nameof(ShowSearchProgress))]
+    private bool _isProcessingResume;
 
     [ObservableProperty]
     private bool _hasProfile;
@@ -218,7 +224,10 @@ public partial class MainViewModel : ViewModelBase
 
     public bool ShowSearchChrome => !IsBusy && !HasSearchCompleted;
 
-    public bool ShowSearchProgress => IsBusy && !HasSearchCompleted;
+    public bool ShowSearchProgress =>
+        IsBusy && !HasSearchCompleted && !IsProcessingResume;
+
+    public bool ShowResumeProcessing => IsBusy && IsProcessingResume;
 
     public bool IsProgressivelyUpdating =>
         _enableProgressiveSearch && IsBusy && HasSearchCompleted;
@@ -259,6 +268,7 @@ public partial class MainViewModel : ViewModelBase
         }
 
         IsBusy = true;
+        IsProcessingResume = true;
         HasResults = false;
         HasSearchCompleted = false;
         HasProfile = false;
@@ -317,6 +327,7 @@ public partial class MainViewModel : ViewModelBase
         }
         finally
         {
+            IsProcessingResume = false;
             IsBusy = false;
         }
     }

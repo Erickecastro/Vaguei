@@ -33,7 +33,11 @@ public sealed class JobFreshnessFilter
 
         if (job.PublishedAt is null)
         {
-            return false;
+            // Algumas páginas institucionais públicas não expõem a data da
+            // publicação, embora a vaga esteja ativa. Não há evidência para
+            // descartá-la como antiga; ela aparece após vagas datadas e a UI
+            // informa claramente que a data não foi disponibilizada.
+            return true;
         }
 
         var publishedAt =

@@ -134,7 +134,7 @@ public sealed class JobFreshnessFilterTests
     }
 
     [Fact]
-    public void IsAllowed_RejectsJobWithoutPublicationDate()
+    public void IsAllowed_AcceptsActiveJobWithoutPublicationDate()
     {
         var job =
             CreateJob(null);
@@ -148,7 +148,7 @@ public sealed class JobFreshnessFilterTests
                 JobPublicationWindow.Last6Months,
                 ReferenceTime);
 
-        Assert.False(result);
+        Assert.True(result);
     }
 
     [Fact]
@@ -205,7 +205,7 @@ public sealed class JobFreshnessFilterTests
                 ReferenceTime);
 
         Assert.Equal(
-            2,
+            3,
             result.Count);
     }
 

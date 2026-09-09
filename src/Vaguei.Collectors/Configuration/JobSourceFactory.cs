@@ -15,12 +15,17 @@ public static class JobSourceFactory
         int retryCount = 1,
         int maximumConcurrentSources = 3,
         IPersistentJobCache? persistentCache = null,
-        IReadOnlySet<string>? persistentCacheExclusions = null)
+        IReadOnlySet<string>? persistentCacheExclusions = null,
+        int smartRecruitersMaximumSearchTerms = 6,
+        TimeSpan? smartRecruitersCompanyTimeout = null,
+        bool greenhouseIncludeContent = true)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
         catalog ??= JobSourceCatalog.Load();
 
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maximumConcurrentSources);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(
+            smartRecruitersMaximumSearchTerms);
         var concurrencyGate = new SemaphoreSlim(
             maximumConcurrentSources,
             maximumConcurrentSources);
@@ -30,10 +35,17 @@ public static class JobSourceFactory
             new JobicyJobSource(httpClient),
             new RemotiveJobSource(httpClient),
             new AshbyJobSource(httpClient, catalog.Ashby),
-            new GreenhouseJobSource(httpClient, catalog.Greenhouse),
+            new GreenhouseJobSource(
+                httpClient,
+                catalog.Greenhouse,
+                greenhouseIncludeContent),
             new InHireJobSource(httpClient, catalog.InHire),
             new LeverJobSource(httpClient, catalog.Lever),
-            new SmartRecruitersJobSource(httpClient, catalog.SmartRecruiters),
+            new SmartRecruitersJobSource(
+                httpClient,
+                catalog.SmartRecruiters,
+                smartRecruitersMaximumSearchTerms,
+                smartRecruitersCompanyTimeout),
             new WorkableJobSource(httpClient, catalog.Workable)
         };
 

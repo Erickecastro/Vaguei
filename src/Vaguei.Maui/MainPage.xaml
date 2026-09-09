@@ -106,6 +106,17 @@
              FontSize="13" TextColor="{AppThemeBinding Light=#626879, Dark=#B5B5B5}" />
     </Grid>
 
+    <Grid IsVisible="{Binding ShowResumeProcessing}" VerticalOptions="Center"
+          Padding="18,16" RowDefinitions="Auto,Auto,Auto" RowSpacing="12">
+      <Label Text="Analisando currículo" HorizontalTextAlignment="Center"
+             FontSize="22" FontAttributes="Bold" />
+      <ActivityIndicator Grid.Row="1" IsRunning="{Binding IsProcessingResume}"
+                         Color="{AppThemeBinding Light=#5856D6, Dark=#F2F2F2}"
+                         WidthRequest="42" HeightRequest="42" />
+      <Label Grid.Row="2" Text="Extraindo suas informações localmente…" HorizontalTextAlignment="Center"
+             FontSize="13" TextColor="{AppThemeBinding Light=#626879, Dark=#B5B5B5}" />
+    </Grid>
+
     <Grid IsVisible="{Binding ShowResultsContent}" RowDefinitions="Auto,10,*" Padding="18,16">
       <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
         <Border WidthRequest="44" HeightRequest="44" Padding="0"

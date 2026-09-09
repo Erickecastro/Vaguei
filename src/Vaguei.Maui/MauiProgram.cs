@@ -36,10 +36,19 @@ public static class MauiProgram
                 cacheDuration: TimeSpan.FromMinutes(30),
                 retryCount: 0,
                 maximumConcurrentSources: 9,
+                // Catálogos brasileiros são consultados por empresa. Duas
+                // palavras-chave e quatro segundos por empresa produzem uma
+                // primeira cobertura útil sem deixar uma empresa lenta consumir
+                // todo o orçamento da pesquisa móvel.
+                smartRecruitersMaximumSearchTerms: 2,
+                smartRecruitersCompanyTimeout: TimeSpan.FromSeconds(4),
+                // Para a primeira cobertura móvel, título, local, data e áreas
+                // são suficientes para filtrar. Evitamos baixar HTML completo
+                // de todos os quadros Greenhouse antes de mostrar as vagas.
+                greenhouseIncludeContent: false,
                 // The very large Greenhouse payload can take tens of seconds to
-                // deserialize on Android and cannot be interrupted through the
-                // synchronous cache contract. Other sources retain their disk
-                // cache; Greenhouse uses only the fast in-memory cache on mobile.
+                // deserialize on Android. Other sources retain their disk cache;
+                // Greenhouse uses only the fast in-memory cache on mobile.
                 persistentCache: new JsonPersistentJobCache(),
                 persistentCacheExclusions: new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 {
