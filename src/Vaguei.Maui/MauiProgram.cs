@@ -20,7 +20,10 @@ public static class MauiProgram
 
         builder.Services.AddSingleton(_ => new HttpClient
         {
-            Timeout = TimeSpan.FromSeconds(15)
+            // O limite HTTP precisa ser maior que uma consulta de página
+            // pública mais lenta. Antes, 15 segundos encerravam a requisição
+            // apesar do orçamento maior configurado para a fonte.
+            Timeout = TimeSpan.FromSeconds(45)
         });
         builder.Services.AddSingleton(provider =>
         {
@@ -36,15 +39,18 @@ public static class MauiProgram
                 // respondem em ritmos diferentes. Todas continuam em paralelo;
                 // ampliar o limite evita perder uma fonte válida por alguns
                 // segundos, sem bloquear a interface.
-                sourceTimeout: TimeSpan.FromSeconds(22),
+                sourceTimeout: TimeSpan.FromSeconds(40),
                 cacheDuration: TimeSpan.FromMinutes(30),
-                retryCount: 0,
-                maximumConcurrentSources: 9,
+                // Uma repetição protege contra oscilações transitórias de
+                // rede. Cinco fontes em paralelo preservam a fluidez sem
+                // saturar a pilha de rede de aparelhos intermediários.
+                retryCount: 1,
+                maximumConcurrentSources: 5,
                 // Catálogos brasileiros são consultados por empresa. Duas
                 // Quatro variações cobrem buscas em português e inglês sem
                 // transformar a pesquisa em uma sequência de requisições.
-                smartRecruitersMaximumSearchTerms: 4,
-                smartRecruitersCompanyTimeout: TimeSpan.FromSeconds(7),
+                smartRecruitersMaximumSearchTerms: 6,
+                smartRecruitersCompanyTimeout: TimeSpan.FromSeconds(10),
                 // Para a primeira cobertura móvel, título, local, data e áreas
                 // são suficientes para filtrar. Evitamos baixar HTML completo
                 // de todos os quadros Greenhouse antes de mostrar as vagas.
@@ -70,7 +76,7 @@ public static class MauiProgram
                 new JobSearchOrchestrator(sources),
                 new JsonFavoriteJobStore(),
                 new JsonJobSearchSettingsStore(),
-                searchTimeout: TimeSpan.FromSeconds(32),
+                searchTimeout: TimeSpan.FromSeconds(60),
                 networkAvailable: () => Connectivity.Current.NetworkAccess ==
                     NetworkAccess.Internet);
         });
