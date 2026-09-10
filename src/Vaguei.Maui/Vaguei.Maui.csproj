@@ -10,8 +10,8 @@
     <SupportedOSPlatformVersion>23.0</SupportedOSPlatformVersion>
     <ApplicationTitle>Vaguei</ApplicationTitle>
     <ApplicationId>com.erickecastro.vaguei.maui</ApplicationId>
-    <ApplicationDisplayVersion>0.1.15</ApplicationDisplayVersion>
-    <ApplicationVersion>16</ApplicationVersion>
+    <ApplicationDisplayVersion>0.1.16</ApplicationDisplayVersion>
+    <ApplicationVersion>17</ApplicationVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
     <!-- A standalone APK must carry the managed payload and native runtime in the
          package. Keeping .so/.blob entries stored also avoids the Android 16

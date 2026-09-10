@@ -68,7 +68,7 @@ public sealed class InHireJobSourceTests
                   [{
                     "jobId": "job-1",
                     "displayName": "Desenvolvedor de Software JR",
-                    "link": "https://sidia.inhire.app/sidia/vagas/job-1"
+                    "link": "https://sidia.inhire.com.br/sidia/vagas/job-1"
                   }]
                   """
                 : """

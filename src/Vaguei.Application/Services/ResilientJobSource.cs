@@ -14,6 +14,7 @@ public sealed class ResilientJobSource : IJobSource
     private readonly int _retryCount;
     private readonly int _maximumCacheEntries;
     private readonly IPersistentJobCache? _persistentCache;
+    private readonly string _cacheKeyNamespace;
     private readonly ConcurrentDictionary<string, CacheEntry> _cache = new();
 
     public ResilientJobSource(
@@ -23,7 +24,8 @@ public sealed class ResilientJobSource : IJobSource
         TimeSpan cacheDuration,
         int retryCount = 1,
         int maximumCacheEntries = 32,
-        IPersistentJobCache? persistentCache = null)
+        IPersistentJobCache? persistentCache = null,
+        string? cacheKeyNamespace = null)
     {
         ArgumentNullException.ThrowIfNull(inner);
         ArgumentNullException.ThrowIfNull(concurrencyGate);
@@ -39,6 +41,7 @@ public sealed class ResilientJobSource : IJobSource
         _retryCount = retryCount;
         _maximumCacheEntries = maximumCacheEntries;
         _persistentCache = persistentCache;
+        _cacheKeyNamespace = cacheKeyNamespace?.Trim() ?? string.Empty;
     }
 
     public string Name => _inner.Name;
@@ -175,8 +178,9 @@ public sealed class ResilientJobSource : IJobSource
         return false;
     }
 
-    private static string CreateCacheKey(JobSearchQuery query) => string.Join(
+    private string CreateCacheKey(JobSearchQuery query) => string.Join(
         '|',
+        _cacheKeyNamespace,
         Normalize(query.Keywords),
         Normalize(query.Locations),
         Normalize(query.WorkModels.Select(value => value.ToString())),

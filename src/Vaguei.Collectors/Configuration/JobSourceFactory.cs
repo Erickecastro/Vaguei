@@ -18,7 +18,8 @@ public static class JobSourceFactory
         IReadOnlySet<string>? persistentCacheExclusions = null,
         int smartRecruitersMaximumSearchTerms = 6,
         TimeSpan? smartRecruitersCompanyTimeout = null,
-        bool greenhouseIncludeContent = true)
+        bool greenhouseIncludeContent = true,
+        string? cacheKeyNamespace = null)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
         catalog ??= JobSourceCatalog.Load();
@@ -65,7 +66,8 @@ public static class JobSourceFactory
                 maximumCacheEntries: 32,
                 persistentCache: persistentCacheExclusions?.Contains(source.Name) == true
                     ? null
-                    : persistentCache))
+                    : persistentCache,
+                cacheKeyNamespace: cacheKeyNamespace))
             .ToArray();
     }
 }

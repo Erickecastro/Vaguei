@@ -128,7 +128,7 @@ public sealed class InHireJobSource : IJobSource
                 Company = company,
                 Description = JobSourceMapping.PlainText(job.Description),
                 Location = JobSourceMapping.MapLocation(job.Location),
-                Url = Uri.TryCreate(summary.Link, UriKind.Absolute, out var uri) ? uri : null,
+                Url = GetPublicUrl(tenantId, summary),
                 Source = Name,
                 SourcePostingId = $"{tenantId}:{summary.JobId}",
                 WorkModel = JobSourceMapping.MapWorkModel(job.Location, job.WorkplaceType),
@@ -160,6 +160,35 @@ public sealed class InHireJobSource : IJobSource
         var request = new HttpRequestMessage(method, url);
         request.Headers.Add("X-Tenant", tenantId);
         return request;
+    }
+
+    private static Uri? GetPublicUrl(
+        string tenantId,
+        InHireJobSummary summary)
+    {
+        if (!Uri.TryCreate(summary.Link, UriKind.Absolute, out var sourceUri) ||
+            (!sourceUri.Scheme.Equals(Uri.UriSchemeHttp, StringComparison.OrdinalIgnoreCase) &&
+             !sourceUri.Scheme.Equals(Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase)))
+        {
+            return null;
+        }
+
+        // A API pública ainda pode devolver o domínio legado *.inhire.com.br,
+        // que não resolve em parte das redes móveis. A página pública atual
+        // usa *.inhire.app; preservamos o caminho e a consulta originais.
+        if (sourceUri.Host.EndsWith(".inhire.com.br", StringComparison.OrdinalIgnoreCase))
+        {
+            var canonicalHost = $"{tenantId}.inhire.app";
+            var builder = new UriBuilder(sourceUri)
+            {
+                Scheme = Uri.UriSchemeHttps,
+                Host = canonicalHost,
+                Port = -1
+            };
+            return builder.Uri;
+        }
+
+        return sourceUri;
     }
 
     private sealed record TenantResult(bool Succeeded, IReadOnlyCollection<JobPosting> Jobs);

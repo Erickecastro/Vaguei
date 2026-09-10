@@ -62,7 +62,11 @@ public static class MauiProgram
                 persistentCacheExclusions: new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 {
                     "Greenhouse"
-                });
+                },
+                // Evita reutilizar entradas pequenas obtidas pela política
+                // móvel anterior. Não apaga dados locais; apenas separa o
+                // cache de cobertura atual das consultas antigas.
+                cacheKeyNamespace: "android-coverage-v2");
 
             return new MainViewModel(
                 new ResumeParserService(
