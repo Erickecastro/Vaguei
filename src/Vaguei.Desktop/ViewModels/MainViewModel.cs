@@ -825,7 +825,7 @@ public partial class MainViewModel : ViewModelBase
 
         var responsiveSources = values.Count(summary => summary.Succeeded);
         var collectedJobs = values.Sum(summary => summary.JobCount);
-        return $"Fontes ativas: {responsiveSources}/{values.Length} · {collectedJobs} vagas coletadas";
+        return $"Consultadas: {responsiveSources}/{values.Length} fontes · {collectedJobs} vagas avaliadas";
     }
 
     private static string CreateSearchCoverageLabel(

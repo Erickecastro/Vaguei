@@ -10,7 +10,10 @@ namespace Vaguei.Collectors.Sources;
 
 public sealed class ArbeitnowJobSource : IJobSource
 {
-    private const int MaximumPages = 3;
+    // A API é paginada e a primeira página não representa todo o catálogo.
+    // Seis páginas ampliam a descoberta sem transformar uma fonte secundária
+    // em uma coleta ilimitada.
+    private const int MaximumPages = 6;
     private readonly HttpClient _httpClient;
 
     public ArbeitnowJobSource(HttpClient httpClient)

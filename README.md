@@ -240,7 +240,7 @@ adb install -r src/Vaguei.Maui/bin/Debug/net10.0-android/android-arm64/Vaguei-de
 adb shell monkey -p com.erickecastro.vaguei.maui -c android.intent.category.LAUNCHER 1
 ```
 
-The MAUI Android application is currently at version `0.1.16` (`versionCode` 17) and remains a test build, not a Play Store release. Its package id is `com.erickecastro.vaguei.maui`. The superseded Avalonia Android prototype has been removed; Avalonia remains the desktop UI technology. Current mobile capabilities, limitations and the complete device checklist are documented in [`docs/MOBILE_PROTOTYPE.md`](docs/MOBILE_PROTOTYPE.md) and [`docs/ANDROID_TESTING.md`](docs/ANDROID_TESTING.md).
+The MAUI Android application is currently at version `0.1.17` (`versionCode` 18) and remains a test build, not a Play Store release. Its package id is `com.erickecastro.vaguei.maui`. The superseded Avalonia Android prototype has been removed; Avalonia remains the desktop UI technology. Current mobile capabilities, limitations and the complete device checklist are documented in [`docs/MOBILE_PROTOTYPE.md`](docs/MOBILE_PROTOTYPE.md) and [`docs/ANDROID_TESTING.md`](docs/ANDROID_TESTING.md).
 
 For local diagnostics, run the CLI with a resume path:
 

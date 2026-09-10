@@ -359,7 +359,7 @@ public sealed class MainViewModelTests
 
         await viewModel.RefreshJobsCommand.ExecuteAsync(null);
 
-        Assert.Contains("Fontes ativas: 1/1", viewModel.SourceCoverageSummary);
+        Assert.Contains("Consultadas: 1/1", viewModel.SourceCoverageSummary);
     }
 
     [Fact]

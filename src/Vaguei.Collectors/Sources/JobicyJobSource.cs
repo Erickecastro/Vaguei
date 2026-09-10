@@ -12,6 +12,7 @@ namespace Vaguei.Collectors.Sources;
 public sealed class JobicyJobSource : IJobSource
 {
     private static readonly TimeSpan CacheDuration = TimeSpan.FromHours(1);
+    private const int RequestedJobCount = 500;
     private readonly HttpClient _httpClient;
     private readonly SemaphoreSlim _cacheGate = new(1, 1);
     private IReadOnlyCollection<JobPosting> _cachedJobs = [];
@@ -46,7 +47,7 @@ public sealed class JobicyJobSource : IJobSource
             if (_cacheExpiresAt > DateTimeOffset.UtcNow) return _cachedJobs;
 
             var response = await _httpClient.GetFromJsonAsync<JobicyResponse>(
-                "https://jobicy.com/api/v2/remote-jobs?count=200",
+                $"https://jobicy.com/api/v2/remote-jobs?count={RequestedJobCount}",
                 cancellationToken);
             _cachedJobs = response?.Jobs.Select(MapJob).ToArray() ?? [];
             _cacheExpiresAt = DateTimeOffset.UtcNow.Add(CacheDuration);

@@ -9,6 +9,8 @@ namespace Vaguei.Collectors.Sources;
 
 public sealed class SmartRecruitersJobSource : IJobSource
 {
+    private const int PageSize = 100;
+    private const int MaximumPagesPerSearchTerm = 3;
     public static readonly IReadOnlyDictionary<string, string> DefaultCompanies =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -128,24 +130,41 @@ public sealed class SmartRecruitersJobSource : IJobSource
         JobSearchQuery query,
         CancellationToken cancellationToken)
     {
-        var parameters = new List<string> { "limit=100" };
-        if (!string.IsNullOrWhiteSpace(searchTerm))
+        var summaries = new List<SmartRecruitersSummary>();
+
+        for (var page = 0; page < MaximumPagesPerSearchTerm; page++)
         {
-            parameters.Add($"q={Uri.EscapeDataString(searchTerm)}");
+            var parameters = new List<string>
+            {
+                $"limit={PageSize}",
+                $"offset={page * PageSize}"
+            };
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                parameters.Add($"q={Uri.EscapeDataString(searchTerm)}");
+            }
+
+            if (query.Locations.Any(IsBrazilTerm))
+            {
+                parameters.Add("country=br");
+            }
+
+            var url =
+                $"{ApiBaseUrl}/{Uri.EscapeDataString(identifier)}/postings?{string.Join('&', parameters)}";
+            var response = await _httpClient.GetFromJsonAsync<SmartRecruitersListResponse>(
+                url,
+                cancellationToken);
+            var pageItems = response?.Content ?? [];
+            summaries.AddRange(pageItems);
+
+            if (pageItems.Count < PageSize ||
+                (response?.TotalFound is int totalFound && totalFound <= summaries.Count))
+            {
+                break;
+            }
         }
 
-        if (query.Locations.Any(IsBrazilTerm))
-        {
-            parameters.Add("country=br");
-        }
-
-        var url =
-            $"{ApiBaseUrl}/{Uri.EscapeDataString(identifier)}/postings?{string.Join('&', parameters)}";
-        var response = await _httpClient.GetFromJsonAsync<SmartRecruitersListResponse>(
-            url,
-            cancellationToken);
-
-        return response?.Content ?? [];
+        return summaries;
     }
 
     private async Task<JobPosting?> GetJobAsync(
@@ -243,6 +262,9 @@ public sealed class SmartRecruitersJobSource : IJobSource
     {
         [JsonPropertyName("content")]
         public List<SmartRecruitersSummary> Content { get; init; } = [];
+
+        [JsonPropertyName("totalFound")]
+        public int? TotalFound { get; init; }
     }
 
     private sealed class SmartRecruitersSummary

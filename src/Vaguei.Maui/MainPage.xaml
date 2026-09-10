@@ -135,6 +135,9 @@
                  TextColor="{AppThemeBinding Light=#626879, Dark=#B5B5B5}" />
           <Label Text="{Binding SearchCoverageLabel}" IsVisible="{Binding HasSearchCoverage}"
                  FontSize="10" TextColor="{AppThemeBinding Light=#626879, Dark=#B5B5B5}" />
+          <Label Text="{Binding SourceCoverageSummary}" FontSize="10"
+                 IsVisible="{Binding HasResults}"
+                 TextColor="{AppThemeBinding Light=#626879, Dark=#B5B5B5}" />
         </VerticalStackLayout>
       </Grid>
 
