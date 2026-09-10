@@ -75,6 +75,9 @@ public sealed class JobSourceCatalogTests
         Assert.Equal("dLocal", catalog.Lever["dlocal"]);
         Assert.Equal("Wildlife Studios", catalog.Greenhouse["wildlifestudios"]);
         Assert.Equal("AlphaSights", catalog.Greenhouse["alphasights"]);
+        Assert.Equal("Wabtec", catalog.SmartRecruiters["Wabtec"]);
+        Assert.Equal("Anglo American", catalog.SmartRecruiters["AngloAmericanDeBeersGroup"]);
+        Assert.Equal("Continental", catalog.SmartRecruiters["Continental"]);
     }
 
     private static string CreateTemporaryCatalog(string contents)

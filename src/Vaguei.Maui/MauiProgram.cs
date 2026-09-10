@@ -66,7 +66,7 @@ public static class MauiProgram
                 // Evita reutilizar entradas pequenas obtidas pela política
                 // móvel anterior. Não apaga dados locais; apenas separa o
                 // cache de cobertura atual das consultas antigas.
-                cacheKeyNamespace: "android-coverage-v3");
+                cacheKeyNamespace: "android-coverage-v4");
 
             return new MainViewModel(
                 new ResumeParserService(

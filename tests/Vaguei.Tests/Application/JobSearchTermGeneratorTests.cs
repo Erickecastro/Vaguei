@@ -177,6 +177,27 @@ public sealed class JobSearchTermGeneratorTests
     }
 
     [Theory]
+    [InlineData("trainee", "graduate program")]
+    [InlineData("gerente", "manager")]
+    [InlineData("operador", "production operator")]
+    [InlineData("supervisora", "supervisor")]
+    [InlineData("coordenador", "coordinator")]
+    [InlineData("técnico", "technician")]
+    public void Generate_ExpandsCommonCrossIndustryRoles(
+        string search,
+        string expectedVariant)
+    {
+        var preferences = new JobSearchPreferences();
+        preferences.DesiredRoles.Add(search);
+
+        var terms = new JobSearchTermGenerator().Generate(
+            new CandidateProfile(),
+            preferences);
+
+        Assert.Contains(expectedVariant, terms, StringComparer.OrdinalIgnoreCase);
+    }
+
+    [Theory]
     [InlineData("Analista de Dados", "data analyst")]
     [InlineData("Engenheira de Software", "software engineer")]
     [InlineData("Recursos Humanos", "human resources")]

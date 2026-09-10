@@ -65,7 +65,7 @@ Software development is the initial validation domain because it reflects the fi
 * Brazilian location recognition and national-only filtering
 * Publication-date filtering
 * Duplicate removal using stable provider identifiers plus canonical employer names, title, location, URL, and description similarity
-* Role normalization and controlled search-term expansion, including plural, program and Portuguese/English internship variants
+* Role normalization and controlled search-term expansion for technology and cross-industry roles, including trainee, management, operations, supervision, coordination, technical work, and Portuguese/English internship variants
 * Controlled bilingual variants for common technology, data, administration, finance, HR, design, engineering, accounting, healthcare, logistics, and sales roles
 * Compatibility based on role and skills, with distinct explainable feedback for missing core skills and required spoken languages
 * Limited, explainable adjustments for experience, education, known mandatory certifications, and language proficiency when both sides provide evidence
@@ -88,7 +88,7 @@ Vaguei currently reads anonymous, read-only job data from public endpoints or pu
 * SmartRecruiters
 * Workable
 
-The repository contains a curated employer catalog for sources that require a board, tenant, site, company, or account identifier. This includes the public Sidia page on InHire and Brazilian coverage such as CI&T, Wildlife Studios, dLocal, EBANX, QuintoAndar, Wellhub, and others across the supported providers. The shared catalog lives in [`config/job-sources.json`](config/job-sources.json), is copied into Desktop and CLI builds, and falls back to validated built-in defaults when it is missing or malformed.
+The repository contains a curated employer catalog for sources that require a board, tenant, site, company, or account identifier. This includes the public Sidia page on InHire and Brazilian coverage such as Anglo American, Applus+ IDIADA, Aumovio, CI&T, Continental, dLocal, EBANX, JDE Peet's, QuintoAndar, Wabtec, Wellhub, Wildlife Studios, and others across the supported providers. The shared catalog lives in [`config/job-sources.json`](config/job-sources.json), is copied into Desktop and CLI builds, and falls back to validated built-in defaults when it is missing or malformed.
 
 The current integration does **not** scrape authenticated or protected pages. LinkedIn, Gupy, Catho, and similar platforms will only be integrated through an official API, an approved partnership, an employer-owned public feed, or another method explicitly permitted by their terms. Vaguei does not attempt to bypass authentication, anti-bot protection, rate limits, or access controls.
 
@@ -240,7 +240,7 @@ adb install -r src/Vaguei.Maui/bin/Debug/net10.0-android/android-arm64/Vaguei-de
 adb shell monkey -p com.erickecastro.vaguei.maui -c android.intent.category.LAUNCHER 1
 ```
 
-The MAUI Android application is currently at version `0.1.18` (`versionCode` 19) and remains a test build, not a Play Store release. Its package id is `com.erickecastro.vaguei.maui`. The superseded Avalonia Android prototype has been removed; Avalonia remains the desktop UI technology. Current mobile capabilities, limitations and the complete device checklist are documented in [`docs/MOBILE_PROTOTYPE.md`](docs/MOBILE_PROTOTYPE.md) and [`docs/ANDROID_TESTING.md`](docs/ANDROID_TESTING.md).
+The MAUI Android application is currently at version `0.1.19` (`versionCode` 20) and remains a test build, not a Play Store release. Its package id is `com.erickecastro.vaguei.maui`. The superseded Avalonia Android prototype has been removed; Avalonia remains the desktop UI technology. Current mobile capabilities, limitations and the complete device checklist are documented in [`docs/MOBILE_PROTOTYPE.md`](docs/MOBILE_PROTOTYPE.md) and [`docs/ANDROID_TESTING.md`](docs/ANDROID_TESTING.md).
 
 For local diagnostics, run the CLI with a resume path:
 

@@ -21,7 +21,13 @@ public sealed class SmartRecruitersJobSource : IJobSource
             ["keycommerce"] = "KeyCommerce",
             ["SeInspire"] = "Se Inspire",
             ["adimplere"] = "Adimplere",
-            ["PimpMyCarroa"] = "Pimp My Carroça"
+            ["PimpMyCarroa"] = "Pimp My Carroça",
+            ["Wabtec"] = "Wabtec",
+            ["AngloAmericanDeBeersGroup"] = "Anglo American",
+            ["ApplusIDIADA1"] = "Applus+ IDIADA",
+            ["Continental"] = "Continental",
+            ["JACOBSDOUWEEGBERTS"] = "JDE Peet's",
+            ["Aumovio"] = "Aumovio"
         };
 
     private const string ApiBaseUrl = "https://api.smartrecruiters.com/v1/companies";
