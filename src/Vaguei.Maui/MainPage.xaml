@@ -133,6 +133,8 @@
           <Label Text="Oportunidades" FontSize="21" FontAttributes="Bold" />
           <Label Text="{Binding StatusMessage}" MaxLines="1" LineBreakMode="TailTruncation" FontSize="11"
                  TextColor="{AppThemeBinding Light=#626879, Dark=#B5B5B5}" />
+          <Label Text="{Binding SearchCoverageLabel}" IsVisible="{Binding HasSearchCoverage}"
+                 FontSize="10" TextColor="{AppThemeBinding Light=#626879, Dark=#B5B5B5}" />
         </VerticalStackLayout>
       </Grid>
 

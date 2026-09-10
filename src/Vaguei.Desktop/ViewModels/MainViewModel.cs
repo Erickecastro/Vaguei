@@ -63,13 +63,17 @@ public partial class MainViewModel : ViewModelBase
     private string _sourceCoverageSummary = string.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasSearchCoverage))]
+    private string _searchCoverageLabel = string.Empty;
+
+    [ObservableProperty]
     private bool _includeInternational;
 
     [ObservableProperty]
     private int _searchScopeIndex;
 
     [ObservableProperty]
-    private int _publicationWindowIndex = 3;
+    private int _publicationWindowIndex;
 
     [ObservableProperty]
     private int _workModelIndex;
@@ -229,12 +233,14 @@ public partial class MainViewModel : ViewModelBase
 
     public bool ShowResultsContent => HasSearchCompleted;
 
+    public bool HasSearchCoverage => !string.IsNullOrWhiteSpace(SearchCoverageLabel);
+
     public bool ShowJobArea => IsBusy || HasResults;
 
     public bool HasAdditionalSkills => AdditionalSkillCount > 0;
 
     public bool HasActiveFilters =>
-        PublicationWindowIndex != 3 ||
+        PublicationWindowIndex != 0 ||
         WorkModelIndex != 0 ||
         EmploymentTypeIndex != 0 ||
         SeniorityIndex != 0 ||
@@ -271,6 +277,7 @@ public partial class MainViewModel : ViewModelBase
         _currentProfile = null;
         RefreshJobsCommand.NotifyCanExecuteChanged();
         SourceWarnings = string.Empty;
+        SearchCoverageLabel = string.Empty;
         Jobs.Clear();
         _allJobs.Clear();
         SelectedFileName = Path.GetFileName(filePath);
@@ -335,6 +342,7 @@ public partial class MainViewModel : ViewModelBase
         _allJobs.Clear();
         HasResults = false;
         HasSearchCompleted = false;
+        SearchCoverageLabel = string.Empty;
 
         if (_networkAvailable?.Invoke() == false)
         {
@@ -451,7 +459,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void ClearAdvancedFilters()
     {
-        PublicationWindowIndex = 3;
+        PublicationWindowIndex = 0;
         WorkModelIndex = 0;
         EmploymentTypeIndex = 0;
         SeniorityIndex = 0;
@@ -514,6 +522,7 @@ public partial class MainViewModel : ViewModelBase
         HasSearchCompleted = false;
         SourceWarnings = string.Empty;
         SourceCoverageSummary = string.Empty;
+        SearchCoverageLabel = string.Empty;
         StatusMessage = HasProfile
             ? "Perfil pronto. Ajuste a busca ou pesquise novamente."
             : "Digite um cargo, tecnologia ou empresa para pesquisar.";
@@ -526,6 +535,7 @@ public partial class MainViewModel : ViewModelBase
         StatusMessage = "Buscando novas oportunidades...";
         SourceWarnings = string.Empty;
         SourceCoverageSummary = string.Empty;
+        SearchCoverageLabel = string.Empty;
 
         var preferences = new JobSearchPreferences
         {
@@ -680,6 +690,9 @@ public partial class MainViewModel : ViewModelBase
 
         SourceCoverageSummary = CreateSourceCoverageSummary(
             result.SourceSummaries);
+        SearchCoverageLabel = CreateSearchCoverageLabel(
+            result.SourceSummaries,
+            _allJobs.Count > 0);
 
         StatusMessage = result.AllSourcesFailed && !connectionUnavailable
             ? "As fontes de vagas estão temporariamente indisponíveis. Tente novamente em instantes."
@@ -800,7 +813,7 @@ public partial class MainViewModel : ViewModelBase
             2 => JobPublicationWindow.Last7Days,
             3 => JobPublicationWindow.Last30Days,
             4 => JobPublicationWindow.Last3Months,
-            _ => JobPublicationWindow.Last30Days
+            _ => JobPublicationWindow.Last24Hours
         };
     }
 
@@ -813,6 +826,25 @@ public partial class MainViewModel : ViewModelBase
         var responsiveSources = values.Count(summary => summary.Succeeded);
         var collectedJobs = values.Sum(summary => summary.JobCount);
         return $"Fontes ativas: {responsiveSources}/{values.Length} · {collectedJobs} vagas coletadas";
+    }
+
+    private static string CreateSearchCoverageLabel(
+        IEnumerable<JobSourceSearchSummary> summaries,
+        bool hasResults)
+    {
+        if (!hasResults)
+        {
+            return string.Empty;
+        }
+
+        var responsiveSources = summaries.Count(summary => summary.Succeeded);
+
+        return responsiveSources switch
+        {
+            <= 0 => string.Empty,
+            1 => "Resultado consultado em 1 fonte",
+            _ => $"Resultado consultado em {responsiveSources} fontes"
+        };
     }
 
     private WorkModel? GetSelectedWorkModel()

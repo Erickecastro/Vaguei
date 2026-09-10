@@ -32,16 +32,19 @@ public static class MauiProgram
             var sources = JobSourceFactory.Create(
                 provider.GetRequiredService<HttpClient>(),
                 catalog,
-                sourceTimeout: TimeSpan.FromSeconds(12),
+                // O orçamento móvel precisa acomodar fontes públicas que
+                // respondem em ritmos diferentes. Todas continuam em paralelo;
+                // ampliar o limite evita perder uma fonte válida por alguns
+                // segundos, sem bloquear a interface.
+                sourceTimeout: TimeSpan.FromSeconds(22),
                 cacheDuration: TimeSpan.FromMinutes(30),
                 retryCount: 0,
                 maximumConcurrentSources: 9,
                 // Catálogos brasileiros são consultados por empresa. Duas
-                // palavras-chave e quatro segundos por empresa produzem uma
-                // primeira cobertura útil sem deixar uma empresa lenta consumir
-                // todo o orçamento da pesquisa móvel.
-                smartRecruitersMaximumSearchTerms: 2,
-                smartRecruitersCompanyTimeout: TimeSpan.FromSeconds(4),
+                // Quatro variações cobrem buscas em português e inglês sem
+                // transformar a pesquisa em uma sequência de requisições.
+                smartRecruitersMaximumSearchTerms: 4,
+                smartRecruitersCompanyTimeout: TimeSpan.FromSeconds(7),
                 // Para a primeira cobertura móvel, título, local, data e áreas
                 // são suficientes para filtrar. Evitamos baixar HTML completo
                 // de todos os quadros Greenhouse antes de mostrar as vagas.
@@ -67,7 +70,7 @@ public static class MauiProgram
                 new JobSearchOrchestrator(sources),
                 new JsonFavoriteJobStore(),
                 new JsonJobSearchSettingsStore(),
-                searchTimeout: TimeSpan.FromSeconds(16),
+                searchTimeout: TimeSpan.FromSeconds(32),
                 networkAvailable: () => Connectivity.Current.NetworkAccess ==
                     NetworkAccess.Internet);
         });

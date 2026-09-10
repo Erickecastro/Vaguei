@@ -28,7 +28,7 @@ public sealed class MainViewModelTests
                 "Últimos 3 meses"
             ],
             viewModel.PublicationWindows);
-        Assert.Equal(3, viewModel.PublicationWindowIndex);
+        Assert.Equal(0, viewModel.PublicationWindowIndex);
         Assert.Equal(
             ["Qualquer modelo", "Remoto", "Híbrido", "Presencial"],
             viewModel.WorkModelOptions);
@@ -271,7 +271,7 @@ public sealed class MainViewModelTests
         viewModel.ClearAdvancedFiltersCommand.Execute(null);
 
         Assert.Equal(0, viewModel.WorkModelIndex);
-        Assert.Equal(3, viewModel.PublicationWindowIndex);
+        Assert.Equal(0, viewModel.PublicationWindowIndex);
         Assert.Equal(0, viewModel.EmploymentTypeIndex);
         Assert.Equal(0, viewModel.SeniorityIndex);
         Assert.Empty(viewModel.LocationFilter);

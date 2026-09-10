@@ -52,7 +52,7 @@ public sealed class JsonJobSearchSettingsStoreTests
             File.WriteAllText(path, "invalid json");
             var loaded = new JsonJobSearchSettingsStore(path).Load();
 
-            Assert.Equal(3, loaded.PublicationWindowIndex);
+            Assert.Equal(0, loaded.PublicationWindowIndex);
             Assert.Empty(loaded.LocationFilter);
         }
         finally

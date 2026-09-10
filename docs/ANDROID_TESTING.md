@@ -18,7 +18,10 @@ adb devices -l
 O APK de debug não é versionado no Git. Depois de compilá-lo, instale com:
 
 ```bash
-adb install -r src/Vaguei.Maui/bin/Debug/net10.0-android/com.erickecastro.vaguei.maui-Signed.apk
+export ANDROID_SDK_ROOT=/caminho/para/o/Android/Sdk
+export JAVA_HOME=/caminho/para/o/jdk-21
+./scripts/build-android-apk.sh
+adb install -r src/Vaguei.Maui/bin/Debug/net10.0-android/android-arm64/Vaguei-debug-arm64.apk
 ```
 
 Para substituir completamente uma instalação anterior de teste — inclusive dados,
@@ -26,12 +29,12 @@ preferências e favoritos locais — desinstale antes e instale novamente:
 
 ```bash
 adb uninstall com.erickecastro.vaguei.maui
-adb install src/Vaguei.Maui/bin/Debug/net10.0-android/com.erickecastro.vaguei.maui-Signed.apk
+adb install src/Vaguei.Maui/bin/Debug/net10.0-android/android-arm64/Vaguei-debug-arm64.apk
 ```
 
 Use `adb install -r` quando quiser atualizar o aplicativo sem apagar dados locais.
 
-A configuração de debug incorpora os assemblies .NET no APK e não depende de Fast Deployment, portanto o arquivo funciona com instalação manual por `adb install` sem depender do pipeline do IDE.
+A configuração de debug incorpora os assemblies .NET no APK e não depende de Fast Deployment, portanto o arquivo funciona com instalação manual por `adb install` sem depender do pipeline do IDE. O script gera somente `arm64`, alinha o pacote e valida a assinatura Android antes de exibir o caminho do APK.
 
 A inicialização dessa configuração foi validada em um aparelho ARM64 real, com Android 16: o processo permaneceu ativo e o buffer de crashes ficou vazio.
 
