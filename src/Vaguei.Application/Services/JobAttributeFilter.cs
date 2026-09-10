@@ -37,9 +37,14 @@ public sealed class JobAttributeFilter
                 text,
                 "estágio",
                 "estagio",
+                "estágios",
+                "estagios",
                 "estagiário",
                 "estagiaria",
                 "estagiária",
+                "estagiários",
+                "estagiarias",
+                "estagiárias",
                 "internship",
                 " intern "))
         {

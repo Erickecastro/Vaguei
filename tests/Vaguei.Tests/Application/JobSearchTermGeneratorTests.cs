@@ -168,8 +168,10 @@ public sealed class JobSearchTermGeneratorTests
 
         Assert.Contains("Estágio", terms);
         Assert.Contains("estagio", terms);
+        Assert.Contains("programa de estágio", terms);
         Assert.Contains("estagiário", terms);
         Assert.Contains("estagiaria", terms);
+        Assert.Contains("estágios", terms);
         Assert.Contains("internship", terms);
         Assert.Contains("intern", terms);
     }

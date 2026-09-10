@@ -31,7 +31,20 @@ public sealed class JobSearchTermGenerator
         DesiredRoleVariants =
         [
             (new Regex(@"\b(est[aá]gio|estagi[aá]ri[oa]|intern(ship)?)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
-                ["estagio", "estagiário", "estagiaria", "internship", "intern"]),
+                [
+                    "estagio",
+                    "estágio",
+                    "internship",
+                    "intern",
+                    "programa de estágio",
+                    "estagiário",
+                    "estagiaria",
+                    "programa de estagio",
+                    "estágios",
+                    "estagios",
+                    "estagiários",
+                    "estagiarias"
+                ]),
             (new Regex(@"\b(analista de dados|data analyst)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
                 ["analista de dados", "data analyst"]),
             (new Regex(@"\b(cientista de dados|data scientist)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),

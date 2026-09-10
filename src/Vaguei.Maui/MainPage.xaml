@@ -90,7 +90,7 @@
                   Clicked="OnSearchButtonClicked"
                   BackgroundColor="{AppThemeBinding Light=#5856D6, Dark=#F0F0F0}"
                   TextColor="{AppThemeBinding Light=White, Dark=#151515}" FontAttributes="Bold" />
-          <Button Grid.Column="1" Text="Filtros" Clicked="OnFiltersClicked" />
+          <Button x:Name="FiltersButton" Grid.Column="1" Text="Filtros" Clicked="OnFiltersClicked" />
         </Grid>
       </VerticalStackLayout>
     </Grid>
@@ -192,13 +192,16 @@
             <TapGestureRecognizer Tapped="OnFiltersCloseClicked" />
           </Border.GestureRecognizers>
         </Border>
-        <Button Grid.Row="1" Text="{Binding SelectedSearchScopeLabel}" Clicked="OnSearchScopeFilterClicked" />
-        <Button Grid.Row="1" Grid.Column="1" Text="{Binding SelectedPublicationWindowLabel}" Clicked="OnPublicationFilterClicked" />
-        <Entry Grid.Row="2" Placeholder="Cidade ou estado" Text="{Binding LocationFilter}" />
-        <Button Grid.Row="2" Grid.Column="1" Text="{Binding SelectedWorkModelLabel}" Clicked="OnWorkModelFilterClicked" />
-        <Button Grid.Row="3" Text="{Binding SelectedEmploymentTypeLabel}" Clicked="OnEmploymentFilterClicked" />
-        <Button Grid.Row="3" Grid.Column="1" Text="{Binding SelectedSeniorityLabel}" Clicked="OnSeniorityFilterClicked" />
-        <Button Grid.Row="4" Grid.ColumnSpan="2" Text="Limpar filtros" Command="{Binding ClearAdvancedFiltersCommand}" />
+        <Button x:Name="SearchScopeFilterButton" Grid.Row="1" Clicked="OnSearchScopeFilterClicked" />
+        <Button x:Name="PublicationFilterButton" Grid.Row="1" Grid.Column="1" Clicked="OnPublicationFilterClicked" />
+        <Entry x:Name="LocationFilterEntry" Grid.Row="2" Placeholder="Cidade ou estado" TextChanged="OnPendingLocationChanged" />
+        <Button x:Name="WorkModelFilterButton" Grid.Row="2" Grid.Column="1" Clicked="OnWorkModelFilterClicked" />
+        <Button x:Name="EmploymentFilterButton" Grid.Row="3" Clicked="OnEmploymentFilterClicked" />
+        <Button x:Name="SeniorityFilterButton" Grid.Row="3" Grid.Column="1" Clicked="OnSeniorityFilterClicked" />
+        <Button Grid.Row="4" Text="Limpar" Clicked="OnClearPendingFiltersClicked" />
+        <Button Grid.Row="4" Grid.Column="1" Text="Aplicar filtros" Clicked="OnApplyFiltersClicked"
+                BackgroundColor="{AppThemeBinding Light=#5856D6, Dark=#F0F0F0}"
+                TextColor="{AppThemeBinding Light=White, Dark=#151515}" />
         </Grid>
       </Border>
     </Grid>

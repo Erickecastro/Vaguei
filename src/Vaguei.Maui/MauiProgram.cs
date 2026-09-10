@@ -46,10 +46,10 @@ public static class MauiProgram
                 // saturar a pilha de rede de aparelhos intermediários.
                 retryCount: 1,
                 maximumConcurrentSources: 5,
-                // Catálogos brasileiros são consultados por empresa. Duas
-                // Quatro variações cobrem buscas em português e inglês sem
-                // transformar a pesquisa em uma sequência de requisições.
-                smartRecruitersMaximumSearchTerms: 6,
+                // Catálogos brasileiros são consultados por empresa. Oito
+                // variações cobrem sinônimos de cargo em português e inglês,
+                // incluindo estágio/internship, sem serializar a pesquisa.
+                smartRecruitersMaximumSearchTerms: 8,
                 smartRecruitersCompanyTimeout: TimeSpan.FromSeconds(10),
                 // Para a primeira cobertura móvel, título, local, data e áreas
                 // são suficientes para filtrar. Evitamos baixar HTML completo
@@ -66,7 +66,7 @@ public static class MauiProgram
                 // Evita reutilizar entradas pequenas obtidas pela política
                 // móvel anterior. Não apaga dados locais; apenas separa o
                 // cache de cobertura atual das consultas antigas.
-                cacheKeyNamespace: "android-coverage-v2");
+                cacheKeyNamespace: "android-coverage-v3");
 
             return new MainViewModel(
                 new ResumeParserService(

@@ -9,6 +9,12 @@ public partial class MainPage : ContentPage
     private Action<int>? _applyFilterSelection;
     private CancellationTokenSource? _searchPulseCancellation;
     private CancellationTokenSource? _networkLossDebounceCancellation;
+    private int _pendingSearchScopeIndex;
+    private int _pendingPublicationWindowIndex;
+    private int _pendingWorkModelIndex;
+    private int _pendingEmploymentTypeIndex;
+    private int _pendingSeniorityIndex;
+    private string _pendingLocationFilter = string.Empty;
 
     private static readonly FilePickerFileType ResumeFiles = new(
         new Dictionary<DevicePlatform, IEnumerable<string>>
@@ -39,6 +45,7 @@ public partial class MainPage : ContentPage
         var app = Microsoft.Maui.Controls.Application.Current;
         if (app is not null && Platform.CurrentActivity is MainActivity activity)
             activity.ApplySystemBars(app.RequestedTheme == AppTheme.Dark);
+        UpdateFiltersButton();
         UpdateSearchPulse();
     }
 
@@ -85,8 +92,17 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private void OnFiltersClicked(object? sender, EventArgs eventArgs) =>
+    private void OnFiltersClicked(object? sender, EventArgs eventArgs)
+    {
+        _pendingSearchScopeIndex = ViewModel.SearchScopeIndex;
+        _pendingPublicationWindowIndex = ViewModel.PublicationWindowIndex;
+        _pendingWorkModelIndex = ViewModel.WorkModelIndex;
+        _pendingEmploymentTypeIndex = ViewModel.EmploymentTypeIndex;
+        _pendingSeniorityIndex = ViewModel.SeniorityIndex;
+        _pendingLocationFilter = ViewModel.LocationFilter;
+        RefreshPendingFilters();
         FiltersSheet.IsVisible = true;
+    }
 
     private void OnSearchButtonClicked(object? sender, EventArgs eventArgs) =>
         SearchEntry.Unfocus();
@@ -99,30 +115,30 @@ public partial class MainPage : ContentPage
     }
 
     private void OnFiltersCloseClicked(object? sender, EventArgs eventArgs) =>
-        FiltersSheet.IsVisible = false;
+        CloseFiltersWithoutApplying();
 
     private void OnFiltersBackdropClicked(object? sender, EventArgs eventArgs) =>
-        FiltersSheet.IsVisible = false;
+        CloseFiltersWithoutApplying();
 
     private void OnSearchScopeFilterClicked(object? sender, EventArgs eventArgs) =>
-        ShowFilterOptions("Região", ViewModel.SearchScopes, ViewModel.SearchScopeIndex,
-            value => ViewModel.SearchScopeIndex = value);
+        ShowFilterOptions("Região", ViewModel.SearchScopes, _pendingSearchScopeIndex,
+            value => _pendingSearchScopeIndex = value);
 
     private void OnPublicationFilterClicked(object? sender, EventArgs eventArgs) =>
-        ShowFilterOptions("Período", ViewModel.PublicationWindows, ViewModel.PublicationWindowIndex,
-            value => ViewModel.PublicationWindowIndex = value);
+        ShowFilterOptions("Período", ViewModel.PublicationWindows, _pendingPublicationWindowIndex,
+            value => _pendingPublicationWindowIndex = value);
 
     private void OnWorkModelFilterClicked(object? sender, EventArgs eventArgs) =>
-        ShowFilterOptions("Modelo de trabalho", ViewModel.WorkModelOptions, ViewModel.WorkModelIndex,
-            value => ViewModel.WorkModelIndex = value);
+        ShowFilterOptions("Modelo de trabalho", ViewModel.WorkModelOptions, _pendingWorkModelIndex,
+            value => _pendingWorkModelIndex = value);
 
     private void OnEmploymentFilterClicked(object? sender, EventArgs eventArgs) =>
-        ShowFilterOptions("Tipo de contrato", ViewModel.EmploymentTypeOptions, ViewModel.EmploymentTypeIndex,
-            value => ViewModel.EmploymentTypeIndex = value);
+        ShowFilterOptions("Tipo de contrato", ViewModel.EmploymentTypeOptions, _pendingEmploymentTypeIndex,
+            value => _pendingEmploymentTypeIndex = value);
 
     private void OnSeniorityFilterClicked(object? sender, EventArgs eventArgs) =>
-        ShowFilterOptions("Senioridade", ViewModel.SeniorityOptions, ViewModel.SeniorityIndex,
-            value => ViewModel.SeniorityIndex = value);
+        ShowFilterOptions("Senioridade", ViewModel.SeniorityOptions, _pendingSeniorityIndex,
+            value => _pendingSeniorityIndex = value);
 
     private void ShowFilterOptions(
         string title,
@@ -153,6 +169,7 @@ public partial class MainPage : ContentPage
         if (sender is Button { CommandParameter: int index })
             _applyFilterSelection?.Invoke(index);
         FilterOptionsOverlay.IsVisible = false;
+        RefreshPendingFilters();
     }
 
     private void OnFilterOptionsCloseClicked(object? sender, EventArgs eventArgs) =>
@@ -160,6 +177,63 @@ public partial class MainPage : ContentPage
 
     private void OnFilterOptionsBackdropClicked(object? sender, EventArgs eventArgs) =>
         FilterOptionsOverlay.IsVisible = false;
+
+    private void OnPendingLocationChanged(object? sender, TextChangedEventArgs eventArgs) =>
+        _pendingLocationFilter = eventArgs.NewTextValue ?? string.Empty;
+
+    private void OnClearPendingFiltersClicked(object? sender, EventArgs eventArgs)
+    {
+        _pendingSearchScopeIndex = 0;
+        _pendingPublicationWindowIndex = 0;
+        _pendingWorkModelIndex = 0;
+        _pendingEmploymentTypeIndex = 0;
+        _pendingSeniorityIndex = 0;
+        _pendingLocationFilter = string.Empty;
+        RefreshPendingFilters();
+    }
+
+    private void OnApplyFiltersClicked(object? sender, EventArgs eventArgs)
+    {
+        ViewModel.SearchScopeIndex = _pendingSearchScopeIndex;
+        ViewModel.PublicationWindowIndex = _pendingPublicationWindowIndex;
+        ViewModel.WorkModelIndex = _pendingWorkModelIndex;
+        ViewModel.EmploymentTypeIndex = _pendingEmploymentTypeIndex;
+        ViewModel.SeniorityIndex = _pendingSeniorityIndex;
+        ViewModel.LocationFilter = _pendingLocationFilter.Trim();
+        FiltersSheet.IsVisible = false;
+        UpdateFiltersButton();
+    }
+
+    private void CloseFiltersWithoutApplying()
+    {
+        FilterOptionsOverlay.IsVisible = false;
+        FiltersSheet.IsVisible = false;
+    }
+
+    private void RefreshPendingFilters()
+    {
+        SearchScopeFilterButton.Text = ViewModel.SearchScopes[_pendingSearchScopeIndex];
+        PublicationFilterButton.Text = ViewModel.PublicationWindows[_pendingPublicationWindowIndex];
+        WorkModelFilterButton.Text = ViewModel.WorkModelOptions[_pendingWorkModelIndex];
+        EmploymentFilterButton.Text = ViewModel.EmploymentTypeOptions[_pendingEmploymentTypeIndex];
+        SeniorityFilterButton.Text = ViewModel.SeniorityOptions[_pendingSeniorityIndex];
+        LocationFilterEntry.Text = _pendingLocationFilter;
+    }
+
+    private void UpdateFiltersButton()
+    {
+        var activeFilters = 0;
+        if (ViewModel.SearchScopeIndex != 0) activeFilters++;
+        if (ViewModel.PublicationWindowIndex != 0) activeFilters++;
+        if (ViewModel.WorkModelIndex != 0) activeFilters++;
+        if (ViewModel.EmploymentTypeIndex != 0) activeFilters++;
+        if (ViewModel.SeniorityIndex != 0) activeFilters++;
+        if (!string.IsNullOrWhiteSpace(ViewModel.LocationFilter)) activeFilters++;
+
+        FiltersButton.Text = activeFilters == 0
+            ? "Filtros"
+            : $"Filtros ({activeFilters})";
+    }
 
     private async void OnOpenJobRequested(object? sender, string url)
     {
