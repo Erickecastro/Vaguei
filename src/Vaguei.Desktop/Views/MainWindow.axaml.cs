@@ -172,6 +172,39 @@ public partial class MainWindow : Window
         viewModel.RefreshJobsCommand.Execute(null);
     }
 
+    private void OnWindowKeyDown(
+        object? sender,
+        KeyEventArgs eventArgs)
+    {
+        if (eventArgs.KeyModifiers.HasFlag(KeyModifiers.Control) &&
+            eventArgs.Key == Key.K)
+        {
+            SearchInput.Focus();
+            SearchInput.SelectAll();
+            eventArgs.Handled = true;
+            return;
+        }
+
+        if ((eventArgs.Key == Key.F5 ||
+             (eventArgs.KeyModifiers.HasFlag(KeyModifiers.Control) &&
+              eventArgs.Key == Key.Enter)) &&
+            DataContext is MainViewModel viewModel &&
+            viewModel.RefreshJobsCommand.CanExecute(null))
+        {
+            viewModel.RefreshJobsCommand.Execute(null);
+            eventArgs.Handled = true;
+            return;
+        }
+
+        if (eventArgs.Key == Key.Escape &&
+            SidebarSplitView.DisplayMode == SplitViewDisplayMode.Overlay &&
+            SidebarSplitView.IsPaneOpen)
+        {
+            SidebarSplitView.IsPaneOpen = false;
+            eventArgs.Handled = true;
+        }
+    }
+
     private static DoubleTransition CreateOpacityTransition(int milliseconds) =>
         new()
         {

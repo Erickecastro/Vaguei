@@ -40,7 +40,7 @@ Software development is the initial validation domain because it reflects the fi
 * Loading and search-attention states that keep work off the UI thread
 * Search refresh that clears stale results immediately and presents an explicit loading state
 * Theme-aware four-second startup introduction with a fixed logo and smooth fade sequence
-* Keyboard search submission with Enter
+* Keyboard search submission with Enter, Ctrl+Enter or F5; Ctrl+K focuses the search field and Escape closes the compact profile pane
 * Compact source-health summary without exposing provider exception details
 * Dismissible connection warning for confirmed network loss, without exposing provider exceptions
 * Original job link for every result
