@@ -30,6 +30,7 @@ Software development is the initial validation domain because it reflects the fi
 * Resume selection and drag-and-drop
 * Candidate sidebar with constrained scrolling and an adaptive overlay on narrow or short windows
 * Responsive, resizable, movable, and maximizable custom window
+* Compact custom title bar with icon-only minimize, maximize, and close controls plus theme-aware hover states
 * Direct search by role, technology, or company
 * Mutually exclusive Brazil-only and international-only scopes
 * Publication filters for 24 hours, 3 days, 7 days, 30 days, and 3 months

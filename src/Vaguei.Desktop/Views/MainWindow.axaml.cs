@@ -192,9 +192,12 @@ public partial class MainWindow : Window
     {
         if (eventArgs.Property == WindowStateProperty)
         {
-            WindowSurface.CornerRadius = WindowState == WindowState.Maximized
+            var isMaximized = WindowState == WindowState.Maximized;
+            WindowSurface.CornerRadius = isMaximized
                 ? new CornerRadius(0)
                 : new CornerRadius(12);
+            MaximizeGlyph.IsVisible = !isMaximized;
+            RestoreGlyph.IsVisible = isMaximized;
         }
     }
 
